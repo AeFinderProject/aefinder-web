@@ -43,7 +43,7 @@ export default function CreateAppStep2({
     if (res) {
       messageApi.open({
         type: 'success',
-        content: 'edit app success, next edit detail',
+        content: 'edit app success',
       });
       dispatch(setCurrentAppDetail(res));
       setCreateAppDrawerVisible(false);

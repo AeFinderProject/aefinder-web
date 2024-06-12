@@ -1,7 +1,10 @@
+import { ConfigProvider } from 'antd';
 import { AppProps } from 'next/app';
 import dynamic from 'next/dynamic';
 
 import '@/styles/globals.css';
+
+import theme from '@/lib/themeConfig';
 
 import Layout from '@/components/layout/Layout';
 import { StoreProvider } from '@/components/layout/StoreProvider';
@@ -21,10 +24,12 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <StoreProvider>
       <LoginProviderDynamic>
-        <Layout>
-          <Seo templateTitle='AeFinder' />
-          <Component {...pageProps} />
-        </Layout>
+        <ConfigProvider theme={theme}>
+          <Layout>
+            <Seo templateTitle='AeFinder' />
+            <Component {...pageProps} />
+          </Layout>
+        </ConfigProvider>
       </LoginProviderDynamic>
     </StoreProvider>
   );

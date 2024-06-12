@@ -40,3 +40,23 @@ export type GetAppListResponse = {
   items: CreateAppResponse[];
   totalCount: number;
 };
+
+export type GetLogRequest = {
+  appId: string;
+  version: string;
+  startTime: string;
+};
+
+export type GetLogResponse = {
+  timestamp: string;
+  environment: string;
+  app_log: {
+    eventId: number;
+    time: string;
+    message: string;
+    level: string;
+    exception: string;
+    appId: string;
+    version: string;
+  };
+};

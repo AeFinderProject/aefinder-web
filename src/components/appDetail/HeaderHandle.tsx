@@ -2,11 +2,13 @@ import { EditOutlined, SyncOutlined } from '@ant-design/icons';
 import { Button, Select } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
 import Image from 'next/image';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
+import DeployDrawer from '@/components/appDetail/DeployDrawer';
 import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
 
-import { useAppSelector } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { setCurrentVersion } from '@/store/slices/appSlice';
 
 import { AppStatusType } from '@/types/appType';
 
@@ -19,20 +21,21 @@ export default function HeaderHandle({
   setDeployDrawerVisible,
   messageApi,
 }: HeaderHandleProps) {
+  const dispatch = useAppDispatch();
   const username = useAppSelector((state) => state.common.username);
   const [editAppDrawerVisible, setEditAppDrawerVisible] = useState(false);
-  const { currentAppDetail } = useAppSelector((state) => state.app);
-  const [version, setVersion] = useState<string>(
-    currentAppDetail?.versions?.currentVersion
+  const [updateDeployDrawerVisible, setUpdateDeployDrawerVisible] =
+    useState(false);
+  const { currentAppDetail, currentVersion } = useAppSelector(
+    (state) => state.app
   );
 
-  useEffect(() => {
-    setVersion(currentAppDetail?.versions?.currentVersion);
-  }, [currentAppDetail?.versions?.currentVersion]);
-
-  const handleUpdate = useCallback(() => {
-    console.log(version);
-  }, [version]);
+  const handleChangeVersion = useCallback(
+    (currentVersion: string) => {
+      dispatch(setCurrentVersion(currentVersion));
+    },
+    [dispatch]
+  );
 
   return (
     <div className='border-gray-F0 flex h-[130px] items-center justify-between border-b pt-[14px]'>
@@ -73,26 +76,25 @@ export default function HeaderHandle({
       {currentAppDetail.status === AppStatusType.Deployed && (
         <div>
           <Select
-            onChange={(value) => setVersion(value)}
+            onChange={(value) => handleChangeVersion(value)}
             className='w-[200px]'
-            defaultValue={currentAppDetail?.versions?.currentVersion}
-            options={[
-              {
-                value: currentAppDetail?.versions?.currentVersion,
-                label: currentAppDetail?.versions?.currentVersion,
-              },
-              {
-                value: currentAppDetail?.versions?.pendingVersion,
-                label: currentAppDetail?.versions?.pendingVersion,
-              },
-            ]}
-          />
+            defaultValue={currentVersion}
+          >
+            <Select.Option value={currentAppDetail?.versions?.currentVersion}>
+              {currentAppDetail?.versions?.currentVersion}
+            </Select.Option>
+            {currentAppDetail?.versions?.pendingVersion && (
+              <Select.Option value={currentAppDetail?.versions?.pendingVersion}>
+                {currentAppDetail?.versions?.pendingVersion}
+              </Select.Option>
+            )}
+          </Select>
           <Button
-            className='text-blue-link ml-3 hidden'
+            className='text-blue-link ml-3'
             icon={<SyncOutlined />}
             type='text'
             iconPosition='start'
-            onClick={() => handleUpdate()}
+            onClick={() => setUpdateDeployDrawerVisible(true)}
           >
             Update
           </Button>
@@ -110,6 +112,16 @@ export default function HeaderHandle({
           appDetail={currentAppDetail}
           createAppDrawerVisible={editAppDrawerVisible}
           setCreateAppDrawerVisible={setEditAppDrawerVisible}
+          messageApi={messageApi}
+        />
+      )}
+      {updateDeployDrawerVisible && (
+        <DeployDrawer
+          type={1}
+          title='Update app'
+          version={currentVersion}
+          deployDrawerVisible={updateDeployDrawerVisible}
+          setDeployDrawerVisible={setUpdateDeployDrawerVisible}
           messageApi={messageApi}
         />
       )}

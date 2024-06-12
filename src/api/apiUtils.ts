@@ -1,7 +1,7 @@
 import axios from 'axios';
 import queryString from 'query-string';
 
-import logger from '@/lib/logger';
+import { handleErrorMessage } from '@/lib/utils';
 
 import { AeFinderAuthHost } from '@/constant';
 
@@ -118,7 +118,7 @@ export const queryAuthApi = async (config: QueryAuthApiExtraRequest) => {
       setLocalJWT('LocalJWTData', { ...res.data, username: config.username });
     }
   } catch (error) {
-    logger(error);
+    throw new Error(handleErrorMessage(error, 'queryAuthApi error'));
   }
 
   return {
@@ -135,6 +135,7 @@ export const queryAuthToken = async () => {
     ] = `${localData.token_type} ${localData.access_token}`;
     return { auth: 'AuthToken', username: localData.username };
   } else {
+    resetLocalJWT();
     return { auth: 'NoAuthToken' };
   }
 };
@@ -164,7 +165,7 @@ export const getAccessToken = async (config: GetAccessTokenRequest) => {
     token_type = res.data.token_type;
     access_token = res.data.access_token;
   } catch (error) {
-    logger(error);
+    throw new Error(handleErrorMessage(error, 'getAccessToken error'));
   }
   return {
     token_type,

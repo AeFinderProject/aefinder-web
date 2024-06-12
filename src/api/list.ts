@@ -39,6 +39,10 @@ export const appApiList = {
     target: `${AeFinderHost}/api/apps`,
     baseConfig: { method: 'GET' },
   },
+  getLog: {
+    target: `${AeFinderHost}/api/apps/log`,
+    baseConfig: { method: 'GET' },
+  },
 };
 
 export const SubscriptionsApiList = {

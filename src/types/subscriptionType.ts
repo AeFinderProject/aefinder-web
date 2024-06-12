@@ -10,10 +10,16 @@ export type CreateSubscriptionResponse = {
 };
 
 export type UpdateSubscriptionRequest = {
+  appId: string;
+  deployKey: string;
+  version: string;
   Manifest: string;
 };
 
 export type UpdateCode = {
+  appId: string;
+  deployKey: string;
+  version: string;
   Code: File;
 };
 

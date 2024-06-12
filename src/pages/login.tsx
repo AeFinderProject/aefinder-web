@@ -1,22 +1,30 @@
 'use client';
 import { Button, Form, Input, message } from 'antd';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import React, { useCallback } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { useCallback, useEffect } from 'react';
 
 import { useDebounceCallback } from '@/lib/utils';
 
 import { useAppDispatch } from '@/store/hooks';
 import { setUsername } from '@/store/slices/commonSlice';
 
-import { queryAuthApi } from '@/api/apiUtils';
+import { queryAuthApi, resetLocalJWT } from '@/api/apiUtils';
 
 export default function LogIn() {
   const [form] = Form.useForm();
   const FormItem = Form.Item;
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const pathname = usePathname();
   const [messageApi, contextHolder] = message.useMessage();
+
+  useEffect(() => {
+    // clear localStorage jwt
+    if (pathname === '/login') {
+      resetLocalJWT();
+    }
+  }, [pathname]);
 
   const loginSuccessActive = useCallback(() => {
     dispatch(setUsername(form.getFieldValue('username')));
