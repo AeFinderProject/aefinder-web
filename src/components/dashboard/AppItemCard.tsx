@@ -29,7 +29,7 @@ export default function AppItemCard({ appList }: AppItemProps) {
               <Button
                 size='small'
                 className={clsx(
-                  'absolute left-6 top-6 text-white',
+                  'absolute left-6 top-6 h-[30px] text-white',
                   item.status === 0 ? 'bg-gray-D6' : 'bg-blue-link'
                 )}
               >

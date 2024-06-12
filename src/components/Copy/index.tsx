@@ -1,6 +1,7 @@
 import { CopyOutlined } from '@ant-design/icons';
 import { message } from 'antd';
 import clsx from 'clsx';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 type CopyProps = {
   label?: string;
@@ -24,7 +25,6 @@ export default function Copy({
   const [messageApi, contextHolder] = message.useMessage();
 
   const handleCopy = () => {
-    navigator?.clipboard?.writeText(String(content));
     messageApi.success({
       content: 'Copied',
       key: 'copy',
@@ -39,7 +39,11 @@ export default function Copy({
         <span className='mr-2 max-w-[80%] overflow-hidden whitespace-pre-wrap break-words'>
           {content}
         </span>
-        {isShowCopy && <CopyOutlined onClick={() => handleCopy()} />}
+        {isShowCopy && (
+          <CopyToClipboard text={content} onCopy={() => handleCopy()}>
+            <CopyOutlined />
+          </CopyToClipboard>
+        )}
       </div>
     </div>
   );

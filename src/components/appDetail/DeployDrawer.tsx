@@ -3,13 +3,20 @@ import { Button, Divider, Drawer, Form, Input, Upload } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
 import { useCallback } from 'react';
 
+import { isValidJSON } from '@/lib/utils';
+
 import { useAppSelector } from '@/store/hooks';
 
-import { addSubscription } from '@/api/requestSubscription';
+import {
+  addSubscription,
+  updateCode,
+  updateSubscription,
+} from '@/api/requestSubscription';
 
 type DeployDrawerProps = {
   type: 0 | 1; // 0: deploy, 1: modify
   title: string;
+  version?: string;
   deployDrawerVisible: boolean;
   setDeployDrawerVisible: (visible: boolean) => void;
   messageApi: MessageInstance;
@@ -17,13 +24,10 @@ type DeployDrawerProps = {
 
 const TextArea = Input.TextArea;
 
-// enum UploadType {
-//   File = 'File',
-//   PreviewImage = 'PreviewImage',
-// }
-
 export default function DeployDrawer({
+  type,
   title,
+  version,
   deployDrawerVisible,
   setDeployDrawerVisible,
   messageApi,
@@ -35,6 +39,7 @@ export default function DeployDrawer({
   );
 
   const handleDeploy = useCallback(async () => {
+    // type === 0 create deploy
     messageApi.open({
       type: 'loading',
       content: 'Deploying...',
@@ -68,6 +73,84 @@ export default function DeployDrawer({
     setDeployDrawerVisible,
   ]);
 
+  const handleUpdate = useCallback(async () => {
+    // type === 1 update deploy  Manifest
+    const Manifest = form.getFieldValue('Manifest');
+    const Code = form.getFieldValue('code') && form.getFieldValue('code')[0];
+    // check value not null both
+    if (!Manifest && !Code) {
+      messageApi.open({
+        type: 'info',
+        content: 'Please update Manifest or Code',
+        duration: 3,
+      });
+      return;
+    }
+
+    if (Manifest && !isValidJSON(Manifest)) {
+      messageApi.open({
+        type: 'info',
+        content: 'Manifest need JSON',
+        duration: 3,
+      });
+      return;
+    }
+
+    if (Manifest) {
+      const haveUpdateManifestOk = await updateSubscription({
+        appId: currentAppDetail?.appId,
+        deployKey: currentAppDetail?.deployKey || '',
+        version: version || '',
+        Manifest: form.getFieldValue('Manifest'),
+      });
+      if (haveUpdateManifestOk) {
+        messageApi.open({
+          type: 'success',
+          content: 'Update Manifest Successfully',
+          duration: 2,
+        });
+        setDeployDrawerVisible(false);
+      } else {
+        messageApi.open({
+          type: 'error',
+          content: 'Update Manifest Failed',
+          duration: 2,
+        });
+      }
+    }
+
+    // type === 1 update deploy Code
+    if (Code) {
+      const haveUpdateCodeOk = await updateCode({
+        appId: currentAppDetail?.appId,
+        deployKey: currentAppDetail?.deployKey || '',
+        version: version || '',
+        Code: Code,
+      });
+      if (haveUpdateCodeOk) {
+        messageApi.open({
+          type: 'success',
+          content: 'Update Code Successfully',
+          duration: 1,
+        });
+        setDeployDrawerVisible(false);
+      } else {
+        messageApi.open({
+          type: 'error',
+          content: 'Update Code Failed',
+          duration: 1,
+        });
+      }
+    }
+  }, [
+    version,
+    currentAppDetail?.appId,
+    currentAppDetail?.deployKey,
+    messageApi,
+    setDeployDrawerVisible,
+    form,
+  ]);
+
   const beforeUpload = async (e: File) => {
     if (e.size > 50 * 1024 * 1024) {
       messageApi.open({
@@ -92,12 +175,14 @@ export default function DeployDrawer({
         form={form}
         layout='vertical'
         className='mt-6'
-        onFinish={() => handleDeploy()}
+        onFinish={() => (type === 0 ? handleDeploy() : handleUpdate())}
       >
         <FormItem
           name='Manifest'
           label='Upload Json'
-          rules={[{ required: true, message: 'Please input upload json!' }]}
+          rules={[
+            { required: type === 0, message: 'Please input upload json!' },
+          ]}
         >
           <TextArea
             placeholder='add subscriptions'
@@ -116,7 +201,7 @@ export default function DeployDrawer({
             return e && e.fileList;
           }}
           extra='Format supported: DLL. Max size 50MB.'
-          rules={[{ required: true, message: 'Please upload code DLL!' }]}
+          rules={[{ required: type === 0, message: 'Please upload code DLL!' }]}
         >
           <Upload
             listType='text'

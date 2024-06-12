@@ -1,3 +1,4 @@
+import { message } from 'antd';
 import clsx, { ClassValue } from 'clsx';
 import { DependencyList, useCallback, useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
@@ -61,6 +62,28 @@ export function useLatestRef<T>(value: T) {
 
 // eslint-disable-next-line
 export function handleErrorMessage(error: any, errorText?: string) {
-  console.log(error);
+  if (error.status === 500) {
+    return errorText || 'Failed to fetch data';
+  }
+  console.log('error', error?.response);
+  error = error?.response?.data?.error || error?.response?.data || error;
+  if (typeof error === 'string') errorText = error;
+  if (typeof error.error_description === 'string') errorText = error.message;
+  if (typeof error.message === 'string') errorText = error.message;
+  if (error?.validationErrors && typeof error?.validationErrors === 'object') {
+    // eslint-disable-next-line
+    error = error?.validationErrors[0];
+    errorText = error?.message;
+  }
+  message.error(errorText);
   return error;
+}
+
+export function isValidJSON(text: string) {
+  try {
+    JSON.parse(text);
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
