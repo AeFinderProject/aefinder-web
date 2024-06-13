@@ -11,7 +11,7 @@ type DetailBoxProps = {
 export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
   return (
     <div className='bg-gray-F5 mt-[30px] flex w-full items-start justify-start rounded-md px-[20px] py-[30px]'>
-      <div className='mr-[24px] w-[46%]'>
+      <div className='w-[49%] max-w-[50%] pr-[24px]'>
         <div className='text-block mb-[24px] text-xl font-medium'>
           {currentAppDetail?.appName}
         </div>
@@ -35,7 +35,7 @@ export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
           />
         )}
       </div>
-      <div className='flex flex-col'>
+      <div className='flex w-[50%] max-w-[50%] flex-col'>
         <Copy
           label='AppID'
           content={currentAppDetail?.appId}
@@ -46,6 +46,7 @@ export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
           label='Deploy Key'
           content={currentAppDetail?.deployKey || ''}
           isShowCopy={true}
+          showLittle={true}
         />
         {currentAppDetail?.sourceCodeUrl && (
           <Copy

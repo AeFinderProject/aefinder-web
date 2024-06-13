@@ -46,27 +46,32 @@ export default function DeployDrawer({
       content: 'Deploying...',
       duration: 1,
     });
-    setDeployLoading(true);
-    const haveOk = await addSubscription({
-      appId: currentAppDetail?.appId,
-      deployKey: currentAppDetail?.deployKey || '',
-      Manifest: form.getFieldValue('Manifest'),
-      Code: form.getFieldValue('code')[0],
-    });
-    setDeployLoading(false);
-    if (haveOk) {
-      messageApi.open({
-        type: 'success',
-        content: 'Deploy Successfully',
-        duration: 1,
+    try {
+      setDeployLoading(true);
+      const haveOk = await addSubscription({
+        appId: currentAppDetail?.appId,
+        deployKey: currentAppDetail?.deployKey || '',
+        Manifest: form.getFieldValue('Manifest'),
+        Code: form.getFieldValue('code')[0],
       });
-      setDeployDrawerVisible(false);
-    } else {
-      messageApi.open({
-        type: 'error',
-        content: 'Deploy Failed',
-        duration: 1,
-      });
+      setDeployLoading(false);
+      if (haveOk) {
+        messageApi.open({
+          type: 'success',
+          content: 'Deploy Successfully',
+          duration: 1,
+        });
+        setDeployDrawerVisible(false);
+      } else {
+        messageApi.open({
+          type: 'error',
+          content: 'Deploy Failed',
+          duration: 1,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      setDeployLoading(false);
     }
   }, [
     form,
@@ -100,53 +105,63 @@ export default function DeployDrawer({
     }
 
     if (Manifest) {
-      setDeployLoading(true);
-      const haveUpdateManifestOk = await updateSubscription({
-        appId: currentAppDetail?.appId,
-        deployKey: currentAppDetail?.deployKey || '',
-        version: version || '',
-        Manifest: form.getFieldValue('Manifest'),
-      });
-      setDeployLoading(false);
-      if (haveUpdateManifestOk) {
-        messageApi.open({
-          type: 'success',
-          content: 'Update Manifest Successfully',
-          duration: 2,
+      try {
+        setDeployLoading(true);
+        const haveUpdateManifestOk = await updateSubscription({
+          appId: currentAppDetail?.appId,
+          deployKey: currentAppDetail?.deployKey || '',
+          version: version || '',
+          Manifest: form.getFieldValue('Manifest'),
         });
-        setDeployDrawerVisible(false);
-      } else {
-        messageApi.open({
-          type: 'error',
-          content: 'Update Manifest Failed',
-          duration: 2,
-        });
+        setDeployLoading(false);
+        if (haveUpdateManifestOk) {
+          messageApi.open({
+            type: 'success',
+            content: 'Update Manifest Successfully',
+            duration: 2,
+          });
+          setDeployDrawerVisible(false);
+        } else {
+          messageApi.open({
+            type: 'error',
+            content: 'Update Manifest Failed',
+            duration: 2,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+        setDeployLoading(false);
       }
     }
 
     // type === 1 update deploy Code
     if (Code) {
-      setDeployLoading(true);
-      const haveUpdateCodeOk = await updateCode({
-        appId: currentAppDetail?.appId,
-        deployKey: currentAppDetail?.deployKey || '',
-        version: version || '',
-        Code: Code,
-      });
-      setDeployLoading(false);
-      if (haveUpdateCodeOk) {
-        messageApi.open({
-          type: 'success',
-          content: 'Update Code Successfully',
-          duration: 1,
+      try {
+        setDeployLoading(true);
+        const haveUpdateCodeOk = await updateCode({
+          appId: currentAppDetail?.appId,
+          deployKey: currentAppDetail?.deployKey || '',
+          version: version || '',
+          Code: Code,
         });
-        setDeployDrawerVisible(false);
-      } else {
-        messageApi.open({
-          type: 'error',
-          content: 'Update Code Failed',
-          duration: 1,
-        });
+        setDeployLoading(false);
+        if (haveUpdateCodeOk) {
+          messageApi.open({
+            type: 'success',
+            content: 'Update Code Successfully',
+            duration: 1,
+          });
+          setDeployDrawerVisible(false);
+        } else {
+          messageApi.open({
+            type: 'error',
+            content: 'Update Code Failed',
+            duration: 1,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+        setDeployLoading(false);
       }
     }
   }, [
@@ -235,7 +250,7 @@ export default function DeployDrawer({
             htmlType='submit'
             loading={deployLoading}
           >
-            Deploy
+            {type === 0 ? 'Deploy' : 'Update'}
           </Button>
         </FormItem>
       </Form>

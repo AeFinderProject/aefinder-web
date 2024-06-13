@@ -45,9 +45,11 @@ export type GetLogRequest = {
   appId: string;
   version: string;
   startTime: string;
+  logId: string;
 };
 
 export type GetLogResponse = {
+  id: string;
   timestamp: string;
   environment: string;
   app_log: {

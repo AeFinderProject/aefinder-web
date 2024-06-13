@@ -26,6 +26,10 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => {
+    if (error?.status === 401 || error?.response?.status === 401) {
+      window.location.href = '/login';
+      return;
+    }
     Promise.reject(error);
   }
 );
