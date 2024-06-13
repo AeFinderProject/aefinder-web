@@ -39,7 +39,7 @@ axiosInstance.interceptors.response.use(
     if (response.status === 200 || response.status === 204) {
       return response.data;
     }
-    return Promise.reject(response.statusText);
+    return Promise.reject(response);
   },
   (error) => {
     if (isDeniedRequest(error)) {

@@ -66,9 +66,13 @@ export function handleErrorMessage(error: any, errorText?: string) {
     return errorText || 'Failed to fetch data';
   }
   console.log('error', error?.response);
-  error = error?.response?.data?.error || error?.response?.data || error;
+  // common error
+  error = error?.response || error;
+  // connect token error
+  error = error?.data?.error_description || error;
+  // api error
+  error = error?.data?.error || error;
   if (typeof error === 'string') errorText = error;
-  if (typeof error.error_description === 'string') errorText = error.message;
   if (typeof error.message === 'string') errorText = error.message;
   if (error?.validationErrors && typeof error?.validationErrors === 'object') {
     // eslint-disable-next-line
