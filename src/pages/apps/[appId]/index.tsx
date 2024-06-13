@@ -63,7 +63,7 @@ export default function AppDetail() {
             {
               key: 'playground',
               label: 'Playground',
-              children: <Playground messageApi={messageApi} />,
+              children: <Playground />,
             },
             {
               key: 'logs',
@@ -74,7 +74,7 @@ export default function AppDetail() {
         />
       )}
       {currentAppDetail.status === AppStatusType.UnDeployed && (
-        <DownloadTempFile messageApi={messageApi} />
+        <DownloadTempFile />
       )}
       {deployDrawerVisible && (
         <DeployDrawer

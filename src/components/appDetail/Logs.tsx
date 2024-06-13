@@ -26,7 +26,8 @@ export default function Logs({ messageApi }: LogsProps) {
   const [sortBy, setSortBy] = useState<string>('Newest');
   const [logsList, setLogsList] = useState<GetLogResponse[]>([]);
   // const [filteredLogsList, setFilteredLogsList] = useState<GetLogResponse[]>([]);
-  const [startTime, setStartTime] = useState<string>('');
+  const [startTime, setStartTime] = useState<string>(new Date().toISOString());
+  const [logId, setLogId] = useState<string>('');
   const { currentAppDetail, currentVersion } = useAppSelector(
     (state) => state.app
   );
@@ -35,22 +36,37 @@ export default function Logs({ messageApi }: LogsProps) {
     const res = await getLog({
       appId: currentAppDetail.appId,
       version: currentVersion,
-      startTime,
+      startTime: startTime,
+      logId: logId,
     });
     if (!res || !res.length) {
       return;
     }
-    // get last log timestamp as the next request's startTime
+    // get last log timestamp as the next request's startTime and logId
     setStartTime(res[res.length - 1].timestamp);
+    setLogId(res[res.length - 1].id);
+
     if (sortBy === 'Newest') {
       setLogsList([...res, ...logsList]);
     }
     if (sortBy === 'Oldest') {
       setLogsList([...logsList, ...res]);
     }
-  }, [currentAppDetail.appId, currentVersion, startTime, logsList, sortBy]);
+  }, [
+    currentAppDetail.appId,
+    currentVersion,
+    startTime,
+    logsList,
+    sortBy,
+    logId,
+  ]);
 
   useEffect(() => {
+    // const interval = setInterval(() => {
+    //   getLogs();
+    // }, 5000);
+
+    // return () => clearInterval(interval);
     getLogs();
   }, [getLogs]);
 
@@ -123,7 +139,7 @@ export default function Logs({ messageApi }: LogsProps) {
           </Select>
         </div>
       </div>
-      <div className='bg-gray-F5 min-h-96 w-full overflow-y-auto rounded-2xl p-8'>
+      <div className='bg-gray-F5 max-h-[800px] min-h-96 w-full overflow-y-auto rounded-2xl p-8'>
         {logsList &&
           logsList.length > 0 &&
           logsList.map((log) => {

@@ -3,11 +3,14 @@ import { message } from 'antd';
 import clsx from 'clsx';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
+import { formatStr2Ellipsis } from '@/lib/utils';
+
 type CopyProps = {
   label?: string;
   content: string | number;
   isShowCopy?: boolean;
   className?: string;
+  showLittle?: boolean;
 };
 
 message.config({
@@ -21,6 +24,7 @@ export default function Copy({
   content,
   isShowCopy = false,
   className,
+  showLittle,
 }: CopyProps) {
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -37,7 +41,7 @@ export default function Copy({
       <div className='text-gray-80 text-xs'>{label}</div>
       <div className='text-block text-base font-medium'>
         <span className='mr-2 max-w-[80%] overflow-hidden whitespace-pre-wrap break-words'>
-          {content}
+          {showLittle ? formatStr2Ellipsis(String(content), [8, 9]) : content}
         </span>
         {isShowCopy && (
           <CopyToClipboard text={content} onCopy={() => handleCopy()}>
