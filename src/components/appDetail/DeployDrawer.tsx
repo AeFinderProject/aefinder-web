@@ -1,7 +1,7 @@
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Divider, Drawer, Form, Input, Upload } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { isValidJSON } from '@/lib/utils';
 
@@ -34,6 +34,7 @@ export default function DeployDrawer({
 }: DeployDrawerProps) {
   const [form] = Form.useForm();
   const FormItem = Form.Item;
+  const [deployLoading, setDeployLoading] = useState<boolean>(false);
   const currentAppDetail = useAppSelector(
     (state) => state.app.currentAppDetail
   );
@@ -45,12 +46,14 @@ export default function DeployDrawer({
       content: 'Deploying...',
       duration: 1,
     });
+    setDeployLoading(true);
     const haveOk = await addSubscription({
       appId: currentAppDetail?.appId,
       deployKey: currentAppDetail?.deployKey || '',
       Manifest: form.getFieldValue('Manifest'),
       Code: form.getFieldValue('code')[0],
     });
+    setDeployLoading(false);
     if (haveOk) {
       messageApi.open({
         type: 'success',
@@ -97,12 +100,14 @@ export default function DeployDrawer({
     }
 
     if (Manifest) {
+      setDeployLoading(true);
       const haveUpdateManifestOk = await updateSubscription({
         appId: currentAppDetail?.appId,
         deployKey: currentAppDetail?.deployKey || '',
         version: version || '',
         Manifest: form.getFieldValue('Manifest'),
       });
+      setDeployLoading(false);
       if (haveUpdateManifestOk) {
         messageApi.open({
           type: 'success',
@@ -121,12 +126,14 @@ export default function DeployDrawer({
 
     // type === 1 update deploy Code
     if (Code) {
+      setDeployLoading(true);
       const haveUpdateCodeOk = await updateCode({
         appId: currentAppDetail?.appId,
         deployKey: currentAppDetail?.deployKey || '',
         version: version || '',
         Code: Code,
       });
+      setDeployLoading(false);
       if (haveUpdateCodeOk) {
         messageApi.open({
           type: 'success',
@@ -226,6 +233,7 @@ export default function DeployDrawer({
             className='w-[48%]'
             type='primary'
             htmlType='submit'
+            loading={deployLoading}
           >
             Deploy
           </Button>
