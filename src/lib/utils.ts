@@ -85,6 +85,9 @@ export function handleErrorMessage(error: any, errorText?: string) {
     error = error?.validationErrors[0];
     errorText = error?.message;
   }
+  if (error?.details && typeof error?.details === 'string') {
+    errorText = error?.details;
+  }
   message.error(errorText, 3);
   return error;
 }

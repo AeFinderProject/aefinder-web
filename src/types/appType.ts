@@ -49,14 +49,14 @@ export type GetLogRequest = {
 };
 
 export type GetLogResponse = {
-  id: string;
+  log_id: string;
   timestamp: string;
   environment: string;
   app_log: {
     eventId: number;
     time: string;
     message: string;
-    level: 'Debug' | 'Error' | 'Warn' | 'Info';
+    level: 'Debug' | 'Error' | 'Warn' | 'Information';
     exception: string;
     appId: string;
     version: string;
