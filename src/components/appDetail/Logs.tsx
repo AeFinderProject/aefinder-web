@@ -46,9 +46,7 @@ export default function Logs() {
   const [filteredLogsList, setFilteredLogsList] = useState<GetLogResponse[]>(
     []
   );
-  const [startTime, setStartTime] = useState<string>(
-    dayjs().utc().format('YYYY-MM-DDTHH:mm:ss.SSSSSS[Z]')
-  );
+  const [startTime, setStartTime] = useState<string>('');
   const [logId, setLogId] = useState<string>('');
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const { currentAppDetail, currentVersion } = useAppSelector(
