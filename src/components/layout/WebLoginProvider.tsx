@@ -23,7 +23,7 @@ export default function LoginProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     queryAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  });
+  }, []);
 
   return <>{children}</>;
 }
