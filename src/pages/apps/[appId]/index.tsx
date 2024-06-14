@@ -68,7 +68,7 @@ export default function AppDetail() {
             {
               key: 'logs',
               label: 'Logs',
-              children: <Logs messageApi={messageApi} />,
+              children: <Logs />,
             },
           ]}
         />

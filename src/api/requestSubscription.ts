@@ -32,12 +32,24 @@ export const addSubscription = async (
       headers: {
         Authorization: `${Authorization.token_type} ${Authorization.access_token}`,
       },
-    }).then((res: Response) => {
-      response = res.ok;
-    });
+    })
+      .then((res: Response) => {
+        console.log('res', res);
+        response = res.ok;
+        return res?.json();
+      })
+      .then((data) => {
+        // tip data error when status is 400
+        if (!response) {
+          throw new Error(
+            handleErrorMessage(data?.error, 'addSubscription error')
+          );
+        }
+      });
     return response;
   } catch (error) {
-    throw new Error(handleErrorMessage(error, 'addSubscription error'));
+    console.log('error', error);
+    return false;
   }
 };
 
@@ -87,9 +99,19 @@ export const updateCode = async (params: UpdateCode): Promise<boolean> => {
       headers: {
         Authorization: `${Authorization.token_type} ${Authorization.access_token}`,
       },
-    }).then((res: Response) => {
-      response = res.ok;
-    });
+    })
+      .then((res: Response) => {
+        response = res.ok;
+        return res?.json();
+      })
+      .then((data) => {
+        // tip data error when status is 400
+        if (!response) {
+          throw new Error(
+            handleErrorMessage(data?.error, 'addSubscription error')
+          );
+        }
+      });
     return response;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'updateCode error'));

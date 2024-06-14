@@ -57,7 +57,7 @@ export default function DownloadTempFile() {
             rules={[
               { required: true, message: 'Please input project name!' },
               {
-                pattern: /[A-Za-z][A-Za-z0-9.]+/,
+                pattern: /^[A-Za-z][A-Za-z0-9.]+$/gim,
                 message:
                   'Project name must start with a letter and can only contain letters, numbers, and dots',
               },

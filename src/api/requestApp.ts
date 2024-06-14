@@ -63,7 +63,7 @@ export const getLog = async (
   try {
     const res: GetLogResponse[] = await request.app.getLog({ params });
     console.log(res);
-    return [];
+    return res;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'getLog error'));
   }

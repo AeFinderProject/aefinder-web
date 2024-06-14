@@ -6,9 +6,11 @@ import {
   UnorderedListOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
-import { Input, Radio, Select } from 'antd';
-import { MessageInstance } from 'antd/es/message/interface';
+import { Input, Radio, Select, Tag } from 'antd';
+import dayjs from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
+
+import { useThrottleCallback } from '@/lib/utils';
 
 import { useAppSelector } from '@/store/hooks';
 
@@ -16,23 +18,28 @@ import { getLog } from '@/api/requestApp';
 
 import { GetLogResponse } from '@/types/appType';
 
-type LogsProps = {
-  messageApi: MessageInstance;
+const LogsColor = {
+  Debug: '#1890ff',
+  Error: '#f5222d',
+  Warn: '#faad14',
+  Info: '#52c41a',
 };
 
-export default function Logs({ messageApi }: LogsProps) {
+export default function Logs() {
   const [search, setSearch] = useState<string>('');
   const [filterBy, setFilterBy] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('Newest');
   const [logsList, setLogsList] = useState<GetLogResponse[]>([]);
-  // const [filteredLogsList, setFilteredLogsList] = useState<GetLogResponse[]>([]);
+  const [filteredLogsList, setFilteredLogsList] = useState<GetLogResponse[]>(
+    []
+  );
   const [startTime, setStartTime] = useState<string>(new Date().toISOString());
   const [logId, setLogId] = useState<string>('');
   const { currentAppDetail, currentVersion } = useAppSelector(
     (state) => state.app
   );
 
-  const getLogs = useCallback(async () => {
+  const getLogs = async () => {
     const res = await getLog({
       appId: currentAppDetail.appId,
       version: currentVersion,
@@ -45,52 +52,83 @@ export default function Logs({ messageApi }: LogsProps) {
     // get last log timestamp as the next request's startTime and logId
     setStartTime(res[res.length - 1].timestamp);
     setLogId(res[res.length - 1].id);
-
-    if (sortBy === 'Newest') {
-      setLogsList([...res, ...logsList]);
-    }
-    if (sortBy === 'Oldest') {
-      setLogsList([...logsList, ...res]);
-    }
-  }, [
-    currentAppDetail.appId,
-    currentVersion,
-    startTime,
-    logsList,
-    sortBy,
-    logId,
-  ]);
+    // add new logs to the end
+    setLogsList([...logsList, ...res]);
+  };
 
   useEffect(() => {
-    // const interval = setInterval(() => {
-    //   getLogs();
-    // }, 5000);
+    const interval = setInterval(() => {
+      getLogs();
+    }, 5000);
 
-    // return () => clearInterval(interval);
-    getLogs();
-  }, [getLogs]);
+    return () => clearInterval(interval);
+  });
 
-  const handleSearch = useCallback(
+  const handleSearch = useThrottleCallback(
     (value: string) => {
-      // TODO: search
-      messageApi.open({
-        type: 'warning',
-        content: 'Search is not supported yet',
+      if (value === '') {
+        setFilteredLogsList([]);
+        setSearch(value);
+        return;
+      }
+      // search message.includes
+      const searchedLogs = logsList.filter((log) => {
+        return log?.app_log?.message.includes(value);
       });
+      setFilteredLogsList(searchedLogs);
       setSearch(value);
     },
-    [messageApi]
+    [search]
   );
 
-  const handleFilterBy = useCallback((value: string) => {
-    // TODO: filter
+  const handleFilterBy = (value: string) => {
+    if (value === 'All') {
+      setFilteredLogsList([]);
+      setFilterBy(value);
+      return;
+    }
+    // filter as level value
+    const filteredLogs = logsList.filter((item) => {
+      return item?.app_log?.level === value;
+    });
+    setFilteredLogsList(filteredLogs);
     setFilterBy(value);
-  }, []);
+  };
 
-  const handleSortBy = useCallback((value: string) => {
-    // TODO: sort
-    setSortBy(value);
-  }, []);
+  const handleLogsList = useCallback(() => {
+    if (
+      logsList &&
+      sortBy === 'Newest' &&
+      filteredLogsList.length === 0 &&
+      logsList.length > 0
+    ) {
+      return logsList;
+    }
+    if (
+      logsList &&
+      sortBy === 'Oldest' &&
+      filteredLogsList.length === 0 &&
+      logsList.length > 0
+    ) {
+      return logsList.reverse();
+    }
+    if (
+      filteredLogsList &&
+      sortBy === 'Newest' &&
+      filteredLogsList.length > 0
+    ) {
+      return filteredLogsList;
+    }
+    if (
+      filteredLogsList &&
+      sortBy === 'Oldest' &&
+      filteredLogsList.length > 0
+    ) {
+      return filteredLogsList.reverse();
+    }
+    // default []
+    return [];
+  }, [logsList, filteredLogsList, sortBy]);
 
   return (
     <div>
@@ -131,7 +169,7 @@ export default function Logs({ messageApi }: LogsProps) {
           Sort by:
           <Select
             value={sortBy}
-            onChange={(value) => handleSortBy(value)}
+            onChange={(value) => setSortBy(value)}
             className='ml-[6px]'
           >
             <Select.Option value='Newest'>Newest first</Select.Option>
@@ -140,23 +178,39 @@ export default function Logs({ messageApi }: LogsProps) {
         </div>
       </div>
       <div className='bg-gray-F5 max-h-[800px] min-h-96 w-full overflow-y-auto rounded-2xl p-8'>
-        {logsList &&
-          logsList.length > 0 &&
-          logsList.map((log) => {
-            return (
-              <div key={log?.app_log?.eventId}>
-                <div>{log?.app_log?.time}</div>
-                <div>{log?.app_log?.level}</div>
-                <div>
-                  <div>{log?.app_log?.message}</div>
-                  <div>{log?.app_log?.exception}</div>
+        {handleLogsList().map((log) => {
+          return (
+            <div
+              key={log?.app_log?.eventId}
+              className='mb-[24px] flex items-center justify-start text-sm'
+            >
+              <div className='w-[160px] min-w-[160px]'>
+                {dayjs(log?.app_log?.time).format('YYYY/MM/DD HH:mm:ss')}
+              </div>
+              <Tag
+                className='mx-[48px] w-[60px] text-center'
+                color={LogsColor[log?.app_log?.level]}
+              >
+                {log?.app_log?.level}
+              </Tag>
+              <div className='overflow-hidden'>
+                <div className='text-muted truncate-3-lines w-full max-w-[100%]'>
+                  {log?.app_log?.message}
+                </div>
+                <div className='text-muted w-full max-w-[100%] truncate'>
+                  {log?.app_log?.exception}
                 </div>
               </div>
-            );
-          })}
-        {logsList && logsList.length === 0 && (
-          <div className='text-center'>No logs</div>
+            </div>
+          );
+        })}
+        {logsList.length === 0 && search === '' && filterBy === 'All' && (
+          <div className='text-center'>No log</div>
         )}
+        {filteredLogsList.length === 0 &&
+          (search !== '' || filterBy !== 'All') && (
+            <div className='text-center'>No match log</div>
+          )}
       </div>
     </div>
   );
