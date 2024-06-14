@@ -56,7 +56,7 @@ export type GetLogResponse = {
     eventId: number;
     time: string;
     message: string;
-    level: 'Debug' | 'Error' | 'Warn' | 'Information';
+    level: 'Debug' | 'Error' | 'Warning' | 'Information';
     exception: string;
     appId: string;
     version: string;
