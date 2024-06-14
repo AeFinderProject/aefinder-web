@@ -15,6 +15,8 @@ import {
 export const addSubscription = async (
   params: CreateSubscriptionRequest
 ): Promise<boolean> => {
+  let response = false;
+  // deploy true or false
   try {
     const { appId, deployKey, Code, Manifest } = params;
     const Authorization = await getAccessToken({
@@ -24,8 +26,8 @@ export const addSubscription = async (
     const formData = new FormData();
     formData.append('Manifest', Manifest);
     formData.append('Code', Code.originFileObj);
-    // deploy true or false
-    let response = false;
+
+    let status = 0;
     await fetch(`${SubscriptionsApiList.addSubscription.target}`, {
       method: 'POST',
       body: formData,
@@ -35,21 +37,24 @@ export const addSubscription = async (
     })
       .then((res: Response) => {
         console.log('res', res);
-        response = res.ok;
-        return res?.json();
+        response = res?.ok;
+        status = res?.status;
+        return res?.status === 200 ? res : res?.json();
       })
       .then((data) => {
-        // tip data error when status is 400
-        if (!response) {
+        // tip data error when status is 400 500
+        if (status === 400 || status === 500) {
           throw new Error(
             handleErrorMessage(data?.error, 'addSubscription error')
           );
+        } else {
+          return response;
         }
       });
     return response;
   } catch (error) {
     console.log('error', error);
-    return false;
+    return response;
   }
 };
 
@@ -83,6 +88,8 @@ export const updateSubscription = async (
 };
 
 export const updateCode = async (params: UpdateCode): Promise<boolean> => {
+  // update Code true or false
+  let response = false;
   try {
     const { appId, deployKey, version, Code } = params;
     const Authorization = await getAccessToken({
@@ -91,8 +98,8 @@ export const updateCode = async (params: UpdateCode): Promise<boolean> => {
     });
     const formData = new FormData();
     formData.append('Code', Code.originFileObj);
-    // update Code true or false
-    let response = false;
+
+    let status = 0;
     await fetch(`${SubscriptionsApiList.updateCode.target}/${version}`, {
       method: 'PUT',
       body: formData,
@@ -101,20 +108,24 @@ export const updateCode = async (params: UpdateCode): Promise<boolean> => {
       },
     })
       .then((res: Response) => {
-        response = res.ok;
-        return res?.json();
+        response = res?.ok;
+        status = res?.status;
+        return res?.status === 200 ? res : res?.json();
       })
       .then((data) => {
-        // tip data error when status is 400
-        if (!response) {
+        // tip data error when status is 400 500
+        if (status === 400 || status === 500) {
           throw new Error(
             handleErrorMessage(data?.error, 'addSubscription error')
           );
+        } else {
+          return response;
         }
       });
     return response;
   } catch (error) {
-    throw new Error(handleErrorMessage(error, 'updateCode error'));
+    console.log('error', error);
+    return response;
   }
 };
 
