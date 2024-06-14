@@ -135,17 +135,6 @@ export default function Logs() {
   };
 
   useEffect(() => {
-    // isSearching is true
-    if (search !== '') {
-      handleSearch(search);
-    }
-    if (filterBy !== 'All') {
-      handleFilterBy(filterBy);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [logsList, handleFilterBy, handleSearch]);
-
-  useEffect(() => {
     const interval = setInterval(() => {
       getLogs();
     }, 5000);
