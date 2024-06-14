@@ -59,12 +59,12 @@ export default function DownloadTempFile() {
               {
                 pattern: /^[A-Za-z][A-Za-z0-9.]+$/gim,
                 message:
-                  'Project name must start with a letter and can only contain letters, numbers, and dots',
+                  '2~20 length and name must start with a letter and can only contain letters, numbers, and dots',
               },
             ]}
           >
             <Input
-              placeholder='project name'
+              placeholder='project name: letter/numbers (2~20 length)'
               className='rounded-md'
               minLength={2}
               maxLength={20}

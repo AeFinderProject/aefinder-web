@@ -3,11 +3,14 @@ import {
   ExclamationCircleOutlined,
   InfoCircleOutlined,
   SearchOutlined,
+  SyncOutlined,
   UnorderedListOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
 import { Input, Radio, Select, Tag } from 'antd';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import utc from 'dayjs/plugin/utc';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useThrottleCallback } from '@/lib/utils';
@@ -25,6 +28,9 @@ const LogsColor = {
   Info: '#52c41a',
 };
 
+dayjs.extend(utc);
+dayjs.extend(customParseFormat);
+
 export default function Logs() {
   const [search, setSearch] = useState<string>('');
   const [filterBy, setFilterBy] = useState<string>('All');
@@ -33,7 +39,9 @@ export default function Logs() {
   const [filteredLogsList, setFilteredLogsList] = useState<GetLogResponse[]>(
     []
   );
-  const [startTime, setStartTime] = useState<string>(new Date().toISOString());
+  const [startTime, setStartTime] = useState<string>(
+    dayjs().utc().format('YYYY-MM-DDTHH:mm:ss.SSSSSS[Z]')
+  );
   const [logId, setLogId] = useState<string>('');
   const { currentAppDetail, currentVersion } = useAppSelector(
     (state) => state.app
@@ -177,7 +185,8 @@ export default function Logs() {
           </Select>
         </div>
       </div>
-      <div className='bg-gray-F5 max-h-[800px] min-h-96 w-full overflow-y-auto rounded-2xl p-8'>
+      <div className='bg-gray-F5 relative max-h-[800px] min-h-96 w-full overflow-y-auto rounded-2xl p-8'>
+        <SyncOutlined spin className='absolute left-1 top-1' />
         {handleLogsList().map((log) => {
           return (
             <div
