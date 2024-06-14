@@ -62,12 +62,6 @@ export default function DeployDrawer({
           duration: 1,
         });
         setDeployDrawerVisible(false);
-      } else {
-        messageApi.open({
-          type: 'error',
-          content: 'Deploy Failed',
-          duration: 1,
-        });
       }
     } catch (error) {
       console.log(error);
@@ -121,12 +115,6 @@ export default function DeployDrawer({
             duration: 2,
           });
           setDeployDrawerVisible(false);
-        } else {
-          messageApi.open({
-            type: 'error',
-            content: 'Update Manifest Failed',
-            duration: 2,
-          });
         }
       } catch (error) {
         console.log(error);
@@ -152,12 +140,6 @@ export default function DeployDrawer({
             duration: 1,
           });
           setDeployDrawerVisible(false);
-        } else {
-          messageApi.open({
-            type: 'error',
-            content: 'Update Code Failed',
-            duration: 1,
-          });
         }
       } catch (error) {
         console.log(error);

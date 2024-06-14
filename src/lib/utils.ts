@@ -85,7 +85,7 @@ export function handleErrorMessage(error: any, errorText?: string) {
     error = error?.validationErrors[0];
     errorText = error?.message;
   }
-  message.error(errorText);
+  message.error(errorText, 3);
   return error;
 }
 

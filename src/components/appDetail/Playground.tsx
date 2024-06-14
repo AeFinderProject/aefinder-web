@@ -28,6 +28,7 @@ export default function Playground() {
         </div>
       )}
       <iframe
+        key={src}
         id='iframeId'
         title='Playground Page'
         src={src}
