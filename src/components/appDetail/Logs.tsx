@@ -25,7 +25,14 @@ const LogsColor = {
   Debug: '#1890ff',
   Error: '#f5222d',
   Warn: '#faad14',
-  Info: '#52c41a',
+  Information: '#52c41a',
+};
+
+const LogsText = {
+  Debug: 'Debug',
+  Error: 'Error',
+  Warn: 'Warn',
+  Information: 'Info',
 };
 
 dayjs.extend(utc);
@@ -43,37 +50,23 @@ export default function Logs() {
     dayjs().utc().format('YYYY-MM-DDTHH:mm:ss.SSSSSS[Z]')
   );
   const [logId, setLogId] = useState<string>('');
+  const [isSearching, setIsSearching] = useState<boolean>(false);
   const { currentAppDetail, currentVersion } = useAppSelector(
     (state) => state.app
   );
 
-  const getLogs = async () => {
-    const res = await getLog({
-      appId: currentAppDetail.appId,
-      version: currentVersion,
-      startTime: startTime,
-      logId: logId,
-    });
-    if (!res || !res.length) {
-      return;
-    }
-    // get last log timestamp as the next request's startTime and logId
-    setStartTime(res[res.length - 1].timestamp);
-    setLogId(res[res.length - 1].id);
-    // add new logs to the end
-    setLogsList([...logsList, ...res]);
-  };
-
   useEffect(() => {
-    const interval = setInterval(() => {
-      getLogs();
-    }, 5000);
-
-    return () => clearInterval(interval);
-  });
+    if (search === '' && filterBy === 'All') {
+      setIsSearching(false);
+    }
+    if (search !== '' || filterBy !== 'All') {
+      setIsSearching(true);
+    }
+  }, [search, filterBy]);
 
   const handleSearch = useThrottleCallback(
     (value: string) => {
+      setFilterBy('All');
       if (value === '') {
         setFilteredLogsList([]);
         setSearch(value);
@@ -86,10 +79,12 @@ export default function Logs() {
       setFilteredLogsList(searchedLogs);
       setSearch(value);
     },
-    [search]
+    [search, filterBy]
   );
 
   const handleFilterBy = (value: string) => {
+    // clear search first
+    setSearch('');
     if (value === 'All') {
       setFilteredLogsList([]);
       setFilterBy(value);
@@ -104,39 +99,59 @@ export default function Logs() {
   };
 
   const handleLogsList = useCallback(() => {
-    if (
-      logsList &&
-      sortBy === 'Newest' &&
-      filteredLogsList.length === 0 &&
-      logsList.length > 0
-    ) {
-      return logsList;
+    if (!isSearching) {
+      return sortBy === 'Newest' ? logsList : logsList.reverse();
     }
-    if (
-      logsList &&
-      sortBy === 'Oldest' &&
-      filteredLogsList.length === 0 &&
-      logsList.length > 0
-    ) {
-      return logsList.reverse();
+
+    if (isSearching) {
+      return sortBy === 'Newest'
+        ? filteredLogsList
+        : filteredLogsList.reverse();
     }
-    if (
-      filteredLogsList &&
-      sortBy === 'Newest' &&
-      filteredLogsList.length > 0
-    ) {
-      return filteredLogsList;
-    }
-    if (
-      filteredLogsList &&
-      sortBy === 'Oldest' &&
-      filteredLogsList.length > 0
-    ) {
-      return filteredLogsList.reverse();
-    }
+
     // default []
     return [];
-  }, [logsList, filteredLogsList, sortBy]);
+  }, [logsList, filteredLogsList, sortBy, isSearching]);
+
+  const getLogs = async () => {
+    const res = await getLog({
+      appId: currentAppDetail.appId,
+      version: currentVersion,
+      startTime: startTime,
+      logId: logId,
+    });
+    if (!res || !res.length) {
+      return;
+    }
+    // get last log timestamp as the next request's startTime and logId
+    setStartTime(res[0].timestamp);
+    setLogId(res[0].log_id);
+    // add new logs to the end
+    let tempList = [...res, ...logsList];
+    if (tempList.length > 5000) {
+      tempList = [...tempList.slice(0, 5000)];
+    }
+    setLogsList(tempList);
+  };
+
+  useEffect(() => {
+    // isSearching is true
+    if (search !== '') {
+      handleSearch(search);
+    }
+    if (filterBy !== 'All') {
+      handleFilterBy(filterBy);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logsList, handleFilterBy, handleSearch]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getLogs();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  });
 
   return (
     <div>
@@ -166,14 +181,14 @@ export default function Logs() {
           <Radio.Button value='Warn'>
             <WarningOutlined /> Warn
           </Radio.Button>
-          <Radio.Button value='Info'>
+          <Radio.Button value='Information'>
             <InfoCircleOutlined /> Info
           </Radio.Button>
           <Radio.Button value='Debug'>
             <CheckCircleOutlined /> Debug
           </Radio.Button>
         </Radio.Group>
-        <div>
+        <div className='hidden'>
           Sort by:
           <Select
             value={sortBy}
@@ -187,39 +202,41 @@ export default function Logs() {
       </div>
       <div className='bg-gray-F5 relative max-h-[800px] min-h-96 w-full overflow-y-auto rounded-2xl p-8'>
         <SyncOutlined spin className='absolute left-1 top-1' />
-        {handleLogsList().map((log) => {
+        {handleLogsList().map((log, index) => {
           return (
             <div
-              key={log?.app_log?.eventId}
+              key={log?.log_id + log?.app_log.time + index}
               className='mb-[24px] flex items-center justify-start text-sm'
             >
               <div className='w-[160px] min-w-[160px]'>
                 {dayjs(log?.app_log?.time).format('YYYY/MM/DD HH:mm:ss')}
               </div>
-              <Tag
-                className='mx-[48px] w-[60px] text-center'
-                color={LogsColor[log?.app_log?.level]}
-              >
-                {log?.app_log?.level}
-              </Tag>
+              <div className='mx-[48px] inline-block w-[80px] text-left'>
+                <Tag
+                  className='w-[80px] text-center'
+                  color={LogsColor[log?.app_log?.level]}
+                >
+                  {LogsText[log?.app_log?.level]}
+                </Tag>
+              </div>
+
               <div className='overflow-hidden'>
-                <div className='text-muted truncate-3-lines w-full max-w-[100%]'>
+                <div className='truncate-3-lines w-full max-w-[100%] text-left'>
                   {log?.app_log?.message}
                 </div>
-                <div className='text-muted w-full max-w-[100%] truncate'>
+                <div className='text-muted w-full max-w-[100%] truncate text-left'>
                   {log?.app_log?.exception}
                 </div>
               </div>
             </div>
           );
         })}
-        {logsList.length === 0 && search === '' && filterBy === 'All' && (
+        {logsList.length === 0 && !isSearching && (
           <div className='text-center'>No log</div>
         )}
-        {filteredLogsList.length === 0 &&
-          (search !== '' || filterBy !== 'All') && (
-            <div className='text-center'>No match log</div>
-          )}
+        {filteredLogsList.length === 0 && isSearching && (
+          <div className='text-center'>No match log</div>
+        )}
       </div>
     </div>
   );
