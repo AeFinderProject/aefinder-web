@@ -24,14 +24,14 @@ import { GetLogResponse } from '@/types/appType';
 const LogsColor = {
   Debug: '#1890ff',
   Error: '#f5222d',
-  Warn: '#faad14',
+  Warning: '#faad14',
   Information: '#52c41a',
 };
 
 const LogsText = {
   Debug: 'Debug',
   Error: 'Error',
-  Warn: 'Warn',
+  Warning: 'Warn',
   Information: 'Info',
 };
 
@@ -111,6 +111,17 @@ export default function Logs() {
     return [];
   }, [logsList, filteredLogsList, sortBy, isSearching]);
 
+  useEffect(() => {
+    // init params when currentVersion change
+    setSearch('');
+    setFilterBy('All');
+    setLogsList([]);
+    setFilteredLogsList([]);
+    setStartTime('');
+    setLogId('');
+    setIsSearching(false);
+  }, [currentVersion]);
+
   const getLogs = async () => {
     const res = await getLog({
       appId: currentAppDetail.appId,
@@ -165,7 +176,7 @@ export default function Logs() {
           <Radio.Button value='Error'>
             <ExclamationCircleOutlined /> Error
           </Radio.Button>
-          <Radio.Button value='Warn'>
+          <Radio.Button value='Warning'>
             <WarningOutlined /> Warn
           </Radio.Button>
           <Radio.Button value='Information'>
