@@ -1,19 +1,11 @@
-import { LoadingOutlined } from '@ant-design/icons';
 import { Button, Form, Input } from 'antd';
-import { MessageInstance } from 'antd/es/message/interface';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { useCallback, useState } from 'react';
 
 import { getDevTemplate } from '@/api/requestSubscription';
 
-type DownloadTempFileProps = {
-  messageApi: MessageInstance;
-};
-
-export default function DownloadTempFile({
-  messageApi,
-}: DownloadTempFileProps) {
+export default function DownloadTempFile() {
   const [downAppName, setDownAppName] = useState('');
   const [form] = Form.useForm();
   const FormItem = Form.Item;
@@ -30,16 +22,11 @@ export default function DownloadTempFile({
       link.click();
       URL.revokeObjectURL(link.href);
     } catch (error) {
-      console.log(error);
       setIsShowLoading(false);
-      messageApi.open({
-        type: 'error',
-        content: 'download error, please retry',
-      });
     } finally {
       setIsShowLoading(false);
     }
-  }, [downAppName, messageApi]);
+  }, [downAppName]);
 
   return (
     <div className='border-gray-E0 mt-5 flex items-center justify-center rounded-md border'>
@@ -67,11 +54,19 @@ export default function DownloadTempFile({
           <FormItem
             name='projectName'
             label='Project name'
-            rules={[{ required: true, message: 'Please input project name!' }]}
+            rules={[
+              { required: true, message: 'Please input project name!' },
+              {
+                pattern: /^[A-Za-z][A-Za-z0-9.]+$/gim,
+                message:
+                  '2~20 length and name must start with a letter and can only contain letters, numbers, and dots',
+              },
+            ]}
           >
             <Input
-              placeholder='project name'
+              placeholder='project name: letter/numbers (2~20 length)'
               className='rounded-md'
+              minLength={2}
               maxLength={20}
               onChange={(e) => setDownAppName(e.target.value)}
             />
@@ -85,8 +80,9 @@ export default function DownloadTempFile({
               )}
               type='primary'
               htmlType='submit'
+              loading={isShowLoading}
             >
-              {isShowLoading ? <LoadingOutlined /> : 'Download'}
+              Download
             </Button>
           </FormItem>
         </Form>

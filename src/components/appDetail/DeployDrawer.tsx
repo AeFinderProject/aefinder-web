@@ -1,15 +1,22 @@
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Divider, Drawer, Form, Input, Upload } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
+
+import { isValidJSON } from '@/lib/utils';
 
 import { useAppSelector } from '@/store/hooks';
 
-import { addSubscription } from '@/api/requestSubscription';
+import {
+  addSubscription,
+  updateCode,
+  updateSubscription,
+} from '@/api/requestSubscription';
 
 type DeployDrawerProps = {
   type: 0 | 1; // 0: deploy, 1: modify
   title: string;
+  version?: string;
   deployDrawerVisible: boolean;
   setDeployDrawerVisible: (visible: boolean) => void;
   messageApi: MessageInstance;
@@ -17,48 +24,48 @@ type DeployDrawerProps = {
 
 const TextArea = Input.TextArea;
 
-// enum UploadType {
-//   File = 'File',
-//   PreviewImage = 'PreviewImage',
-// }
-
 export default function DeployDrawer({
+  type,
   title,
+  version,
   deployDrawerVisible,
   setDeployDrawerVisible,
   messageApi,
 }: DeployDrawerProps) {
   const [form] = Form.useForm();
   const FormItem = Form.Item;
+  const [deployLoading, setDeployLoading] = useState<boolean>(false);
   const currentAppDetail = useAppSelector(
     (state) => state.app.currentAppDetail
   );
 
   const handleDeploy = useCallback(async () => {
+    // type === 0 create deploy
     messageApi.open({
       type: 'loading',
       content: 'Deploying...',
       duration: 1,
     });
-    const haveOk = await addSubscription({
-      appId: currentAppDetail?.appId,
-      deployKey: currentAppDetail?.deployKey || '',
-      Manifest: form.getFieldValue('Manifest'),
-      Code: form.getFieldValue('code')[0],
-    });
-    if (haveOk) {
-      messageApi.open({
-        type: 'success',
-        content: 'Deploy Successfully',
-        duration: 1,
+    try {
+      setDeployLoading(true);
+      const haveOk = await addSubscription({
+        appId: currentAppDetail?.appId,
+        deployKey: currentAppDetail?.deployKey || '',
+        Manifest: form.getFieldValue('Manifest'),
+        Code: form.getFieldValue('code')[0],
       });
-      setDeployDrawerVisible(false);
-    } else {
-      messageApi.open({
-        type: 'error',
-        content: 'Deploy Failed',
-        duration: 1,
-      });
+      setDeployLoading(false);
+      if (haveOk) {
+        messageApi.open({
+          type: 'success',
+          content: 'Deploy Successfully',
+          duration: 1,
+        });
+        setDeployDrawerVisible(false);
+      }
+    } catch (error) {
+      console.log(error);
+      setDeployLoading(false);
     }
   }, [
     form,
@@ -66,6 +73,86 @@ export default function DeployDrawer({
     currentAppDetail?.deployKey,
     messageApi,
     setDeployDrawerVisible,
+  ]);
+
+  const handleUpdate = useCallback(async () => {
+    // type === 1 update deploy  Manifest
+    const Manifest = form.getFieldValue('Manifest');
+    const Code = form.getFieldValue('code') && form.getFieldValue('code')[0];
+    // check value not null both
+    if (!Manifest && !Code) {
+      messageApi.open({
+        type: 'info',
+        content: 'Please update Manifest or Code',
+        duration: 3,
+      });
+      return;
+    }
+
+    if (Manifest && !isValidJSON(Manifest)) {
+      messageApi.open({
+        type: 'info',
+        content: 'Manifest need JSON',
+        duration: 3,
+      });
+      return;
+    }
+
+    if (Manifest) {
+      try {
+        setDeployLoading(true);
+        const haveUpdateManifestOk = await updateSubscription({
+          appId: currentAppDetail?.appId,
+          deployKey: currentAppDetail?.deployKey || '',
+          version: version || '',
+          Manifest: form.getFieldValue('Manifest'),
+        });
+        setDeployLoading(false);
+        if (haveUpdateManifestOk) {
+          messageApi.open({
+            type: 'success',
+            content: 'Update Manifest Successfully',
+            duration: 2,
+          });
+          setDeployDrawerVisible(false);
+        }
+      } catch (error) {
+        console.log(error);
+        setDeployLoading(false);
+      }
+    }
+
+    // type === 1 update deploy Code
+    if (Code) {
+      try {
+        setDeployLoading(true);
+        const haveUpdateCodeOk = await updateCode({
+          appId: currentAppDetail?.appId,
+          deployKey: currentAppDetail?.deployKey || '',
+          version: version || '',
+          Code: Code,
+        });
+        setDeployLoading(false);
+        if (haveUpdateCodeOk) {
+          messageApi.open({
+            type: 'success',
+            content: 'Update Code Successfully',
+            duration: 1,
+          });
+          setDeployDrawerVisible(false);
+        }
+      } catch (error) {
+        console.log(error);
+        setDeployLoading(false);
+      }
+    }
+  }, [
+    version,
+    currentAppDetail?.appId,
+    currentAppDetail?.deployKey,
+    messageApi,
+    setDeployDrawerVisible,
+    form,
   ]);
 
   const beforeUpload = async (e: File) => {
@@ -92,12 +179,14 @@ export default function DeployDrawer({
         form={form}
         layout='vertical'
         className='mt-6'
-        onFinish={() => handleDeploy()}
+        onFinish={() => (type === 0 ? handleDeploy() : handleUpdate())}
       >
         <FormItem
           name='Manifest'
           label='Upload Json'
-          rules={[{ required: true, message: 'Please input upload json!' }]}
+          rules={[
+            { required: type === 0, message: 'Please input upload json!' },
+          ]}
         >
           <TextArea
             placeholder='add subscriptions'
@@ -116,7 +205,7 @@ export default function DeployDrawer({
             return e && e.fileList;
           }}
           extra='Format supported: DLL. Max size 50MB.'
-          rules={[{ required: true, message: 'Please upload code DLL!' }]}
+          rules={[{ required: type === 0, message: 'Please upload code DLL!' }]}
         >
           <Upload
             listType='text'
@@ -141,8 +230,9 @@ export default function DeployDrawer({
             className='w-[48%]'
             type='primary'
             htmlType='submit'
+            loading={deployLoading}
           >
-            Deploy
+            {type === 0 ? 'Deploy' : 'Update'}
           </Button>
         </FormItem>
       </Form>

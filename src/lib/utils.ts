@@ -1,3 +1,4 @@
+import { message } from 'antd';
 import clsx, { ClassValue } from 'clsx';
 import { DependencyList, useCallback, useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
@@ -61,6 +62,65 @@ export function useLatestRef<T>(value: T) {
 
 // eslint-disable-next-line
 export function handleErrorMessage(error: any, errorText?: string) {
-  console.log(error);
+  if (error.status === 500) {
+    return errorText || 'Failed to fetch data';
+  }
+  console.log('error', error?.response);
+  // common error
+  error = error?.response || error;
+  // log timeout
+  if (error?.status === 401) {
+    message.error('log timeout');
+    window.location.href = '/login';
+    return;
+  }
+  // connect token error
+  error = error?.data?.error_description || error;
+  // api error
+  error = error?.data?.error || error;
+  if (typeof error === 'string') errorText = error;
+  if (typeof error.message === 'string') errorText = error.message;
+  if (error?.validationErrors && typeof error?.validationErrors === 'object') {
+    // eslint-disable-next-line
+    error = error?.validationErrors[0];
+    errorText = error?.message;
+  }
+  if (error?.details && typeof error?.details === 'string') {
+    errorText = error?.details;
+  }
+  message.error(errorText, 3);
   return error;
 }
+
+export function isValidJSON(text: string) {
+  try {
+    JSON.parse(text);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
+ * this function is to format address,just like "formatStr2EllipsisStr" ---> "for...Str"
+ * @param address
+ * @param digits [pre_count, suffix_count]
+ * @param type
+ * @returns
+ */
+export const formatStr2Ellipsis = (
+  address = '',
+  digits = [10, 10],
+  type: 'middle' | 'tail' = 'middle'
+): string => {
+  if (!address) return '';
+
+  const len = address.length;
+
+  if (type === 'tail') return `${address.slice(0, digits[0])}...`;
+
+  if (len < digits[0] + digits[1]) return address;
+  const pre = address.substring(0, digits[0]);
+  const suffix = address.substring(len - digits[1]);
+  return `${pre}...${suffix}`;
+};

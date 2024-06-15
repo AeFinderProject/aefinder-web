@@ -8,6 +8,8 @@ import {
   GetAppDetailRequest,
   GetAppDetailResponse,
   GetAppListResponse,
+  GetLogRequest,
+  GetLogResponse,
   ModifyAppRequest,
 } from '@/types/appType';
 
@@ -52,5 +54,17 @@ export const getAppList = async (): Promise<GetAppListResponse> => {
     return res;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'getAppList error'));
+  }
+};
+
+export const getLog = async (
+  params: GetLogRequest
+): Promise<GetLogResponse[]> => {
+  try {
+    const res: GetLogResponse[] = await request.app.getLog({ params });
+    console.log(res);
+    return res;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'getLog error'));
   }
 };

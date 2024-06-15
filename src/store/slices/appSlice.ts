@@ -1,17 +1,16 @@
 import { createAppSlice } from '@/store/createAppSlice';
 
 import { CreateAppResponse, GetAppDetailResponse } from '@/types/appType';
-import { GetSubscriptionResponse } from '@/types/subscriptionType';
 
 export interface appSliceState {
   currentAppDetail: GetAppDetailResponse;
-  currentVersion: GetSubscriptionResponse;
+  currentVersion: string;
   appList: CreateAppResponse[];
 }
 
 const initialState: appSliceState = {
   currentAppDetail: {} as GetAppDetailResponse,
-  currentVersion: {} as GetSubscriptionResponse,
+  currentVersion: '',
   appList: [],
 };
 

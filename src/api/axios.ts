@@ -1,4 +1,3 @@
-import { message } from 'antd';
 import axios from 'axios';
 
 import logger from '@/lib/logger';
@@ -27,7 +26,10 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => {
-    message.error(error?.message);
+    if (error?.status === 401 || error?.response?.status === 401) {
+      window.location.href = '/login';
+      return;
+    }
     Promise.reject(error);
   }
 );
@@ -38,15 +40,12 @@ axiosInstance.interceptors.response.use(
       window.location.href = '/login';
       return;
     }
-    if (response.status !== 200) {
-      message.error(response.data);
-      return Promise.reject(response.statusText);
+    if (response.status === 200 || response.status === 204) {
+      return response.data;
     }
-    return response.data;
+    return Promise.reject(response);
   },
   (error) => {
-    console.log('error', error);
-    message.error(error.message);
     if (isDeniedRequest(error)) {
       myEvents.DeniedRequest.emit();
     }
