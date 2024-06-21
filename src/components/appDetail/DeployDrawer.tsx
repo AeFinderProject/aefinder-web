@@ -129,6 +129,18 @@ export default function DeployDrawer({
     version,
   ]);
 
+  const beforeUpload = (e: File) => {
+    if (e.size > 12 * 1024 * 1024) {
+      messageApi.open({
+        type: 'error',
+        content:
+          'File upload failed. Please choose a file within the size limit.',
+      });
+      return false;
+    }
+    return true;
+  };
+
   const handleUpdateCode = useCallback(async () => {
     const Code = form.getFieldValue('code') && form.getFieldValue('code')[0];
     // check code value not null
@@ -140,6 +152,8 @@ export default function DeployDrawer({
       });
       return;
     }
+
+    if (!beforeUpload(Code)) return;
 
     try {
       setUpdateCodeLoading(true);
@@ -170,17 +184,6 @@ export default function DeployDrawer({
     setDeployDrawerVisible,
     form,
   ]);
-
-  const beforeUpload = async (e: File) => {
-    if (e.size > 12 * 1024 * 1024) {
-      messageApi.open({
-        type: 'error',
-        content:
-          'File upload failed. Please choose a file within the size limit.',
-      });
-      return false;
-    }
-  };
 
   return (
     <Drawer

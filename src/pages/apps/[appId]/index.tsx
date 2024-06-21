@@ -83,7 +83,7 @@ export default function AppDetail() {
             {
               key: 'logs',
               label: 'Logs',
-              children: <Logs />,
+              children: <Logs messageApi={messageApi} />,
               forceRender: true,
             },
           ]}
