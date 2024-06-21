@@ -96,6 +96,13 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+  .truncate-10-lines {
+    display: -webkit-box;
+    -webkit-line-clamp: 10;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }
 
 @layer utilities {

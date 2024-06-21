@@ -35,6 +35,9 @@ export default function DeployDrawer({
   const [form] = Form.useForm();
   const FormItem = Form.Item;
   const [deployLoading, setDeployLoading] = useState<boolean>(false);
+  const [updateManifestLoading, setUpdateManifestLoading] =
+    useState<boolean>(false);
+  const [updateCodeLoading, setUpdateCodeLoading] = useState<boolean>(false);
   const currentAppDetail = useAppSelector(
     (state) => state.app.currentAppDetail
   );
@@ -75,15 +78,13 @@ export default function DeployDrawer({
     setDeployDrawerVisible,
   ]);
 
-  const handleUpdate = useCallback(async () => {
+  const handleUpdateManifest = useCallback(async () => {
     // type === 1 update deploy  Manifest
     const Manifest = form.getFieldValue('Manifest');
-    const Code = form.getFieldValue('code') && form.getFieldValue('code')[0];
-    // check value not null both
-    if (!Manifest && !Code) {
+    if (!Manifest) {
       messageApi.open({
-        type: 'info',
-        content: 'Please update Manifest or Code',
+        type: 'warning',
+        content: 'Please update Manifest',
         duration: 3,
       });
       return;
@@ -91,60 +92,75 @@ export default function DeployDrawer({
 
     if (Manifest && !isValidJSON(Manifest)) {
       messageApi.open({
-        type: 'info',
+        type: 'warning',
         content: 'Manifest need JSON',
         duration: 3,
       });
       return;
     }
 
-    if (Manifest) {
-      try {
-        setDeployLoading(true);
-        const haveUpdateManifestOk = await updateSubscription({
-          appId: currentAppDetail?.appId,
-          deployKey: currentAppDetail?.deployKey || '',
-          version: version || '',
-          Manifest: form.getFieldValue('Manifest'),
+    try {
+      setUpdateManifestLoading(true);
+      const haveUpdateManifestOk = await updateSubscription({
+        appId: currentAppDetail?.appId,
+        deployKey: currentAppDetail?.deployKey || '',
+        version: version || '',
+        Manifest: form.getFieldValue('Manifest'),
+      });
+      setUpdateManifestLoading(false);
+      if (haveUpdateManifestOk) {
+        messageApi.open({
+          type: 'success',
+          content: 'Update Manifest Successfully',
+          duration: 2,
         });
-        setDeployLoading(false);
-        if (haveUpdateManifestOk) {
-          messageApi.open({
-            type: 'success',
-            content: 'Update Manifest Successfully',
-            duration: 2,
-          });
-          setDeployDrawerVisible(false);
-        }
-      } catch (error) {
-        console.log(error);
-        setDeployLoading(false);
+        setDeployDrawerVisible(false);
       }
+    } catch (error) {
+      console.log(error);
+      setUpdateManifestLoading(false);
+    }
+  }, [
+    form,
+    currentAppDetail?.appId,
+    currentAppDetail?.deployKey,
+    messageApi,
+    setDeployDrawerVisible,
+    version,
+  ]);
+
+  const handleUpdateCode = useCallback(async () => {
+    const Code = form.getFieldValue('code') && form.getFieldValue('code')[0];
+    // check code value not null
+    if (!Code) {
+      messageApi.open({
+        type: 'warning',
+        content: 'Please update Code',
+        duration: 3,
+      });
+      return;
     }
 
-    // type === 1 update deploy Code
-    if (Code) {
-      try {
-        setDeployLoading(true);
-        const haveUpdateCodeOk = await updateCode({
-          appId: currentAppDetail?.appId,
-          deployKey: currentAppDetail?.deployKey || '',
-          version: version || '',
-          Code: Code,
+    try {
+      setUpdateCodeLoading(true);
+      const haveUpdateCodeOk = await updateCode({
+        appId: currentAppDetail?.appId,
+        deployKey: currentAppDetail?.deployKey || '',
+        version: version || '',
+        Code: Code,
+      });
+      setUpdateCodeLoading(false);
+      if (haveUpdateCodeOk) {
+        messageApi.open({
+          type: 'success',
+          content: 'Update Code Successfully',
+          duration: 1,
         });
-        setDeployLoading(false);
-        if (haveUpdateCodeOk) {
-          messageApi.open({
-            type: 'success',
-            content: 'Update Code Successfully',
-            duration: 1,
-          });
-          setDeployDrawerVisible(false);
-        }
-      } catch (error) {
-        console.log(error);
-        setDeployLoading(false);
+        setDeployDrawerVisible(false);
       }
+    } catch (error) {
+      console.log(error);
+      setUpdateCodeLoading(false);
     }
   }, [
     version,
@@ -156,7 +172,7 @@ export default function DeployDrawer({
   ]);
 
   const beforeUpload = async (e: File) => {
-    if (e.size > 50 * 1024 * 1024) {
+    if (e.size > 12 * 1024 * 1024) {
       messageApi.open({
         type: 'error',
         content:
@@ -171,7 +187,6 @@ export default function DeployDrawer({
       title={title}
       open={deployDrawerVisible}
       onClose={() => setDeployDrawerVisible(false)}
-      closeIcon={null}
       destroyOnClose={true}
       width='80%'
     >
@@ -179,13 +194,13 @@ export default function DeployDrawer({
         form={form}
         layout='vertical'
         className='mt-6'
-        onFinish={() => (type === 0 ? handleDeploy() : handleUpdate())}
+        onFinish={() => handleDeploy()}
       >
         <FormItem
           name='Manifest'
-          label='Upload Json'
+          label='Upload manifest (JSON)'
           rules={[
-            { required: type === 0, message: 'Please input upload json!' },
+            { required: type === 0, message: 'Please input upload Manifest!' },
           ]}
         >
           <TextArea
@@ -194,9 +209,23 @@ export default function DeployDrawer({
             autoSize={{ minRows: 8, maxRows: 14 }}
           />
         </FormItem>
+        {type === 1 && (
+          <FormItem>
+            <Button
+              size='large'
+              className='w-[180px]'
+              type='primary'
+              loading={updateManifestLoading}
+              onClick={() => handleUpdateManifest()}
+            >
+              Update manifest
+            </Button>
+            <Divider />
+          </FormItem>
+        )}
         <FormItem
           name='code'
-          label='Upload DLL file'
+          label='Upload code (DLL)'
           valuePropName='fileList'
           getValueFromEvent={(e) => {
             if (Array.isArray(e)) {
@@ -204,7 +233,7 @@ export default function DeployDrawer({
             }
             return e && e.fileList;
           }}
-          extra='Format supported: DLL. Max size 50MB.'
+          extra='Format supported: DLL. Max size 12MB.'
           rules={[{ required: type === 0, message: 'Please upload code DLL!' }]}
         >
           <Upload
@@ -217,23 +246,38 @@ export default function DeployDrawer({
           </Upload>
         </FormItem>
         <Divider />
-        <FormItem className='text-center'>
-          <Button
-            size='large'
-            className='border-blue-link text-blue-link mr-[4%] w-[48%]'
-            onClick={() => setDeployDrawerVisible(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            size='large'
-            className='w-[48%]'
-            type='primary'
-            htmlType='submit'
-            loading={deployLoading}
-          >
-            {type === 0 ? 'Deploy' : 'Update'}
-          </Button>
+        <FormItem>
+          {type === 0 && (
+            <Button
+              size='large'
+              className='border-blue-link text-blue-link mr-[10px] w-[180px]'
+              onClick={() => setDeployDrawerVisible(false)}
+            >
+              Cancel
+            </Button>
+          )}
+          {type === 0 && (
+            <Button
+              size='large'
+              className='w-[180px]'
+              type='primary'
+              htmlType='submit'
+              loading={deployLoading}
+            >
+              Deploy
+            </Button>
+          )}
+          {type === 1 && (
+            <Button
+              size='large'
+              className='w-[180px]'
+              type='primary'
+              loading={updateCodeLoading}
+              onClick={() => handleUpdateCode()}
+            >
+              Update code
+            </Button>
+          )}
         </FormItem>
       </Form>
     </Drawer>

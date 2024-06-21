@@ -23,17 +23,19 @@ import { AppStatusType } from '@/types/appType';
 
 export default function AppDetail() {
   const [deployDrawerVisible, setDeployDrawerVisible] = useState(false);
+  const router = useRouter();
+  const { appId, currentTab } = router.query;
   // currentTable default playground -> click change logs
-  const [currentTable, setCurrentTable] = useState<string>('playground');
+  const [currentTable, setCurrentTable] = useState<string>(
+    typeof currentTab === 'string' ? currentTab : 'playground'
+  );
   const { currentAppDetail } = useAppSelector((state) => state.app);
   const dispatch = useAppDispatch();
   const [messageApi, contextHolder] = message.useMessage();
-  const router = useRouter();
 
   useEffect(() => {
     const getAppDetailTemp = async () => {
       await queryAuthToken();
-      const { appId } = router.query;
       if (appId) {
         const res = await getAppDetail({ appId: String(appId) });
         dispatch(setCurrentAppDetail(res));
@@ -42,7 +44,20 @@ export default function AppDetail() {
       }
     };
     getAppDetailTemp();
-  }, [dispatch, deployDrawerVisible, router.query]);
+  }, [dispatch, deployDrawerVisible, router.query, appId]);
+
+  const handleTabChange = (key: string) => {
+    // change url tab params
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, currentTab: key },
+      },
+      undefined,
+      { shallow: true }
+    );
+    setCurrentTable(key);
+  };
 
   return (
     <div className='px-[40px] pb-[60px]'>
@@ -55,10 +70,10 @@ export default function AppDetail() {
       {currentAppDetail.status === AppStatusType.Deployed && (
         <Tabs
           defaultActiveKey={currentTable}
-          onChange={(key) => setCurrentTable(key)}
+          onChange={(key) => handleTabChange(key)}
           centered
           size='large'
-          className='mt-[12px] min-h-[500px]'
+          className='mt-[12px] min-h-[600px]'
           items={[
             {
               key: 'playground',
@@ -69,6 +84,7 @@ export default function AppDetail() {
               key: 'logs',
               label: 'Logs',
               children: <Logs />,
+              forceRender: true,
             },
           ]}
         />

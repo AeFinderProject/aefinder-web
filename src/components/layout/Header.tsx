@@ -1,3 +1,4 @@
+import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useCallback, useState } from 'react';
@@ -31,7 +32,7 @@ export default function Header() {
             Docs
           </UnstyledLink> */}
           <div
-            className='w-25 border-gray-E0 relative inline-block min-h-10 cursor-pointer rounded border px-[20px] leading-[40px]'
+            className='border-gray-E0 relative inline-block min-h-10 w-[154px] cursor-pointer rounded border px-[20px] leading-[40px]'
             onClick={() => setIsShowBox(!isShowBox)}
           >
             <Image
@@ -42,12 +43,20 @@ export default function Header() {
               className='mr-2 inline-block'
             />
             {username}
+            {isShowBox ? (
+              <UpOutlined className='ml-[6px]' />
+            ) : (
+              <DownOutlined className='ml-[6px]' />
+            )}
             {isShowBox && (
-              <div
-                className='border-t-none border-gray-E0 hover:bg-gray-F5 hover:text-blue-click absolute left-0 top-11 h-10 w-full rounded border bg-white text-center'
-                onClick={() => handleLogout()}
-              >
-                Logout
+              <div className='h-13 border-gray-E0 absolute left-0 top-[52px] w-full rounded border bg-white p-1 text-center'>
+                <UpOutlined className='border-b-none text-gray-E0 absolute left-[68px] top-[-10px] bg-white text-xs' />
+                <div
+                  className='hover:bg-gray-F5 border-none text-center'
+                  onClick={() => handleLogout()}
+                >
+                  Logout
+                </div>
               </div>
             )}
           </div>
