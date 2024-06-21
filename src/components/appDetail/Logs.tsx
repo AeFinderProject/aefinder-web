@@ -8,126 +8,67 @@ import {
   WarningOutlined,
 } from '@ant-design/icons';
 import { Input, Radio, Select, Tag } from 'antd';
+import { MessageInstance } from 'antd/es/message/interface';
 import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import utc from 'dayjs/plugin/utc';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useThrottleCallback } from '@/lib/utils';
 
 import { useAppSelector } from '@/store/hooks';
 
 import { getLog } from '@/api/requestApp';
+import { LogsColor, LogsText } from '@/constant';
+
+import LogsItem from './LogsItem';
 
 import { GetLogResponse } from '@/types/appType';
 
-const LogsColor = {
-  Debug: '#1890ff',
-  Error: '#f5222d',
-  Warning: '#faad14',
-  Information: '#52c41a',
+type LogsProps = {
+  messageApi: MessageInstance;
 };
 
-const LogsText = {
-  Debug: 'Debug',
-  Error: 'Error',
-  Warning: 'Warn',
-  Information: 'Info',
-};
-
-dayjs.extend(utc);
-dayjs.extend(customParseFormat);
-
-export default function Logs() {
+export default function Logs({ messageApi }: LogsProps) {
   const [search, setSearch] = useState<string>('');
   const [filterBy, setFilterBy] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('Newest');
   const [logsList, setLogsList] = useState<GetLogResponse[]>([]);
-  const [filteredLogsList, setFilteredLogsList] = useState<GetLogResponse[]>(
-    []
-  );
   const [startTime, setStartTime] = useState<string>('');
   const [logId, setLogId] = useState<string>('');
-  const [isSearching, setIsSearching] = useState<boolean>(false);
   const { currentAppDetail, currentVersion } = useAppSelector(
     (state) => state.app
   );
 
-  useEffect(() => {
-    if (search === '' && filterBy === 'All') {
-      setIsSearching(false);
-    }
-    if (search !== '' || filterBy !== 'All') {
-      setIsSearching(true);
-    }
-  }, [search, filterBy]);
+  const handleSearch = useThrottleCallback((value) => {
+    setLogsList([]);
+    setStartTime('');
+    setLogId('');
+    setSearch(value);
+  }, []);
 
-  const handleSearch = useThrottleCallback(
-    (value: string) => {
-      setFilterBy('All');
-      if (value === '') {
-        setFilteredLogsList([]);
-        setSearch(value);
-        return;
-      }
-      // search message.includes
-      const searchedLogs = logsList.filter((log) => {
-        return log?.app_log?.message.includes(value);
-      });
-      setFilteredLogsList(searchedLogs);
-      setSearch(value);
-    },
-    [search, filterBy]
-  );
-
-  const handleFilterBy = (value: string) => {
-    // clear search first
-    setSearch('');
-    if (value === 'All') {
-      setFilteredLogsList([]);
-      setFilterBy(value);
-      return;
-    }
-    // filter as level value
-    const filteredLogs = logsList.filter((item) => {
-      return item?.app_log?.level === value;
-    });
-    setFilteredLogsList(filteredLogs);
+  const handleFilterBy = useThrottleCallback((value) => {
+    setLogsList([]);
+    setStartTime('');
+    setLogId('');
     setFilterBy(value);
-  };
-
-  const handleLogsList = useCallback(() => {
-    if (!isSearching) {
-      return sortBy === 'Newest' ? logsList : logsList.reverse();
-    }
-
-    if (isSearching) {
-      return sortBy === 'Newest'
-        ? filteredLogsList
-        : filteredLogsList.reverse();
-    }
-
-    // default []
-    return [];
-  }, [logsList, filteredLogsList, sortBy, isSearching]);
+  }, []);
 
   useEffect(() => {
     // init params when currentVersion change
     setSearch('');
     setFilterBy('All');
     setLogsList([]);
-    setFilteredLogsList([]);
     setStartTime('');
     setLogId('');
-    setIsSearching(false);
   }, [currentVersion]);
 
-  const getLogs = async () => {
+  const getLogs = useThrottleCallback(async () => {
     const res = await getLog({
       appId: currentAppDetail.appId,
       version: currentVersion,
       startTime: startTime,
       logId: logId,
+      searchKeyWord: search,
+      level: filterBy === 'All' ? '' : filterBy,
     });
     if (!res || !res.length) {
       return;
@@ -137,11 +78,18 @@ export default function Logs() {
     setLogId(res[0].log_id);
     // add new logs to the end
     let tempList = [...res, ...logsList];
-    if (tempList.length > 5000) {
-      tempList = [...tempList.slice(0, 5000)];
+    if (tempList.length > 1500) {
+      tempList = [...tempList.slice(0, 1500)];
     }
     setLogsList(tempList);
-  };
+  }, [
+    currentAppDetail.appId,
+    currentVersion,
+    startTime,
+    logId,
+    search,
+    filterBy,
+  ]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -200,16 +148,16 @@ export default function Logs() {
       </div>
       <div className='bg-gray-F5 relative max-h-[800px] min-h-96 w-full overflow-y-auto rounded-2xl p-8'>
         <SyncOutlined spin className='absolute left-1 top-1' />
-        {handleLogsList().map((log, index) => {
+        {logsList.map((log, index) => {
           return (
             <div
               key={log?.log_id + log?.app_log.time + index}
               className='mb-[24px] flex items-center justify-start text-sm'
             >
-              <div className='w-[160px] min-w-[160px]'>
+              <div className='w-[160px] min-w-[160px] flex-none'>
                 {dayjs(log?.app_log?.time).format('YYYY/MM/DD HH:mm:ss')}
               </div>
-              <div className='mx-[48px] inline-block w-[80px] text-left'>
+              <div className='mx-[48px] inline-block w-[80px] flex-none text-left'>
                 <Tag
                   className='w-[80px] text-center'
                   color={LogsColor[log?.app_log?.level]}
@@ -217,24 +165,15 @@ export default function Logs() {
                   {LogsText[log?.app_log?.level]}
                 </Tag>
               </div>
-
-              <div className='overflow-hidden'>
-                <div className='truncate-3-lines w-full max-w-[100%] text-left'>
-                  {log?.app_log?.message}
-                </div>
-                <div className='text-muted w-full max-w-[100%] truncate text-left'>
-                  {log?.app_log?.exception}
-                </div>
-              </div>
+              <LogsItem
+                message={log?.app_log?.message}
+                exception={log?.app_log?.exception}
+                messageApi={messageApi}
+              />
             </div>
           );
         })}
-        {logsList.length === 0 && !isSearching && (
-          <div className='text-center'>No log</div>
-        )}
-        {filteredLogsList.length === 0 && isSearching && (
-          <div className='text-center'>No match log</div>
-        )}
+        {logsList.length === 0 && <div className='text-center'>loading...</div>}
       </div>
     </div>
   );
