@@ -53,7 +53,7 @@ export default function LogsItem({
       <div
         className={clsx(
           'w-full max-w-[100%] break-all text-left',
-          isShow ? 'truncate-10-lines' : 'line-clamp-3'
+          isShow ? '' : 'line-clamp-3'
         )}
       >
         {message}
@@ -61,7 +61,7 @@ export default function LogsItem({
       <div
         className={clsx(
           'w-full max-w-[100%] break-all text-left font-bold text-black',
-          isShow ? 'truncate-10-lines' : 'line-clamp-1'
+          isShow ? '' : 'line-clamp-1'
         )}
       >
         {exception}
