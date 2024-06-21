@@ -32,7 +32,7 @@ export default function Header() {
             Docs
           </UnstyledLink> */}
           <div
-            className='border-gray-E0 relative inline-block min-h-10 w-[155px] cursor-pointer rounded border px-[20px] leading-[40px]'
+            className='border-gray-E0 relative inline-block min-h-10 w-[165px] cursor-pointer rounded border px-[20px] leading-[40px]'
             onClick={() => setIsShowBox(!isShowBox)}
           >
             <Image
@@ -44,9 +44,9 @@ export default function Header() {
             />
             {username}
             {isShowBox ? (
-              <UpOutlined className='text-gray-80 absolute right-[16px] top-[13px]' />
+              <UpOutlined className='text-gray-80 ml-[6px]' />
             ) : (
-              <DownOutlined className='text-gray-80 absolute right-[16px] top-[13px]' />
+              <DownOutlined className='text-gray-80 ml-[6px]' />
             )}
             {isShowBox && (
               <div className='h-13 border-gray-E0 absolute left-0 top-[52px] w-full rounded border bg-white p-1 text-center'>
