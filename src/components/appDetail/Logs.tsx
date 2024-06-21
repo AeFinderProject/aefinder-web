@@ -8,6 +8,7 @@ import {
   WarningOutlined,
 } from '@ant-design/icons';
 import { Input, Radio, Select, Tag } from 'antd';
+import { MessageInstance } from 'antd/es/message/interface';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 
@@ -22,7 +23,11 @@ import LogsItem from './LogsItem';
 
 import { GetLogResponse } from '@/types/appType';
 
-export default function Logs() {
+type LogsProps = {
+  messageApi: MessageInstance;
+};
+
+export default function Logs({ messageApi }: LogsProps) {
   const [search, setSearch] = useState<string>('');
   const [filterBy, setFilterBy] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('Newest');
@@ -149,10 +154,10 @@ export default function Logs() {
               key={log?.log_id + log?.app_log.time + index}
               className='mb-[24px] flex items-center justify-start text-sm'
             >
-              <div className='w-[160px] min-w-[160px]'>
+              <div className='w-[160px] min-w-[160px] flex-none'>
                 {dayjs(log?.app_log?.time).format('YYYY/MM/DD HH:mm:ss')}
               </div>
-              <div className='mx-[48px] inline-block w-[80px] text-left'>
+              <div className='mx-[48px] inline-block w-[80px] flex-none text-left'>
                 <Tag
                   className='w-[80px] text-center'
                   color={LogsColor[log?.app_log?.level]}
@@ -163,6 +168,7 @@ export default function Logs() {
               <LogsItem
                 message={log?.app_log?.message}
                 exception={log?.app_log?.exception}
+                messageApi={messageApi}
               />
             </div>
           );
