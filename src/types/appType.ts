@@ -46,6 +46,8 @@ export type GetLogRequest = {
   version: string;
   startTime: string;
   logId: string;
+  searchKeyWord: string;
+  level: string;
 };
 
 export type GetLogResponse = {
