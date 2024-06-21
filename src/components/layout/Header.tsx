@@ -32,7 +32,7 @@ export default function Header() {
             Docs
           </UnstyledLink> */}
           <div
-            className='border-gray-E0 relative inline-block min-h-10 w-[165px] cursor-pointer rounded border px-[20px] leading-[40px]'
+            className='border-gray-E0 relative inline-block min-h-10 w-[175px] cursor-pointer rounded border px-[20px] leading-[40px]'
             onClick={() => setIsShowBox(!isShowBox)}
           >
             <Image
