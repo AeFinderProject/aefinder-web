@@ -18,7 +18,10 @@ export default function Header() {
   }, [router]);
 
   const handleLinkToHome = useCallback(() => {
-    router.push('/');
+    router.replace('/');
+    setTimeout(() => {
+      router.reload();
+    }, 100);
   }, [router]);
 
   return (
