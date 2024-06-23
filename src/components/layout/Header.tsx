@@ -17,6 +17,10 @@ export default function Header() {
     router.push('/login');
   }, [router]);
 
+  const handleLinkToHome = useCallback(() => {
+    router.push('/');
+  }, [router]);
+
   return (
     <header className='border-gray-E0 flex h-[72px] w-full items-center justify-between border-b px-[40px] py-[24px]'>
       <Image
@@ -24,8 +28,10 @@ export default function Header() {
         alt='logo'
         width={150}
         height={30}
+        onClick={handleLinkToHome}
+        className='cursor-pointer'
       />
-      {pathname !== '/login' && (
+      {pathname !== '/login' && pathname !== '/' && (
         <div>
           <PrimaryLink className='mr-[40px]' href='/dashboard'>
             My Dashboard
