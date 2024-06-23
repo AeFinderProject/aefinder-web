@@ -1,4 +1,4 @@
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { ReactNode } from 'react';
 import { useCallback, useEffect } from 'react';
 
@@ -10,8 +10,12 @@ import { queryAuthToken } from '@/api/apiUtils';
 export default function LoginProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
-
   const queryAuth = useCallback(async () => {
+    // if home page, do not queryAuth
+    if (router?.pathname === '/') {
+      return;
+    }
+
     const res = await queryAuthToken();
     if (res.auth === 'NoAuthToken') {
       router.push(`/login`);
