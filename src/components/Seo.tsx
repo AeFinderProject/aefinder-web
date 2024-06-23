@@ -15,7 +15,7 @@ const defaultMeta = {
    * No need to be filled, will be populated with openGraph function
    * If you wish to use a normal image, just specify the path below
    */
-  image: '/public/svg/logo-banner.svg',
+  image: '/assets/svg/logo-banner.svg',
 };
 
 type SeoProps = {
@@ -64,7 +64,10 @@ export default function Seo(props: SeoProps) {
         <link key={linkProps.href} {...linkProps} />
       ))}
       <meta name='msapplication-TileColor' content='#ffffff' />
-      <meta name='msapplication-config' content='/favicon/browserconfig.xml' />
+      <meta
+        name='msapplication-config'
+        content='/assets/favicon/browserconfig.xml'
+      />
       <meta name='theme-color' content='#ffffff' />
     </Head>
   );
@@ -74,25 +77,25 @@ const favicons: Array<React.ComponentPropsWithoutRef<'link'>> = [
   {
     rel: 'apple-touch-icon',
     sizes: '180x180',
-    href: '/favicon/apple-touch-icon.png',
+    href: '/assets/favicon/apple-touch-icon.png',
   },
   {
     rel: 'icon',
     type: 'image/png',
     sizes: '32x32',
-    href: '/favicon/favicon-32x32.png',
+    href: '/assets/favicon/favicon-32x32.png',
   },
   {
     rel: 'icon',
     type: 'image/png',
     sizes: '16x16',
-    href: '/favicon/favicon-16x16.png',
+    href: '/assets/favicon/favicon-16x16.png',
   },
-  { rel: 'manifest', href: '/favicon/site.webmanifest' },
+  { rel: 'manifest', href: '/assets/favicon/site.webmanifest' },
   {
     rel: 'mask-icon',
-    href: '/favicon/safari-pinned-tab.svg',
+    href: '/assets/favicon/safari-pinned-tab.svg',
     color: '#00e887',
   },
-  { rel: 'shortcut icon', href: '/favicon/favicon.ico' },
+  { rel: 'shortcut icon', href: '/assets/favicon/favicon.ico' },
 ];

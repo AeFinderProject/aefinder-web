@@ -11,4 +11,8 @@ module.exports = [
     source: '/connect/:path*',
     destination: `${AeFinderAuthHost}/connect/:path*`,
   },
+  {
+    source: '/assets/_next/:path*',
+    destination: '/_next/:path*',
+  },
 ];

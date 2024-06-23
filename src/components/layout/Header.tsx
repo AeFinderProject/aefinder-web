@@ -17,10 +17,24 @@ export default function Header() {
     router.push('/login');
   }, [router]);
 
+  const handleLinkToHome = useCallback(() => {
+    router.replace('/');
+    setTimeout(() => {
+      router.reload();
+    }, 100);
+  }, [router]);
+
   return (
     <header className='border-gray-E0 flex h-[72px] w-full items-center justify-between border-b px-[40px] py-[24px]'>
-      <Image src='/svg/aefinder-logo.svg' alt='logo' width={150} height={30} />
-      {pathname !== '/login' && (
+      <Image
+        src='/assets/svg/aefinder-logo.svg'
+        alt='logo'
+        width={150}
+        height={30}
+        onClick={handleLinkToHome}
+        className='cursor-pointer'
+      />
+      {pathname !== '/login' && pathname !== '/' && (
         <div>
           <PrimaryLink className='mr-[40px]' href='/dashboard'>
             My Dashboard
@@ -36,7 +50,7 @@ export default function Header() {
             onClick={() => setIsShowBox(!isShowBox)}
           >
             <Image
-              src='/svg/user.svg'
+              src='/assets/svg/user.svg'
               alt='user'
               width={18}
               height={18}

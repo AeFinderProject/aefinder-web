@@ -33,7 +33,7 @@ export default function DownloadTempFile() {
       <div className='w-[370px] text-center'>
         <div className='mt-8 text-xs font-medium'>GET STARTED</div>
         <Image
-          src='/svg/download.svg'
+          src='/assets/svg/download.svg'
           alt='download'
           width={72}
           height={110}

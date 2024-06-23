@@ -1,1 +1,8 @@
-module.exports = [(nextConfig) => nextConfig];
+module.exports = [
+  (nextConfig) => {
+    return {
+      ...nextConfig,
+      assetPrefix: '/assets',
+    };
+  },
+];
