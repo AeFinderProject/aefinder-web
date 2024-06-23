@@ -53,7 +53,12 @@ export default function Dashboard() {
       </div>
       {appList.length === 0 && (
         <div className='flex min-h-[450px] w-full flex-col items-center justify-center'>
-          <Image src='/svg/no-app.svg' alt='No app' width={165} height={190} />
+          <Image
+            src='/assets/svg/no-app.svg'
+            alt='No app'
+            width={165}
+            height={190}
+          />
           <div className='mb-2 mt-6 text-2xl text-black'>
             No apps created yet
           </div>

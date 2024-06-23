@@ -9,7 +9,7 @@ export function openGraph({
   siteName,
   templateTitle,
   description,
-  logo = '/public/svg/logo-banner.svg',
+  logo = '/assets/svg/logo-banner.svg',
 }: OpenGraphType): string {
   const ogLogo = encodeURIComponent(logo);
   const ogSiteName = encodeURIComponent(siteName.trim());
