@@ -53,7 +53,12 @@ export default function LogIn() {
   return (
     <div className='flex w-full flex-col items-center justify-center pb-10 text-center'>
       {contextHolder}
-      <Image src='/svg/logo-banner.svg' alt='logo' width={320} height={320} />
+      <Image
+        src='/assets/svg/logo-banner.svg'
+        alt='logo'
+        width={320}
+        height={320}
+      />
       <div className='mx-auto w-[442px]'>
         <div className='text-xl'>Welcome, please sign in to continue</div>
         <div className='border-gray-F0 mt-4 rounded-md border px-[24px] pt-[24px]'>

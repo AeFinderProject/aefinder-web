@@ -36,7 +36,7 @@ export default function AppItemCard({ appList }: AppItemProps) {
                 {AppStatusType[item.status]}
               </Button>
               <Image
-                src='/svg/app-default-bg.svg'
+                src='/assets/svg/app-default-bg.svg'
                 alt='app-bg'
                 width={120}
                 height={120}

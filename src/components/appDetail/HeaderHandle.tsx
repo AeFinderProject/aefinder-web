@@ -41,7 +41,7 @@ export default function HeaderHandle({
     <div className='border-gray-F0 flex h-[130px] items-center justify-between border-b pt-[14px]'>
       <div>
         <Image
-          src='/svg/app-default-bg.svg'
+          src='/assets/svg/app-default-bg.svg'
           alt='logo'
           width={32}
           height={32}
@@ -53,7 +53,7 @@ export default function HeaderHandle({
           </div>
           <div className='text-gray-80 absolute left-[-40px] top-[-20px] min-w-[100px] text-sm'>
             <Image
-              src='/svg/user.svg'
+              src='/assets/svg/user.svg'
               alt='user'
               width={18}
               height={18}
