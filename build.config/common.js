@@ -17,7 +17,7 @@ module.exports = {
       },
       {
         protocol: 'https',
-        hostname: 'aefinder.s3.ap-northeast-1.amazonaws.com',
+        hostname: 'aefinder-mainnet.s3.ap-northeast-1.amazonaws.com',
       },
     ],
   },

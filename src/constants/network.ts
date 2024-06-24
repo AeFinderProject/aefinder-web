@@ -13,7 +13,7 @@ export const BackEndNetWorkMap: Record<string, WebsiteNetworkConfig> = {
     },
     mainnet: {
       cmsUrl: 'https://cms.aefinder.io/',
-      s3Url: 'https://aefinder-dev.s3.ap-northeast-1.amazonaws.com/',
+      s3Url: 'https://aefinder-mainnet.s3.ap-northeast-1.amazonaws.com/',
     },
   },
   // Add More ...
