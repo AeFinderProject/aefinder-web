@@ -33,8 +33,8 @@ export default function CreateAppDrawer({
       description: '',
       sourceCodeUrl: '',
       status: 0,
-      CreateTime: 0,
-      UpdateTime: 0,
+      createTime: 0,
+      updateTime: 0,
     }
   );
 

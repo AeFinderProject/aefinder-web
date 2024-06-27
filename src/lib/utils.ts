@@ -68,9 +68,9 @@ export function handleErrorMessage(error: any, errorText?: string) {
   console.log('error', error?.response);
   // common error
   error = error?.response || error;
-  // log timeout
+  // login timeout
   if (error?.status === 401) {
-    message.error('log timeout');
+    message.info('Need login');
     window.location.href = '/login';
     return;
   }

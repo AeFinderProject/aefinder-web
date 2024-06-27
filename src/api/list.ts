@@ -43,6 +43,10 @@ export const appApiList = {
     target: `${AeFinderHost}/api/apps/log`,
     baseConfig: { method: 'GET' },
   },
+  fetchQraphiql: {
+    target: `${AeFinderHost}/api/app/graphql`,
+    baseConfig: { method: 'GET' },
+  },
 };
 
 export const SubscriptionsApiList = {

@@ -1,4 +1,4 @@
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 import Copy from '@/components/Copy';
 
@@ -20,11 +20,11 @@ export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
           <Copy
             className='mx-[32px]'
             label='Last updated'
-            content={moment(currentAppDetail?.UpdateTime).format('YYYY-MM-DD')}
+            content={dayjs(currentAppDetail?.updateTime).format('YYYY-MM-DD')}
           />
           <Copy
             label='Created'
-            content={moment(currentAppDetail?.CreateTime).format('YYYY-MM-DD')}
+            content={dayjs(currentAppDetail?.createTime).format('YYYY-MM-DD')}
           />
         </div>
         {currentAppDetail?.description && (
