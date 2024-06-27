@@ -15,8 +15,8 @@ export interface CreateAppResponse {
   description: string;
   sourceCodeUrl: string;
   status: number; // 0: UnDeployed, 1: Deployed
-  CreateTime: number;
-  UpdateTime: number;
+  createTime: number;
+  updateTime: number;
 }
 
 export type ModifyAppRequest = {
