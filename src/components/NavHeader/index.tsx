@@ -85,14 +85,14 @@ export default function NavHeader({ className, style, path = ROUTER.DEFAULT, dat
     <header
       id="website-header"
       className={clsx([
-        'flex-row-content-center',
-        'section-container',
+        'flex-row-center-between',
+        styles.headerContainer,
         styles.navSticky,
         styles.navBlackHeader,
         className,
       ])}
       style={{ backgroundColor: data.commonStyles?.defaultBackgroundColor, ...style }}>
-      <div className={clsx(['page-container', styles.navHeader])}>
+      <div className={clsx([styles.navHeader])}>
         <CommonImage
           quality={100}
           src={data.logo?.filename_disk ? s3Url + data.logo.filename_disk : ''}

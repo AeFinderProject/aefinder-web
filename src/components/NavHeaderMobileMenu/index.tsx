@@ -63,7 +63,12 @@ export default function NavHeaderMobileMenu({ isOpen = false, data, callback }: 
       <div className={clsx(['flex-row-between', styles.logoRow])}>
         <CommonImage
           src={data.logo?.filename_disk ? s3Url + data.logo.filename_disk : ''}
-          style={{ width: (Number(data.logo.width) / Number(data.logo.height)) * 32, height: 32, cursor: 'pointer' }}
+          style={{
+            width: (Number(data.logo.width) / Number(data.logo.height)) * 32,
+            minWidth: 150,
+            height: 32,
+            cursor: 'pointer',
+          }}
           fill
           alt="websiteLogo"
           priority
