@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import React, { useCallback, useState } from 'react';
 
 import PrimaryLink from '@/components/links/PrimaryLink';
+import UnstyledLink from '@/components/links/UnstyledLink';
 
 import { useAppSelector } from '@/store/hooks';
 
@@ -36,15 +37,10 @@ export default function Header() {
       />
       {pathname !== '/login' && pathname !== '/' && (
         <div>
-          <PrimaryLink className='mr-[40px]' href='/dashboard'>
-            My Dashboard
-          </PrimaryLink>
-          {/* <UnstyledLink
-            href='https://hoopox.feishu.cn/wiki/UDSiwf6s6iHTQ9k4ZbWcvEaGn0e'
-            className='mx-[40px]'
-          >
+          <PrimaryLink href='/dashboard'>My Dashboard</PrimaryLink>
+          <UnstyledLink href='https://docs.aefinder.io' className='mx-[40px]'>
             Docs
-          </UnstyledLink> */}
+          </UnstyledLink>
           <div
             className='border-gray-E0 relative inline-block min-h-10 cursor-pointer rounded border pl-[20px] pr-[30px] text-center leading-[40px]'
             onClick={() => setIsShowBox(!isShowBox)}
