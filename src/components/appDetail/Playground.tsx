@@ -21,8 +21,6 @@ export default function Playground() {
       url: `${appApiList?.fetchQraphiql?.target}/${appId}/${currentVersion}`,
       headers: {
         'Content-Type': 'application/json',
-        credentials: 'cross-origin',
-        mode: 'cors',
       },
     });
     return <GraphiQL fetcher={tempFetcher}></GraphiQL>;
