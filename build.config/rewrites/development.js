@@ -1,6 +1,6 @@
 // testnet
-const AeFinderHost = 'https://gcptest-indexer-api.aefinder.io';
-const AeFinderAuthHost = 'https://gcptest-indexer-auth.aefinder.io';
+const AeFinderHost = 'https://k8sgcptest-indexer-api.aefinder.io';
+const AeFinderAuthHost = 'https://k8sgcptest-indexer-auth.aefinder.io';
 
 // devnet
 // const AeFinderHost = 'http://192.168.71.128:8081';
