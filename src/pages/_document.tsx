@@ -9,7 +9,7 @@ const MyDocument = () => (
     <Head>
       <link
         rel='preload'
-        href='/assets/fonts/inter-var-latin.woff2'
+        href='https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap'
         as='font'
         type='font/woff2'
         crossOrigin='anonymous'

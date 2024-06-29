@@ -6,9 +6,7 @@ const defaultMeta = {
   siteName: 'Finding data is easier',
   description:
     'AeFinder is a powerful decentralised protocol used for indexing and querying the data of the blockchain',
-  /** Without additional '/' on the end, e.g. https://theodorusclarence.com */
-  // TODO !STARTERCONF Change these default meta
-  url: 'https://tsnext-tw.thcl.dev',
+  url: 'https://aefinder.io/',
   type: 'website',
   robots: 'follow, index',
   /**
