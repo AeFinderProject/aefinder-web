@@ -1,7 +1,10 @@
+'use client';
+
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
+import clsx from 'clsx';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import PrimaryLink from '@/components/links/PrimaryLink';
 import UnstyledLink from '@/components/links/UnstyledLink';
@@ -13,6 +16,20 @@ export default function Header() {
   const [isShowBox, setIsShowBox] = useState(false);
   const { pathname } = router;
   const username = useAppSelector((state) => state.common.username);
+
+  useEffect(() => {
+    const logoutContainer = document?.getElementById('logout-container');
+    const listen = function (event: Event) {
+      const node = event?.target;
+      if (node instanceof Node && !logoutContainer?.contains(node)) {
+        setIsShowBox(false);
+      }
+    };
+    document?.addEventListener('click', listen);
+    return () => {
+      document?.removeEventListener('click', listen);
+    };
+  }, []);
 
   const handleLogout = useCallback(() => {
     router.push('/login');
@@ -26,7 +43,7 @@ export default function Header() {
   }, [router]);
 
   return (
-    <header className='border-gray-E0 flex h-[72px] w-full items-center justify-between border-b px-[40px] py-[24px]'>
+    <header className='border-gray-E0 flex h-[72px] w-full items-center justify-between border-b px-[16px] py-[24px] sm:px-[40px]'>
       <Image
         src='/assets/svg/aefinder-logo.svg'
         alt='logo'
@@ -43,7 +60,11 @@ export default function Header() {
           </UnstyledLink>
           <div
             className='border-gray-E0 relative inline-block min-h-10 cursor-pointer rounded border pl-[20px] pr-[30px] text-center leading-[40px]'
-            onClick={() => setIsShowBox(!isShowBox)}
+            onClick={() => {
+              setTimeout(() => {
+                setIsShowBox(true);
+              }, 100);
+            }}
           >
             <Image
               src='/assets/svg/user.svg'
@@ -58,17 +79,21 @@ export default function Header() {
             ) : (
               <DownOutlined className='text-gray-80 absolute right-[6px] top-[13px]' />
             )}
-            {isShowBox && (
-              <div className='h-13 border-gray-E0 absolute left-0 top-[52px] w-full rounded border bg-white p-1 text-center'>
-                <UpOutlined className='border-b-none text-gray-E0 absolute left-[68px] top-[-10px] bg-white text-xs' />
-                <div
-                  className='hover:bg-gray-F5 border-none text-center'
-                  onClick={() => handleLogout()}
-                >
-                  Logout
-                </div>
+            <div
+              id='logout-container'
+              className={clsx(
+                'h-13 border-gray-E0 absolute left-0 top-[52px] w-full rounded border bg-white p-1 text-center',
+                !isShowBox && 'hidden'
+              )}
+            >
+              <UpOutlined className='border-b-none text-gray-E0 absolute left-[68px] top-[-10px] bg-white text-xs' />
+              <div
+                className='hover:bg-gray-F5 border-none text-center'
+                onClick={() => handleLogout()}
+              >
+                Logout
               </div>
-            )}
+            </div>
           </div>
         </div>
       )}

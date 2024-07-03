@@ -56,8 +56,9 @@ export default function LogIn() {
       <Image
         src='/assets/svg/logo-banner.svg'
         alt='logo'
-        width={320}
-        height={320}
+        width={240}
+        height={240}
+        className='sm:h-[320px] sm:w-[320px]'
       />
       <div className='mx-auto w-[442px]'>
         <div className='text-xl'>Welcome, please sign in to continue</div>

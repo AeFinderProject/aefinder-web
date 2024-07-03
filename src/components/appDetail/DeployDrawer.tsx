@@ -137,7 +137,7 @@ export default function DeployDrawer({
           content:
             'File upload failed. Please choose a file within the size limit.',
         });
-        return false;
+        return Upload.LIST_IGNORE;
       }
       return true;
     },
