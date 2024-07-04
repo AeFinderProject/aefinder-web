@@ -23,7 +23,7 @@ export default function Playground() {
         'Content-Type': 'application/json',
       },
     });
-    return <GraphiQL fetcher={tempFetcher} query='' />;
+    return <GraphiQL fetcher={tempFetcher} />;
   }, [appId, currentVersion]);
 
   return (
