@@ -1,13 +1,14 @@
 {
   "name": "aefinder",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:mainnet": "node ./scripts/handleNetwork_mainnet.js && next build",
-    "build:testnet": "node ./scripts/handleNetwork_testnet.js && next build",
-    "build:devnet": "node ./scripts/handleNetwork_devnet.js && next build",
+    "build:mainnet": "NEXT_PUBLIC_NETWORK_KEY=mainnet next build",
+    "build:testnet": "NEXT_PUBLIC_NETWORK_KEY=testnet next build",
+    "build:devnet": "NEXT_PUBLIC_NETWORK_KEY=devnet next build",
+    "build:localnet": "NEXT_PUBLIC_NETWORK_KEY=localnet next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "eslint src --fix && yarn format",

@@ -34,7 +34,7 @@ export default function Dashboard() {
     <div>
       {contextHolder}
       <Seo templateTitle='Dashboard' />
-      <div className='px-[40px]'>
+      <div className='px-[16px] sm:px-[40px]'>
         <div className='border-gray-F0 flex h-[140px] items-center justify-between border-b'>
           <div>
             <div className='text-3xl text-black'>My Dashboard</div>
@@ -62,7 +62,7 @@ export default function Dashboard() {
           <div className='mb-2 mt-6 text-2xl text-black'>
             No apps created yet
           </div>
-          <div className='text-gray-80 w-[670px] text-center'>
+          <div className='text-gray-80 w-[380px] text-center sm:w-[580px]'>
             AeFinder is a powerful decentralised protocol used for indexing and
             querying the data of the blockchain. It makes it possible to query
             data that are difficult to query directly.

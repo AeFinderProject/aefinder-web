@@ -1,10 +1,14 @@
-// testnet
-// const AeFinderHost = 'https://gcptest-indexer-api.aefinder.io';
-// const AeFinderAuthHost = 'https://gcptest-indexer-auth.aefinder.io';
+const { NEXT_PUBLIC_NETWORK_KEY } = process.env;
 
-// devnet
-const AeFinderHost = 'http://192.168.71.128:8081';
-const AeFinderAuthHost = 'http://192.168.71.128:8082';
+// devnet | localnet
+let AeFinderHost = 'http://192.168.71.128:8081';
+let AeFinderAuthHost = 'http://192.168.71.128:8082';
+
+// testnet
+if (NEXT_PUBLIC_NETWORK_KEY === 'testnet') {
+  AeFinderHost = 'https://gcptest-indexer-api.aefinder.io';
+  AeFinderAuthHost = 'https://gcptest-indexer-auth.aefinder.io';
+}
 
 module.exports = [
   {

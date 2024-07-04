@@ -1,3 +1,4 @@
+'use client';
 import { Drawer, Steps } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
 import React, { useState } from 'react';
@@ -43,8 +44,8 @@ export default function CreateAppDrawer({
       title={current === 0 ? 'Create App' : 'Edit App'}
       open={createAppDrawerVisible}
       onClose={() => setCreateAppDrawerVisible(false)}
-      closeIcon={null}
       destroyOnClose={true}
+      width={window?.innerWidth > 640 ? 380 : 640}
     >
       {type === 0 && (
         <Steps
