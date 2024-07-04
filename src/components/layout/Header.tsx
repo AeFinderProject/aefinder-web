@@ -54,15 +54,20 @@ export default function Header() {
       />
       {pathname !== '/login' && pathname !== '/' && (
         <div>
-          <PrimaryLink href='/dashboard'>My Dashboard</PrimaryLink>
-          <UnstyledLink href='https://docs.aefinder.io' className='mx-[40px]'>
+          <PrimaryLink href='/dashboard' className='hidden sm:inline-block'>
+            My Dashboard
+          </PrimaryLink>
+          <UnstyledLink
+            href='https://docs.aefinder.io'
+            className='mx-[40px] hidden sm:inline-block'
+          >
             Docs
           </UnstyledLink>
           <div
             className='border-gray-E0 relative inline-block min-h-10 cursor-pointer rounded border pl-[20px] pr-[30px] text-center leading-[40px]'
             onClick={() => {
               setTimeout(() => {
-                setIsShowBox(true);
+                setIsShowBox(!isShowBox);
               }, 100);
             }}
           >
@@ -82,13 +87,27 @@ export default function Header() {
             <div
               id='logout-container'
               className={clsx(
-                'h-13 border-gray-E0 absolute left-0 top-[52px] w-full rounded border bg-white p-1 text-center',
+                'h-13 border-gray-F0 fixed left-0 top-[71px] z-10 w-full border-b border-t bg-white bg-opacity-100 p-1 sm:absolute sm:top-[52px] sm:rounded sm:border',
                 !isShowBox && 'hidden'
               )}
             >
-              <UpOutlined className='border-b-none text-gray-E0 absolute left-[68px] top-[-10px] bg-white text-xs' />
+              <UpOutlined className='border-b-none text-gray-E0 absolute hidden bg-white text-xs sm:right-[58px] sm:top-[-10px] sm:block' />
+              <PrimaryLink
+                href='/dashboard'
+                className='hover:bg-gray-F5 w-full border-none px-[16px] sm:hidden'
+              >
+                My Dashboard
+              </PrimaryLink>
+              <div className='hover:bg-gray-F5 border-gray-F0 w-full border-b border-t px-[16px] text-left sm:hidden'>
+                <UnstyledLink
+                  href='https://docs.aefinder.io'
+                  className='test-left block w-full'
+                >
+                  Docs
+                </UnstyledLink>
+              </div>
               <div
-                className='hover:bg-gray-F5 border-none text-center'
+                className='hover:bg-gray-F5 border-none px-[16px] text-left sm:text-center'
                 onClick={() => handleLogout()}
               >
                 Logout
