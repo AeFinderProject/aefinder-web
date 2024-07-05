@@ -24,7 +24,7 @@ import LogsItem from './LogsItem';
 import { GetLogResponse } from '@/types/appType';
 
 type LogsProps = {
-  messageApi: MessageInstance;
+  readonly messageApi: MessageInstance;
 };
 
 export default function Logs({ messageApi }: LogsProps) {
@@ -70,7 +70,7 @@ export default function Logs({ messageApi }: LogsProps) {
       searchKeyWord: search,
       level: filterBy === 'All' ? '' : filterBy,
     });
-    if (!res || !res.length) {
+    if (!res?.length) {
       return;
     }
     // get last log timestamp as the next request's startTime and logId

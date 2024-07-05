@@ -62,8 +62,13 @@ export function useLatestRef<T>(value: T) {
 
 // eslint-disable-next-line
 export function handleErrorMessage(error: any, errorText?: string) {
-  if (error.status === 500) {
-    return errorText || 'Failed to fetch data';
+  if (
+    error.status === 500 ||
+    error.status === 501 ||
+    error.status === 502 ||
+    error.status === 503
+  ) {
+    return errorText ?? 'Failed to fetch data';
   }
   console.log('error', error?.response);
   // common error

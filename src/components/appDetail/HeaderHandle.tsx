@@ -14,7 +14,7 @@ import { AppStatusType } from '@/types/appType';
 
 type HeaderHandleProps = {
   setDeployDrawerVisible: (visible: boolean) => void;
-  messageApi: MessageInstance;
+  readonly messageApi: MessageInstance;
 };
 
 export default function HeaderHandle({
@@ -110,7 +110,6 @@ export default function HeaderHandle({
       {editAppDrawerVisible && (
         <CreateAppDrawer
           type={1}
-          title='Edit App'
           appDetail={currentAppDetail}
           createAppDrawerVisible={editAppDrawerVisible}
           setCreateAppDrawerVisible={setEditAppDrawerVisible}

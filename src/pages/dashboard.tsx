@@ -22,7 +22,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     const getAppListTemp = async () => {
-      // TODO Login provider not did with service Authorization is null
       await queryAuthToken();
       const { items = [] } = await getAppList();
       dispatch(setAppList(items));
@@ -73,7 +72,6 @@ export default function Dashboard() {
       {createAppDrawerVisible && (
         <CreateAppDrawer
           type={0}
-          title='Create app'
           createAppDrawerVisible={createAppDrawerVisible}
           setCreateAppDrawerVisible={setCreateAppDrawerVisible}
           messageApi={messageApi}

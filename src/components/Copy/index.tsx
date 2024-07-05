@@ -6,11 +6,11 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { formatStr2Ellipsis } from '@/lib/utils';
 
 type CopyProps = {
-  label?: string;
-  content: string | number;
-  isShowCopy?: boolean;
-  className?: string;
-  showLittle?: boolean;
+  readonly label?: string;
+  readonly content: string | number;
+  readonly isShowCopy?: boolean;
+  readonly className?: string;
+  readonly showLittle?: boolean;
 };
 
 message.config({

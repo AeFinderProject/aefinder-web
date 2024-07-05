@@ -5,7 +5,7 @@ import Copy from '@/components/Copy';
 import { CreateAppResponse } from '@/types/appType';
 
 type DetailBoxProps = {
-  currentAppDetail: CreateAppResponse;
+  readonly currentAppDetail: CreateAppResponse;
 };
 
 export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
@@ -44,7 +44,7 @@ export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
         <Copy
           className='my-[24px]'
           label='Deploy Key'
-          content={currentAppDetail?.deployKey || ''}
+          content={currentAppDetail?.deployKey ?? ''}
           isShowCopy={true}
           showLittle={true}
         />

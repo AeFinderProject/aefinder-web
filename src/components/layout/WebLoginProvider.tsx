@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router';
-import { ReactNode } from 'react';
-import { useCallback, useEffect } from 'react';
+import { ReactNode, useCallback, useEffect } from 'react';
 
 import { useAppDispatch } from '@/store/hooks';
 import { setUsername } from '@/store/slices/commonSlice';

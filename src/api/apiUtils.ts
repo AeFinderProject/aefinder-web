@@ -22,9 +22,9 @@ export function getRequestConfig(base: BaseConfig, config?: RequestConfig) {
       ...config,
       ...baseConfig,
       query: (baseConfig.query || '') + (query || ''),
-      method: method ? method : baseConfig.method,
-      params: Object.assign({}, baseConfig.params, params),
-      data: Object.assign({}, baseConfig.data, data),
+      method: method || baseConfig.method,
+      params: { ...baseConfig.params, ...params },
+      data: { ...baseConfig.data, ...data },
     };
   }
 }
