@@ -60,7 +60,7 @@ export default function AppDetail() {
   };
 
   return (
-    <div className='px-[40px] pb-[60px]'>
+    <div className='px-[16px] pb-[30px] sm:px-[40px] sm:pb-[60px]'>
       {contextHolder}
       <HeaderHandle
         setDeployDrawerVisible={setDeployDrawerVisible}

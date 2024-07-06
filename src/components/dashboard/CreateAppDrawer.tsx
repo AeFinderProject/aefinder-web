@@ -1,3 +1,4 @@
+'use client';
 import { Drawer, Steps } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
 import React, { useState } from 'react';
@@ -8,12 +9,11 @@ import CreateAppStep2 from '@/components/dashboard/CreateAppStep2';
 import { CreateAppResponse } from '@/types/appType';
 
 type CreateAppDrawerProps = {
-  type: 0 | 1; // 0 create app, 1 modify app
-  title: string;
-  createAppDrawerVisible: boolean;
+  readonly type: 0 | 1; // 0 create app, 1 modify app
+  readonly createAppDrawerVisible: boolean;
   setCreateAppDrawerVisible: (visible: boolean) => void;
-  appDetail?: CreateAppResponse;
-  messageApi: MessageInstance;
+  readonly appDetail?: CreateAppResponse;
+  readonly messageApi: MessageInstance;
 };
 
 export default function CreateAppDrawer({
@@ -43,8 +43,8 @@ export default function CreateAppDrawer({
       title={current === 0 ? 'Create App' : 'Edit App'}
       open={createAppDrawerVisible}
       onClose={() => setCreateAppDrawerVisible(false)}
-      closeIcon={null}
       destroyOnClose={true}
+      width={window?.innerWidth > 640 ? 380 : 640}
     >
       {type === 0 && (
         <Steps

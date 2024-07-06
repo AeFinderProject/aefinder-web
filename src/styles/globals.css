@@ -130,3 +130,23 @@
     background-size: 0 2px, 100% 2px;
   }
 }
+
+/* graphiql css cover */
+#graphiql-box .graphiql-container {
+  flex-direction: row-reverse;
+}
+#graphiql-box .graphiql-container .graphiql-main {
+  flex-direction: row-reverse;
+}
+
+#graphiql-box .graphiql-execute-button {
+  background-color: #127fff;
+}
+
+#graphiql-box .cm-s-graphiql .cm-keyword {
+  color: #127fff;
+}
+
+#graphiql-box .graphiql-container .graphiql-sessions {
+  background-color: #f5f5f5;
+}

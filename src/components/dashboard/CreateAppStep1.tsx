@@ -9,9 +9,9 @@ import { CreateAppResponse } from '@/types/appType';
 type CreateAppStep1Props = {
   setCurrent: (value: 0 | 1) => void;
   setCreateAppDrawerVisible: (visible: boolean) => void;
-  currentAppDetail: CreateAppResponse;
+  readonly currentAppDetail: CreateAppResponse;
   setCurrentAppDetail: (value: CreateAppResponse) => void;
-  messageApi: MessageInstance;
+  readonly messageApi: MessageInstance;
 };
 
 export default function CreateAppStep1({

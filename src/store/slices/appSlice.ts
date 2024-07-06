@@ -2,13 +2,13 @@ import { createAppSlice } from '@/store/createAppSlice';
 
 import { CreateAppResponse, GetAppDetailResponse } from '@/types/appType';
 
-export interface appSliceState {
+export interface AppSliceState {
   currentAppDetail: GetAppDetailResponse;
   currentVersion: string;
   appList: CreateAppResponse[];
 }
 
-const initialState: appSliceState = {
+const initialState: AppSliceState = {
   currentAppDetail: {} as GetAppDetailResponse,
   currentVersion: '',
   appList: [],

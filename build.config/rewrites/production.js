@@ -1,4 +1,4 @@
-const AeFinderHost = 'https://gcp-indexer-api.aelf.io';
+const AeFinderHost = 'https://indexer-api.aelf.io';
 const AeFinderAuthHost = 'https://indexer-auth.aefinder.io';
 
 module.exports = [

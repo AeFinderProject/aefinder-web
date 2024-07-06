@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { AppStatusType, CreateAppResponse } from '@/types/appType';
 
 type AppItemProps = {
-  appList: CreateAppResponse[];
+  readonly appList: CreateAppResponse[];
 };
 
 export default function AppItemCard({ appList }: AppItemProps) {
@@ -18,10 +18,16 @@ export default function AppItemCard({ appList }: AppItemProps) {
   };
 
   return (
-    <div className='px-[40px] py-[24px]'>
+    <div className='px-[16px] pb-[30px] sm:px-[40px] sm:py-[24px]'>
       <Row gutter={24}>
         {appList.map((item) => (
-          <Col key={item.appId} className='gutter-row p-[16px]' span={6}>
+          <Col
+            key={item.appId}
+            className='gutter-row p-[16px]'
+            xs={12}
+            sm={8}
+            lg={6}
+          >
             <div
               onClick={() => handleAppDetail(item.appId)}
               className='border-gray-E0 bg-gray-F5 flex h-[280px] cursor-pointer flex-col items-center justify-center border'

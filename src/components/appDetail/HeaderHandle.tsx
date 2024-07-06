@@ -14,7 +14,7 @@ import { AppStatusType } from '@/types/appType';
 
 type HeaderHandleProps = {
   setDeployDrawerVisible: (visible: boolean) => void;
-  messageApi: MessageInstance;
+  readonly messageApi: MessageInstance;
 };
 
 export default function HeaderHandle({
@@ -45,7 +45,7 @@ export default function HeaderHandle({
           alt='logo'
           width={32}
           height={32}
-          className='mr-3 inline-block'
+          className='mb-3 mr-3 mt-3 inline-block'
         />
         <div className='relative inline-block'>
           <div className='text-block relative top-[4px] mr-3 text-3xl font-medium'>
@@ -62,22 +62,24 @@ export default function HeaderHandle({
             <span>{username}</span>
           </div>
         </div>
-        <Button
-          className='border-blue-link text-blue-link mr-3'
-          onClick={() => setEditAppDrawerVisible(true)}
-        >
-          <EditOutlined className='align-middle' />
-          Edit
-        </Button>
-        <Button type='primary' onClick={() => setDeployDrawerVisible(true)}>
-          Deploy...
-        </Button>
+        <div className='inline-block'>
+          <Button
+            className='border-blue-link text-blue-link mr-3'
+            onClick={() => setEditAppDrawerVisible(true)}
+          >
+            <EditOutlined className='align-middle' />
+            Edit
+          </Button>
+          <Button type='primary' onClick={() => setDeployDrawerVisible(true)}>
+            Deploy...
+          </Button>
+        </div>
       </div>
       {currentAppDetail.status === AppStatusType.Deployed && (
-        <div>
+        <div className='text-right'>
           <Select
             onChange={(value) => handleChangeVersion(value)}
-            className='w-[200px]'
+            className='mb-3 w-[200px]'
             defaultValue={currentVersion}
           >
             <Select.Option value={currentAppDetail?.versions?.currentVersion}>
@@ -108,7 +110,6 @@ export default function HeaderHandle({
       {editAppDrawerVisible && (
         <CreateAppDrawer
           type={1}
-          title='Edit App'
           appDetail={currentAppDetail}
           createAppDrawerVisible={editAppDrawerVisible}
           setCreateAppDrawerVisible={setEditAppDrawerVisible}

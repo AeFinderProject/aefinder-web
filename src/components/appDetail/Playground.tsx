@@ -23,8 +23,12 @@ export default function Playground() {
         'Content-Type': 'application/json',
       },
     });
-    return <GraphiQL fetcher={tempFetcher}></GraphiQL>;
+    return <GraphiQL fetcher={tempFetcher} />;
   }, [appId, currentVersion]);
 
-  return <div className='relative h-[756px] w-full'>{getGraphiqlhUI()}</div>;
+  return (
+    <div id='graphiql-box' className='relative h-[756px] w-full'>
+      {getGraphiqlhUI()}
+    </div>
+  );
 }

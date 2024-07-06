@@ -12,10 +12,10 @@ import { modifyApp } from '@/api/requestApp';
 import { CreateAppResponse } from '@/types/appType';
 
 type CreateAppStep2Props = {
-  type: 0 | 1; // 0: create, 1: modify
-  currentAppDetail: CreateAppResponse;
+  readonly type: 0 | 1; // 0: create, 1: modify
+  readonly currentAppDetail: CreateAppResponse;
   setCreateAppDrawerVisible: (value: boolean) => void;
-  messageApi: MessageInstance;
+  readonly messageApi: MessageInstance;
 };
 
 export default function CreateAppStep2({
@@ -27,18 +27,18 @@ export default function CreateAppStep2({
   const [form] = Form.useForm();
   const FormItem = Form.Item;
   const dispatch = useAppDispatch();
-  const [tempDescription, setTemDescription] = useState<string>(
+  const [description, setDescription] = useState<string>(
     currentAppDetail.description
   );
-  const [tempSourceCodeUrl, setTempSourceCodeUrl] = useState<string>(
+  const [sourceCodeUrl, setSourceCodeUrl] = useState<string>(
     currentAppDetail.sourceCodeUrl
   );
 
   const handleModify = useCallback(async () => {
     const res = await modifyApp({
       appId: currentAppDetail.appId,
-      description: tempDescription,
-      sourceCodeUrl: tempSourceCodeUrl,
+      description: description,
+      sourceCodeUrl: sourceCodeUrl,
     });
     if (res) {
       messageApi.open({
@@ -53,8 +53,8 @@ export default function CreateAppStep2({
     setCreateAppDrawerVisible,
     messageApi,
     dispatch,
-    tempDescription,
-    tempSourceCodeUrl,
+    description,
+    sourceCodeUrl,
   ]);
 
   return (
@@ -81,27 +81,27 @@ export default function CreateAppStep2({
       <FormItem
         name='description'
         label='Description'
-        initialValue={tempDescription}
+        initialValue={description}
       >
         <Input
-          value={tempDescription}
+          value={description}
           placeholder='App description'
           className='rounded-md'
           maxLength={500}
-          onChange={(e) => setTemDescription(e.target.value)}
+          onChange={(e) => setDescription(e.target.value)}
         />
       </FormItem>
       <FormItem
         name='sourceCodeUrl'
         label='Repository URL'
-        initialValue={tempSourceCodeUrl}
+        initialValue={sourceCodeUrl}
       >
         <Input
-          value={tempSourceCodeUrl}
+          value={sourceCodeUrl}
           placeholder='App sourceCodeUrl'
           className='rounded-md'
           maxLength={200}
-          onChange={(e) => setTempSourceCodeUrl(e.target.value)}
+          onChange={(e) => setSourceCodeUrl(e.target.value)}
         />
       </FormItem>
       <Divider />

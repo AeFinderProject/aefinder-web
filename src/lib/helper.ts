@@ -17,8 +17,7 @@ export function openGraph({
     ? encodeURIComponent(templateTitle.trim())
     : undefined;
   const ogDesc = encodeURIComponent(description.trim());
-  // TODO : change  your-domain
-  return `https://og.<your-domain>/api/general?siteName=${ogSiteName}&description=${ogDesc}&logo=${ogLogo}${
+  return `https://aefinder.io/api/general?siteName=${ogSiteName}&description=${ogDesc}&logo=${ogLogo}${
     ogTemplateTitle ? `&templateTitle=${ogTemplateTitle}` : ''
   }`;
 }
