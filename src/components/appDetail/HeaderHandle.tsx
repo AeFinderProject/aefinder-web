@@ -14,7 +14,7 @@ import { AppStatusType } from '@/types/appType';
 
 type HeaderHandleProps = {
   setDeployDrawerVisible: (visible: boolean) => void;
-  messageApi: MessageInstance;
+  readonly messageApi: MessageInstance;
 };
 
 export default function HeaderHandle({
@@ -79,7 +79,7 @@ export default function HeaderHandle({
         <div className='text-right'>
           <Select
             onChange={(value) => handleChangeVersion(value)}
-            className='mb-3 w-[200px]'
+            className='mb-3 w-[150px] sm:mb-0 sm:w-[200px]'
             defaultValue={currentVersion}
           >
             <Select.Option value={currentAppDetail?.versions?.currentVersion}>
@@ -110,7 +110,6 @@ export default function HeaderHandle({
       {editAppDrawerVisible && (
         <CreateAppDrawer
           type={1}
-          title='Edit App'
           appDetail={currentAppDetail}
           createAppDrawerVisible={editAppDrawerVisible}
           setCreateAppDrawerVisible={setEditAppDrawerVisible}

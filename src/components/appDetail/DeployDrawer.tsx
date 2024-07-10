@@ -14,12 +14,12 @@ import {
 } from '@/api/requestSubscription';
 
 type DeployDrawerProps = {
-  type: 0 | 1; // 0: deploy, 1: modify
-  title: string;
-  version?: string;
-  deployDrawerVisible: boolean;
+  readonly type: 0 | 1; // 0: deploy, 1: modify
+  readonly title: string;
+  readonly version?: string;
+  readonly deployDrawerVisible: boolean;
   setDeployDrawerVisible: (visible: boolean) => void;
-  messageApi: MessageInstance;
+  readonly messageApi: MessageInstance;
 };
 
 const TextArea = Input.TextArea;
@@ -104,7 +104,7 @@ export default function DeployDrawer({
       const haveUpdateManifestOk = await updateSubscription({
         appId: currentAppDetail?.appId,
         deployKey: currentAppDetail?.deployKey || '',
-        version: version || '',
+        version: version ?? '',
         Manifest: form.getFieldValue('Manifest'),
       });
       setUpdateManifestLoading(false);
@@ -163,7 +163,7 @@ export default function DeployDrawer({
       const haveUpdateCodeOk = await updateCode({
         appId: currentAppDetail?.appId,
         deployKey: currentAppDetail?.deployKey || '',
-        version: version || '',
+        version: version ?? '',
         Code: Code,
       });
       setUpdateCodeLoading(false);
@@ -195,7 +195,7 @@ export default function DeployDrawer({
       open={deployDrawerVisible}
       onClose={() => setDeployDrawerVisible(false)}
       destroyOnClose={true}
-      width='80%'
+      width={window?.innerWidth > 640 ? '80%' : 640}
     >
       <Form
         form={form}
@@ -257,7 +257,7 @@ export default function DeployDrawer({
           {type === 0 && (
             <Button
               size='large'
-              className='border-blue-link text-blue-link mr-[10px] w-[180px]'
+              className='border-blue-link text-blue-link mr-[10px] w-[100px] sm:w-[180px]'
               onClick={() => setDeployDrawerVisible(false)}
             >
               Cancel
@@ -266,7 +266,7 @@ export default function DeployDrawer({
           {type === 0 && (
             <Button
               size='large'
-              className='w-[180px]'
+              className='w-[100px] sm:w-[180px]'
               type='primary'
               htmlType='submit'
               loading={deployLoading}

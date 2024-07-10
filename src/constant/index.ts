@@ -20,9 +20,10 @@ const networkHostMap = {
 };
 
 export type networkType = 'mainnet' | 'testnet' | 'devnet' | 'localnet';
-export const AeFinderHost = networkHostMap[network as networkType].AeFinderHost;
+export const AeFinderHost =
+  networkHostMap[network as networkType]?.AeFinderHost;
 export const AeFinderAuthHost =
-  networkHostMap[network as networkType].AeFinderAuthHost;
+  networkHostMap[network as networkType]?.AeFinderAuthHost;
 
 export const LogsColor = {
   Debug: '#1890ff',

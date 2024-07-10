@@ -5,9 +5,9 @@ import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 type LogsItemProps = {
-  message: string;
-  exception: string;
-  messageApi: MessageInstance;
+  readonly message: string;
+  readonly exception: string;
+  readonly messageApi: MessageInstance;
 };
 
 export default function LogsItem({

@@ -113,8 +113,8 @@ export const updateCode = async (params: UpdateCode): Promise<boolean> => {
         return res?.status === 200 ? res : res?.json();
       })
       .then((data) => {
-        // tip data error when status is 400 500
-        if (status === 400 || status === 500) {
+        // tip data error when status is 400 403 500
+        if (status !== 200) {
           throw new Error(
             handleErrorMessage(data?.error, 'addSubscription error')
           );

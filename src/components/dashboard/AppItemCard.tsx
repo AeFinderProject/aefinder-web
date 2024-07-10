@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { AppStatusType, CreateAppResponse } from '@/types/appType';
 
 type AppItemProps = {
-  appList: CreateAppResponse[];
+  readonly appList: CreateAppResponse[];
 };
 
 export default function AppItemCard({ appList }: AppItemProps) {

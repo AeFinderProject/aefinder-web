@@ -24,7 +24,7 @@ import LogsItem from './LogsItem';
 import { GetLogResponse } from '@/types/appType';
 
 type LogsProps = {
-  messageApi: MessageInstance;
+  readonly messageApi: MessageInstance;
 };
 
 export default function Logs({ messageApi }: LogsProps) {
@@ -70,7 +70,7 @@ export default function Logs({ messageApi }: LogsProps) {
       searchKeyWord: search,
       level: filterBy === 'All' ? '' : filterBy,
     });
-    if (!res || !res.length) {
+    if (!res?.length) {
       return;
     }
     // get last log timestamp as the next request's startTime and logId
@@ -101,7 +101,7 @@ export default function Logs({ messageApi }: LogsProps) {
 
   return (
     <div>
-      <div className='mb-[16px] flex items-center justify-between'>
+      <div className='mb-[16px] flex flex-col sm:flex-row sm:items-center sm:justify-between'>
         <Input
           placeholder='Search logs'
           value={search}
@@ -109,14 +109,17 @@ export default function Logs({ messageApi }: LogsProps) {
           style={{
             width: 200,
             height: 32,
-            borderColor: '#808080',
+            borderColor: '#E0E0E0',
             borderRadius: '8px',
+            marginRight: '8px',
           }}
-          prefix={<SearchOutlined />}
+          prefix={<SearchOutlined className='text-[#E0E0E0]' />}
         />
         <Radio.Group
           value={filterBy}
           onChange={(e) => handleFilterBy(e.target.value)}
+          className='ml-1 mt-3 min-w-[410px] sm:ml-0 sm:mt-0'
+          size={window.innerWidth > 640 ? 'middle' : 'small'}
         >
           <Radio.Button value='All'>
             <UnorderedListOutlined /> All

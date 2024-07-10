@@ -59,6 +59,14 @@ export default function AppDetail() {
     setCurrentTable(key);
   };
 
+  useEffect(() => {
+    // mobile change tab to logs and playground disable
+    if (window?.innerWidth < 640) {
+      handleTabChange('logs');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className='px-[16px] pb-[30px] sm:px-[40px] sm:pb-[60px]'>
       {contextHolder}
@@ -71,7 +79,7 @@ export default function AppDetail() {
         <Tabs
           defaultActiveKey={currentTable}
           onChange={(key) => handleTabChange(key)}
-          centered
+          centered={window?.innerWidth > 640 ? true : false}
           size='large'
           className='mt-[12px] min-h-[600px]'
           items={[
@@ -79,6 +87,7 @@ export default function AppDetail() {
               key: 'playground',
               label: 'Playground',
               children: <Playground />,
+              disabled: window?.innerWidth > 640 ? false : true,
             },
             {
               key: 'logs',
