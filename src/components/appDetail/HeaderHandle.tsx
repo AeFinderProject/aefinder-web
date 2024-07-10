@@ -79,7 +79,7 @@ export default function HeaderHandle({
         <div className='text-right'>
           <Select
             onChange={(value) => handleChangeVersion(value)}
-            className='mb-3 w-[150px] sm:mb-0 sm:w-[200px]'
+            className='mb-3 w-[100px] sm:mb-0 sm:w-[200px]'
             defaultValue={currentVersion}
           >
             <Select.Option value={currentAppDetail?.versions?.currentVersion}>
