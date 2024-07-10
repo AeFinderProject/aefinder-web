@@ -150,3 +150,7 @@
 #graphiql-box .graphiql-container .graphiql-sessions {
   background-color: #f5f5f5;
 }
+
+#graphiql-box button.graphiql-execute-button:focus {
+  outline: #285eef;
+}
