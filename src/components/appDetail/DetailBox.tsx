@@ -13,7 +13,7 @@ export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
   return (
     <div className='bg-gray-F5 mt-[30px] flex w-full items-start justify-start rounded-md px-[20px] py-[30px]'>
       <Row gutter={24} className='w-full'>
-        <Col sm={24} md={12} className='min-w-[360px]'>
+        <Col sm={24} md={12} className='min-w-[340px]'>
           <div className='text-block mb-[24px] text-xl font-medium'>
             {currentAppDetail?.appName}
           </div>
