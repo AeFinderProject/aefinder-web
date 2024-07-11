@@ -4,7 +4,14 @@ import RowDescription from '@/components/RowDescription';
 import { CSSProperties, useMemo } from 'react';
 import styles from './styles.module.scss';
 import { motion, Variants } from 'framer-motion';
-import { INITIAL, WHILE_IN_VIEW, VIEWPORT, variantLeftToRight, variantRightToLeft } from '@/constants/motion';
+import {
+  INITIAL,
+  WHILE_IN_VIEW,
+  variantDownToUp,
+  VIEWPORT,
+  variantLeftToRight,
+  variantRightToLeft,
+} from '@/constants/motion';
 import { GraphicTextModuleType } from '@/types/modules/graphicTextModule';
 import { DescriptionComponent } from '@/types/components/description';
 import { s3Url } from '@/constants/network';
@@ -20,14 +27,15 @@ interface ContentData extends DescriptionComponent {
 }
 
 interface HomeTwoColumnsCardProps {
-  className?: string;
-  imageClassName?: string;
-  style?: CSSProperties;
-  imgPosition?: GraphicTextModuleType; // image position, must be on the right or left
-  imgSrc: string; // image url
-  title?: string;
-  contents: Array<ContentData>;
-  buttonList?: Array<CommonButtonComponent>;
+  readonly className?: string;
+  readonly imageClassName?: string;
+  readonly style?: CSSProperties;
+  readonly imgPosition?: GraphicTextModuleType; // image position, must be on the right or left
+  readonly imgSrc: string; // image url
+  readonly titleText?: string;
+  readonly title?: string;
+  readonly contents: Array<ContentData>;
+  readonly buttonList?: Array<CommonButtonComponent>;
 }
 
 export default function HomeTwoColumnsCard(props: HomeTwoColumnsCardProps) {
@@ -37,6 +45,7 @@ export default function HomeTwoColumnsCard(props: HomeTwoColumnsCardProps) {
     style,
     imgSrc,
     imgPosition = GraphicTextModuleType.LeftPicture_RightText,
+    titleText,
     title,
     contents,
     buttonList,
@@ -50,6 +59,14 @@ export default function HomeTwoColumnsCard(props: HomeTwoColumnsCardProps) {
     return (
       <div className={className}>
         <motion.div initial={INITIAL} whileInView={WHILE_IN_VIEW} viewport={VIEWPORT}>
+          {titleText && (
+            <motion.div variants={variantDownToUp(0)}>
+              <div className={clsx(['page-container', styles.sectionTitle, styles.graphicTextModuleTitle])}>
+                <div style={{ color: '#127FFF' }}>AeFinder Apps</div>
+                <div>Powerful Indexer for Blockchain Data Access</div>
+              </div>
+            </motion.div>
+          )}
           <motion.div variants={variant(0)}>
             {title ? <div className={styles.cardTitle}>{title}</div> : null}
           </motion.div>

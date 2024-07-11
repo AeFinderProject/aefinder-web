@@ -121,7 +121,7 @@ export const getPage = async (key: string): Promise<DappPage | undefined> => {
   try {
     const { data } = await get(API.GET.PAGE);
     const pageData = data.find(
-      (item: any) => item.status === 'published' && item.key?.toLowerCase() === key?.toLowerCase(),
+      (item: any) => item?.status === 'published' && item.key?.toLowerCase() === key?.toLowerCase(),
     );
     if (!pageData) return undefined;
     const moduleList = formatModuleList(pageData.moduleList || []);
@@ -141,7 +141,7 @@ export const formatModuleList = (moduleList = []): Module[] => {
 };
 
 const formatModule = (moduleItem: any): Module | undefined => {
-  if (moduleItem.status !== 'published') return undefined;
+  if (moduleItem?.status !== 'published') return undefined;
   switch (moduleItem.key) {
     case ModuleType.BrandModule:
       return {

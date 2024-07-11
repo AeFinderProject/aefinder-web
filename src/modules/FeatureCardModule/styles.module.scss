@@ -3,9 +3,66 @@
 @import '/src/assets/theme/constants.scss';
 
 .featureCardModuleWrapper {
+  width: 100%;
   background: $page-bg;
 
+  .cardWrapperBox {
+    width: 100%;
+    min-height: 500px;
+  }
+
+  .cardRow {
+    width: 100%;
+    min-height: 500px;
+    background-color: #1A1A1A;
+    border-radius: 8px;
+    padding: 40px 40px 0;
+  }
+
+  .cardCol {
+    padding: 10px 40px;
+    overflow: hidden;
+  }
+
+  .featureTileBox {
+    height: 200px;
+  }
+
+  .step {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 22px;
+    color: #8C8C8C;
+    margin-bottom: 30px;
+  }
+
+  .featureTile {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 28px;
+    color: #E8E8E8;
+    margin-bottom: 30px;
+  }
+
+  .featureDes {
+    font-size: 16px;
+    line-height: 22px;
+    margin-bottom: 30px;
+    color: #8C8C8C;
+  }
+
+  .arrowBox {
+    display: block;
+    font-size: 16px;
+    line-height: 22px;
+    color: #1370DD;
+    cursor: pointer;
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+
   .featureCardModuleContentWrapper {
+    width: 100%;
     gap: 80px;
   }
 
