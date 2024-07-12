@@ -87,9 +87,8 @@ export default function CardListModule({ moduleData }: ICardListModuleProps) {
               width={334}
               height={263}
               src="/img/frame2.png"
-              className={styles.cardImgCol}
+              className={clsx(styles.cardImgCol, styles.frame3Img)}
               alt="cardImage"
-              style={{ verticalAlign: 'top', marginLeft: '-30px', marginRight: '10px' }}
             />
             <Image
               quality={100}
@@ -115,9 +114,8 @@ export default function CardListModule({ moduleData }: ICardListModuleProps) {
               width={522}
               height={270}
               src="/img/frame4.png"
-              className={styles.cardImgCol}
+              className={clsx(styles.cardImgCol, styles.frame4Img)}
               alt="cardImage"
-              style={{ marginLeft: '-60px' }}
             />
           </div>
         </Col>
