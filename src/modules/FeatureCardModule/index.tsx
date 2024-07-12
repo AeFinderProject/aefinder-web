@@ -24,7 +24,7 @@ export default function FeatureCardModule({ module: { title, subTitle, commonSty
           paddingBottom: getVertical(commonStyles || {}).bottom + 'px',
           backgroundColor: defaultBackgroundColor,
         }}>
-        <div className={clsx(['page-container', 'flex-column-center'], styles.featureCardModuleContentWrapper)}>
+        <div className={clsx(['flex-column-center'], styles.featureCardModuleContentWrapper)}>
           {(!!title?.text || !!subTitle?.text) && (
             <motion.div variants={variantDownToUp(0)}>
               <div className={clsx('flex-column-center', styles.sectionTitleWrapper)}>
@@ -43,7 +43,7 @@ export default function FeatureCardModule({ module: { title, subTitle, commonSty
                     Customize the AeFinder App to meet your specific data requirements.
                   </div>
                 </div>
-                <Image src="/img/step1.svg" alt="step1" width={205} height={190} priority />
+                <Image src="/img/step1.png" alt="step1" width={205} height={190} priority />
                 <Link href="https://aefinder.io/login" className={styles.arrowBox}>
                   Get started now
                   <Image src="/img/arrow-right.svg" alt="arrow" width={22} height={22} priority />
@@ -57,7 +57,7 @@ export default function FeatureCardModule({ module: { title, subTitle, commonSty
                     Use GraphQL queries to retrieve the required blockchain data for your dApps in AeFinder App.
                   </div>
                 </div>
-                <Image src="/img/step2.svg" alt="step2" width={193} height={190} priority />
+                <Image src="/img/step2.png" alt="step2" width={193} height={190} priority />
                 <Link href="https://aefinder.io/dashboard" className={styles.arrowBox}>
                   View the playground
                   <Image src="/img/arrow-right.svg" alt="arrow" width={22} height={22} priority />
@@ -69,7 +69,7 @@ export default function FeatureCardModule({ module: { title, subTitle, commonSty
                   <div className={styles.featureTile}>Integrate</div>
                   <div className={styles.featureDes}>Integrate the retrieved data into your dApp.</div>
                 </div>
-                <Image src="/img/step3.svg" alt="step3" width={373} height={190} priority />
+                <Image src="/img/step3.png" alt="step3" width={373} height={190} priority />
                 <Link href="https://explorer.aelf.io" className={styles.arrowBox}>
                   View the dApp
                   <Image src="/img/arrow-right.svg" alt="arrow" width={22} height={22} priority />

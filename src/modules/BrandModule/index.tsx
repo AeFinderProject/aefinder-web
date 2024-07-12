@@ -36,7 +36,9 @@ export default function BrandModule({ type, moduleData }: BrandModuleProps) {
       <section className={clsx([styles.brandModuleContainer, styles.brandModule])}>
         <section className={styles.brandModuleLeft}>
           {/* section 1: title */}
-          <div className={styles.title} style={{ letterSpacing: type === DEVICE_TYPE.IOS ? -1 : 'normal' }}>
+          <div
+            className={styles.title}
+            style={{ fontFamily: 'WorkSans-Bold', letterSpacing: type === DEVICE_TYPE.IOS ? -1 : 'normal' }}>
             {moduleData.title.text}
           </div>
 

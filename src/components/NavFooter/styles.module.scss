@@ -3,7 +3,7 @@
 @import '/src/assets/theme/constants.scss';
 
 .footer {
-  padding-top: 60px;
+  // padding-top: 60px;
   min-width: $page-min-width;
 
   .footerBody {
@@ -83,7 +83,7 @@
     .footerPower {
       font-size: 14px;
       line-height: 22px;
-      color: $disable-text;
+      color: #808080;
     }
   }
 

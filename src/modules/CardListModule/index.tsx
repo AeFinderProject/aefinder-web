@@ -64,12 +64,11 @@ export default function CardListModule({ moduleData }: ICardListModuleProps) {
             </div>
             <Image
               quality={100}
-              width={0}
-              height={0}
-              src="/img/frame1.svg"
+              width={612}
+              height={341}
+              src="/img/frame1.png"
               className={styles.cardImgCol}
               alt="cardImage"
-              style={{ width: '108%', height: 'auto' }}
             />
           </div>
         </Col>
@@ -85,21 +84,20 @@ export default function CardListModule({ moduleData }: ICardListModuleProps) {
             </div>
             <Image
               quality={100}
-              width={0}
-              height={0}
-              src="/img/frame2.svg"
+              width={334}
+              height={263}
+              src="/img/frame2.png"
               className={styles.cardImgCol}
               alt="cardImage"
-              style={{ width: '60%', height: 'auto' }}
+              style={{ verticalAlign: 'top', marginLeft: '-30px', marginRight: '10px' }}
             />
             <Image
               quality={100}
-              width={0}
-              height={0}
-              src="/img/frame3.svg"
+              width={204}
+              height={553}
+              src="/img/frame3.png"
               className={styles.cardImgCol}
               alt="cardImage"
-              style={{ width: '36%', height: 'auto' }}
             />
           </div>
         </Col>
@@ -114,12 +112,12 @@ export default function CardListModule({ moduleData }: ICardListModuleProps) {
             </div>
             <Image
               quality={100}
-              width={0}
-              height={0}
-              src="/img/frame4.svg"
+              width={522}
+              height={270}
+              src="/img/frame4.png"
               className={styles.cardImgCol}
               alt="cardImage"
-              style={{ width: '100%', height: 'auto' }}
+              style={{ marginLeft: '-60px' }}
             />
           </div>
         </Col>
@@ -134,12 +132,12 @@ export default function CardListModule({ moduleData }: ICardListModuleProps) {
             </div>
             <Image
               quality={100}
-              width={0}
-              height={0}
-              src="/img/frame5.svg"
+              width={329}
+              height={329}
+              src="/img/frame5.png"
               className={styles.cardImgCol}
               alt="cardImage"
-              style={{ width: '60%', height: 'auto', margin: '0 auto' }}
+              style={{ margin: '0 auto' }}
             />
           </div>
         </Col>

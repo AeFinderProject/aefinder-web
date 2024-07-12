@@ -9,6 +9,7 @@
   .sectionTitle {
     font-weight: 700;
     font-size: 32px;
+    font-family: WorkSans-Bold, PingFangSC-Semibold, PingFang SC, sans-serif;
     line-height: 40px;
     text-align: left;
     color: $primary-text;
@@ -23,7 +24,7 @@
     margin: auto;
 
     .cardInfoRight {
-      max-width: 480px;
+      max-width: 580px;
     }
 
     .cardInfoLeft {
@@ -93,7 +94,7 @@
 @media screen and (max-width: $divide-991) {
   .btnListWrap {
     margin-top: 40px;
-    justify-content: center;
+    justify-content: left;
   }
 }
 

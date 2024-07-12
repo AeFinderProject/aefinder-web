@@ -42,6 +42,7 @@
         font-size: 48px;
         line-height: 64px;
         padding-bottom: 16px;
+        text-align: left;
       }
 
       .desc {
@@ -84,21 +85,20 @@
   @media screen and (max-width: $divide-991) {
     .brandModule {
       padding-bottom: 60px;
-      flex-direction: column;
+      flex-direction: column-reverse;
 
       .brandModuleLeft {
         display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: baseline;
         margin-right: 0;
         padding-top: 48px;
-        padding-bottom: 40px;
         .title {
           font-size: 36px;
           line-height: 48px;
           padding-bottom: 8px;
           width: auto;
-          text-align: center;
+          text-align: left;
         }
         .desc {
           font-size: 16px;

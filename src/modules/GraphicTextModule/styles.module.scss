@@ -33,6 +33,7 @@
     word-wrap: break-word;
     font-weight: 700;
     font-size: 24px;
+    font-family: WorkSans-Bold, PingFangSC-Semibold, PingFang SC, sans-serif;
     line-height: 30px;
     text-align: center;
     margin-top: 20px;
@@ -57,6 +58,7 @@
   }
 
   .graphicTextModuleItem {
+    overflow: hidden;
     margin-bottom: 120px;
 
     &:last-child {
@@ -91,7 +93,6 @@
     }
 
     .graphicTextModuleItem {
-      min-width: $content-width-mobile;
       margin-bottom: 100px;
 
       &:last-child {

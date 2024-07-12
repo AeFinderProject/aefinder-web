@@ -17,6 +17,10 @@
   font-display: swap;
   src: url('/font/Roboto-Regular.ttf');
 }
+@font-face {
+  font-family: WorkSans-Bold;
+  src: url('/font/WorkSans-Bold.ttf');
+}
 html {
   // constants
   $max-weight: 1080px;

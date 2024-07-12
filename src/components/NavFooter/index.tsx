@@ -60,7 +60,7 @@ export default function NavFooter({ className, style, footerMediaClassName, data
       className={clsx(['section-container', 'flex-row-content-center', styles.footer, className])}
       style={{ backgroundColor: data.commonStyles?.defaultBackgroundColor, ...style }}>
       <div className={clsx(['page-container', styles.footerBody])}>
-        <div className={styles.footerNav}>
+        <div className={styles.footerNav} style={{ display: 'none' }}>
           <div className={clsx('flex-column', styles.footerLogoWrapper)}>
             <CommonImage
               src={data.logo?.filename_disk ? s3Url + data.logo.filename_disk : ''}
@@ -101,6 +101,9 @@ export default function NavFooter({ className, style, footerMediaClassName, data
         <div
           className={clsx([styles.footerMedia, footerMediaClassName])}
           style={{ borderTopColor: data.commonStyles?.dividingLineColor }}>
+          <div className={styles.footerPower}>
+            Copyright @{getFullYear()} {data.powerName.text}
+          </div>
           <div className="flex-row-center">
             {socialMediaData?.map((item, index) => {
               return (
@@ -141,9 +144,6 @@ export default function NavFooter({ className, style, footerMediaClassName, data
                 </div>
               );
             })}
-          </div>
-          <div className={styles.footerPower}>
-            {data.powerName.text}@{getFullYear()}
           </div>
         </div>
       </div>

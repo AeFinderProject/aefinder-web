@@ -61,7 +61,7 @@ export default function HomeTwoColumnsCard(props: HomeTwoColumnsCardProps) {
         <motion.div initial={INITIAL} whileInView={WHILE_IN_VIEW} viewport={VIEWPORT}>
           {titleText && (
             <motion.div variants={variantDownToUp(0)}>
-              <div className={clsx(['page-container', styles.sectionTitle, styles.graphicTextModuleTitle])}>
+              <div className={clsx([styles.sectionTitle, styles.graphicTextModuleTitle])}>
                 <div style={{ color: '#127FFF' }}>AeFinder Apps</div>
                 <div>Powerful Indexer for Blockchain Data Access</div>
               </div>
