@@ -14,7 +14,7 @@ export default function AppItemCard({ appList }: AppItemProps) {
   const router = useRouter();
 
   const handleAppDetail = (appId: string) => {
-    router.push(`/apps/${appId}?currentTab=playground`);
+    router.push(`/apps/${appId}`);
   };
 
   return (

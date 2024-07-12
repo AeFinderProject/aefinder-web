@@ -96,4 +96,5 @@ const favicons: Array<React.ComponentPropsWithoutRef<'link'>> = [
     color: '#00e887',
   },
   { rel: 'shortcut icon', href: '/assets/favicon/favicon.ico' },
+  { rel: 'canonical', href: 'https://aefinder.io' },
 ];
