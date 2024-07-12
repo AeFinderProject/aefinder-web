@@ -70,7 +70,7 @@ export default function FeatureCardModule({ module: { title, subTitle, commonSty
                   <div className={styles.featureDes}>Integrate the retrieved data into your dApp.</div>
                 </div>
                 <Image src="/img/step3.png" alt="step3" width={373} height={190} priority />
-                <Link href="https://explorer.aelf.io" className={styles.arrowBox}>
+                <Link href="https://aelfscan.io" className={styles.arrowBox}>
                   View the dApp
                   <Image src="/img/arrow-right.svg" alt="arrow" width={22} height={22} priority />
                 </Link>
