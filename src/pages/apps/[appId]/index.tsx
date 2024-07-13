@@ -1,7 +1,7 @@
 'use client';
 import { message, Tabs } from 'antd';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import DeployDrawer from '@/components/appDetail/DeployDrawer';
 import DetailBox from '@/components/appDetail/DetailBox';
@@ -24,10 +24,10 @@ import { AppStatusType } from '@/types/appType';
 export default function AppDetail() {
   const [deployDrawerVisible, setDeployDrawerVisible] = useState(false);
   const router = useRouter();
-  const { appId, currentTab } = router.query;
+  const { appId } = router.query;
   // currentTable default playground -> click change logs
   const [currentTable, setCurrentTable] = useState<string>(
-    typeof currentTab === 'string' ? currentTab : 'playground'
+    localStorage.getItem('currentTab') ?? 'playground'
   );
   const { currentAppDetail } = useAppSelector((state) => state.app);
   const dispatch = useAppDispatch();
@@ -46,18 +46,18 @@ export default function AppDetail() {
     getAppDetailTemp();
   }, [dispatch, deployDrawerVisible, router.query, appId]);
 
-  const handleTabChange = (key: string) => {
-    // change url tab params
-    router.replace(
-      {
-        pathname: router.pathname,
-        query: { ...router.query, currentTab: key },
-      },
-      undefined,
-      { shallow: true }
-    );
+  const handleTabChange = useCallback((key: string) => {
+    localStorage.setItem('currentTab', key);
     setCurrentTable(key);
-  };
+  }, []);
+
+  useEffect(() => {
+    // mobile change tab to logs and playground disable
+    if (window?.innerWidth < 640) {
+      handleTabChange('logs');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className='px-[16px] pb-[30px] sm:px-[40px] sm:pb-[60px]'>
@@ -71,7 +71,7 @@ export default function AppDetail() {
         <Tabs
           defaultActiveKey={currentTable}
           onChange={(key) => handleTabChange(key)}
-          centered
+          centered={window?.innerWidth > 640}
           size='large'
           className='mt-[12px] min-h-[600px]'
           items={[
@@ -79,6 +79,7 @@ export default function AppDetail() {
               key: 'playground',
               label: 'Playground',
               children: <Playground />,
+              disabled: window?.innerWidth < 640,
             },
             {
               key: 'logs',

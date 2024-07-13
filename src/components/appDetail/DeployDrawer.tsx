@@ -195,7 +195,7 @@ export default function DeployDrawer({
       open={deployDrawerVisible}
       onClose={() => setDeployDrawerVisible(false)}
       destroyOnClose={true}
-      width='80%'
+      width={window?.innerWidth > 640 ? '80%' : 640}
     >
       <Form
         form={form}
@@ -257,7 +257,7 @@ export default function DeployDrawer({
           {type === 0 && (
             <Button
               size='large'
-              className='border-blue-link text-blue-link mr-[10px] w-[180px]'
+              className='border-blue-link text-blue-link mr-[10px] w-[100px] sm:w-[180px]'
               onClick={() => setDeployDrawerVisible(false)}
             >
               Cancel
@@ -266,7 +266,7 @@ export default function DeployDrawer({
           {type === 0 && (
             <Button
               size='large'
-              className='w-[180px]'
+              className='w-[100px] sm:w-[180px]'
               type='primary'
               htmlType='submit'
               loading={deployLoading}

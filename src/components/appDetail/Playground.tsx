@@ -23,6 +23,8 @@ export default function Playground() {
         'Content-Type': 'application/json',
       },
     });
+    localStorage.removeItem('graphiql:query');
+    localStorage.removeItem('graphiql:tabState');
     return <GraphiQL fetcher={tempFetcher} />;
   }, [appId, currentVersion]);
 
