@@ -79,11 +79,11 @@ export default function HeaderHandle({
         <div className='text-right'>
           <Select
             onChange={(value) => handleChangeVersion(value)}
-            className='mb-3 w-[100px] sm:mb-0 sm:w-[200px]'
+            className='mb-3 h-[40px] w-[100px] sm:mb-0 sm:w-[200px]'
             defaultValue={currentVersion}
           >
             <Select.Option value={currentAppDetail?.versions?.currentVersion}>
-              {currentAppDetail?.versions?.currentVersion}
+              (Current) {currentAppDetail?.versions?.currentVersion}
             </Select.Option>
             {currentAppDetail?.versions?.pendingVersion && (
               <Select.Option value={currentAppDetail?.versions?.pendingVersion}>
@@ -103,7 +103,11 @@ export default function HeaderHandle({
         </div>
       )}
       {currentAppDetail.status === AppStatusType.UnDeployed && (
-        <Button type='text' size='small' className='bg-gray-D6 relative top-1'>
+        <Button
+          type='text'
+          size='small'
+          className='bg-gray-D6 relative top-1 h-[32px]'
+        >
           UnDeployed
         </Button>
       )}

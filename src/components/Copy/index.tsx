@@ -38,13 +38,17 @@ export default function Copy({
   return (
     <div className={clsx('inline-block', className)}>
       {contextHolder}
-      <div className='text-gray-80 text-xs'>{label}</div>
+      <div className='text-gray-80 mb-[10px] text-xs'>{label}</div>
       <div className='text-block text-base font-medium'>
         <span className='mr-2 max-w-[80%] overflow-hidden whitespace-pre-wrap break-words'>
           {showLittle ? formatStr2Ellipsis(String(content), [8, 9]) : content}
         </span>
         {isShowCopy && (
-          <CopyToClipboard text={content} onCopy={() => handleCopy()}>
+          <CopyToClipboard
+            text={content}
+            onCopy={() => handleCopy()}
+            style={{ color: '#ADADAD' }}
+          >
             <CopyOutlined />
           </CopyToClipboard>
         )}

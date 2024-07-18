@@ -7,6 +7,7 @@ import { SubscriptionsApiList } from './list';
 import {
   CreateSubscriptionRequest,
   GetDevTemplateRequest,
+  GetSubscriptionRequest,
   GetSubscriptionResponse,
   UpdateCode,
   UpdateSubscriptionRequest,
@@ -129,10 +130,34 @@ export const updateCode = async (params: UpdateCode): Promise<boolean> => {
   }
 };
 
-export const getSubscriptions = async (): Promise<GetSubscriptionResponse> => {
+export const getSubscriptions = async (
+  params: GetSubscriptionRequest
+): Promise<GetSubscriptionResponse> => {
+  let response = {} as GetSubscriptionResponse;
   try {
-    const res = await request.subscription.getSubscriptions();
-    return res;
+    const { appId, deployKey } = params;
+    const Authorization = await getAccessToken({
+      client_id: appId,
+      client_secret: deployKey,
+    });
+
+    await fetch(`${SubscriptionsApiList.getSubscriptions}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `${Authorization.token_type} ${Authorization.access_token}`,
+      },
+    })
+      .then((res: Response) => {
+        if (res?.status !== 200) {
+          throw new Error(handleErrorMessage(res, 'addSubscription error'));
+        }
+        return res?.json();
+      })
+      .then((data) => {
+        response = data;
+        return data as GetSubscriptionResponse;
+      });
+    return response;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'getSubscription error'));
   }

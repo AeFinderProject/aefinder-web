@@ -64,7 +64,7 @@ export default function DownloadTempFile() {
             ]}
           >
             <Input
-              placeholder='project name: letter/numbers (2~20 length)'
+              placeholder='Use letters or numbers only (2-20 characters)'
               className='rounded-md'
               minLength={2}
               maxLength={20}
