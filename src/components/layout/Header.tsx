@@ -68,7 +68,7 @@ export default function Header() {
             Docs
           </UnstyledLink>
           <div
-            className='border-gray-E0 relative inline-block min-h-10 cursor-pointer rounded border pl-[20px] pr-[30px] text-center leading-[40px]'
+            className='border-gray-E0 m-w-[150px] relative inline-block min-h-10 cursor-pointer rounded border pl-[20px] pr-[30px] text-center leading-[40px]'
             onClick={() => {
               setTimeout(() => {
                 setIsShowBox(!isShowBox);

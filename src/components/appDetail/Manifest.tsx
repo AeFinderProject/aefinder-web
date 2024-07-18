@@ -1,7 +1,16 @@
+'use client';
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-import ReactJson from 'react-json-view';
 
 import { useAppSelector } from '@/store/hooks';
+
+const ReactJson = dynamic(
+  async () => {
+    const ReactJson = await import('react-json-view').then((module) => module);
+    return ReactJson;
+  },
+  { ssr: false }
+);
 export default function Manifest() {
   const [manifestJson, setManifestJson] = useState<object>({});
   const { subscriptions, currentVersion } = useAppSelector(
