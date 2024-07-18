@@ -211,7 +211,7 @@ export default function DeployDrawer({
           ]}
         >
           <TextArea
-            placeholder='add subscriptions'
+            placeholder='Add subscriptions'
             className='rounded'
             autoSize={{ minRows: 8, maxRows: 14 }}
           />

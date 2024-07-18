@@ -17,7 +17,7 @@ export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
           <div className='text-block mb-[24px] text-xl font-medium'>
             {currentAppDetail?.appName}
           </div>
-          <div className='mb-[24px] flex justify-between'>
+          <div className='mb-[24px] flex justify-start'>
             <Copy label='Network' content='aelf' />
             <Copy
               className='mx-[32px]'

@@ -25,10 +25,7 @@ export default function LogsItem({
   };
 
   return (
-    <div
-      className={clsx('overflow-wrap relative')}
-      style={{ width: `calc(100% - 340px)` }}
-    >
+    <div className={clsx('overflow-wrap relative w-full flex-1')}>
       <div className='text-gray-80 absolute right-0 top-0 cursor-pointer'>
         {isShow ? (
           <div className='relative right-[-14px] flex flex-col'>

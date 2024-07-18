@@ -45,6 +45,7 @@ export default function Dashboard() {
             type='primary'
             icon={<PlusOutlined />}
             onClick={() => setCreateAppDrawerVisible(true)}
+            className='h-[40px] w-[140px] text-sm'
           >
             Create app
           </Button>

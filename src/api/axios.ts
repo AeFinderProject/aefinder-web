@@ -1,4 +1,5 @@
 import axios from 'axios';
+import qs from 'qs';
 
 import logger from '@/lib/logger';
 
@@ -17,6 +18,11 @@ const isDeniedRequest = (error: { message: string }) => {
 const axiosInstance = axios.create({
   baseURL: '/',
   timeout: 50000,
+  paramsSerializer: (params) => {
+    return qs.stringify(params, {
+      arrayFormat: 'repeat',
+    });
+  },
 });
 
 axiosInstance.defaults.headers.common['x-csrf-token'] = 'AUTH_TOKEN';
