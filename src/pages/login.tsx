@@ -84,6 +84,7 @@ export default function LogIn() {
                 placeholder='Password'
                 type='password'
                 className='rounded-md'
+                size='large'
               />
             </FormItem>
             <FormItem>

@@ -24,7 +24,7 @@ export const AuthList = {
     baseConfig: { method: 'POST' },
   },
   resetPassword: {
-    target: '/api/users/reset/password',
+    target: `${AeFinderHost}/api/users/reset/password`,
     baseConfig: { method: 'POST' },
   },
 };
