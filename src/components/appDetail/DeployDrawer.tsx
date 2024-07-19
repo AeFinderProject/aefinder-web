@@ -1,7 +1,7 @@
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Divider, Drawer, Form, Input, Upload } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { isValidJSON } from '@/lib/utils';
 
@@ -38,9 +38,32 @@ export default function DeployDrawer({
   const [updateManifestLoading, setUpdateManifestLoading] =
     useState<boolean>(false);
   const [updateCodeLoading, setUpdateCodeLoading] = useState<boolean>(false);
-  const currentAppDetail = useAppSelector(
-    (state) => state.app.currentAppDetail
+  const { currentAppDetail, subscriptions, currentVersion } = useAppSelector(
+    (state) => state.app
   );
+
+  useEffect(() => {
+    let defaultManifest = '';
+    if (subscriptions?.currentVersion?.version === currentVersion) {
+      defaultManifest = JSON.stringify(
+        subscriptions?.currentVersion?.subscriptionManifest,
+        null,
+        2
+      );
+    } else if (subscriptions?.pendingVersion?.version === currentVersion) {
+      defaultManifest = JSON.stringify(
+        subscriptions?.pendingVersion?.subscriptionManifest,
+        null,
+        2
+      );
+    }
+
+    if (type) {
+      form.setFieldsValue({
+        Manifest: defaultManifest,
+      });
+    }
+  }, [currentVersion, subscriptions, form, type]);
 
   const handleDeploy = useCallback(async () => {
     // type === 0 create deploy
@@ -211,7 +234,7 @@ export default function DeployDrawer({
           ]}
         >
           <TextArea
-            placeholder='add subscriptions'
+            placeholder='Add subscriptions'
             className='rounded'
             autoSize={{ minRows: 8, maxRows: 14 }}
           />

@@ -1,7 +1,7 @@
 name: 'Issue Autolink'
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize, reopened]
 
 jobs:
   issue-links:

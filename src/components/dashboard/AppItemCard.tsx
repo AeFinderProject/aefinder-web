@@ -1,5 +1,5 @@
 'use client';
-import { Button, Col, Row } from 'antd';
+import { Col, Row } from 'antd';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -30,17 +30,16 @@ export default function AppItemCard({ appList }: AppItemProps) {
           >
             <div
               onClick={() => handleAppDetail(item.appId)}
-              className='border-gray-E0 bg-gray-F5 flex h-[280px] cursor-pointer flex-col items-center justify-center border'
+              className='border-gray-E0 bg-gray-F5 flex h-[280px] cursor-pointer flex-col items-center justify-center rounded-lg border'
             >
-              <Button
-                size='small'
+              <div
                 className={clsx(
-                  'absolute left-6 top-6 h-[30px] text-white',
+                  'absolute left-[28px] top-[28px] h-[30px] rounded px-[6px] leading-8 text-white',
                   item.status === 0 ? 'bg-gray-D6' : 'bg-blue-link'
                 )}
               >
                 {AppStatusType[item.status]}
-              </Button>
+              </div>
               <Image
                 src='/assets/svg/app-default-bg.svg'
                 alt='app-bg'

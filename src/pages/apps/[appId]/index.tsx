@@ -8,16 +8,19 @@ import DetailBox from '@/components/appDetail/DetailBox';
 import DownloadTempFile from '@/components/appDetail/DownloadTempFile';
 import HeaderHandle from '@/components/appDetail/HeaderHandle';
 import Logs from '@/components/appDetail/Logs';
+import Manifest from '@/components/appDetail/Manifest';
 import Playground from '@/components/appDetail/Playground';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   setCurrentAppDetail,
   setCurrentVersion,
+  setSubscriptions,
 } from '@/store/slices/appSlice';
 
 import { queryAuthToken } from '@/api/apiUtils';
 import { getAppDetail } from '@/api/requestApp';
+import { getSubscriptions } from '@/api/requestSubscription';
 
 import { AppStatusType } from '@/types/appType';
 
@@ -29,7 +32,9 @@ export default function AppDetail() {
   const [currentTable, setCurrentTable] = useState<string>(
     localStorage.getItem('currentTab') ?? 'playground'
   );
-  const { currentAppDetail } = useAppSelector((state) => state.app);
+  const { currentAppDetail, currentVersion } = useAppSelector(
+    (state) => state.app
+  );
   const dispatch = useAppDispatch();
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -46,6 +51,19 @@ export default function AppDetail() {
     getAppDetailTemp();
   }, [dispatch, deployDrawerVisible, router.query, appId]);
 
+  useEffect(() => {
+    const getSubscriptionsRes = async () => {
+      if (appId && currentAppDetail?.deployKey) {
+        const res = await getSubscriptions({
+          appId: String(appId),
+          deployKey: currentAppDetail?.deployKey,
+        });
+        dispatch(setSubscriptions(res));
+      }
+    };
+    getSubscriptionsRes();
+  }, [dispatch, currentVersion, appId, currentAppDetail?.deployKey]);
+
   const handleTabChange = useCallback((key: string) => {
     localStorage.setItem('currentTab', key);
     setCurrentTable(key);
@@ -60,7 +78,7 @@ export default function AppDetail() {
   }, []);
 
   return (
-    <div className='px-[16px] pb-[30px] sm:px-[40px] sm:pb-[60px]'>
+    <div className='px-[16px] pb-[20px] sm:px-[40px] sm:pb-[40px]'>
       {contextHolder}
       <HeaderHandle
         setDeployDrawerVisible={setDeployDrawerVisible}
@@ -86,6 +104,11 @@ export default function AppDetail() {
               label: 'Logs',
               children: <Logs messageApi={messageApi} />,
               forceRender: true,
+            },
+            {
+              key: 'manifest',
+              label: 'Manifest',
+              children: <Manifest />,
             },
           ]}
         />

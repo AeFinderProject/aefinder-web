@@ -1,8 +1,15 @@
+import { ChainIdType } from './appType';
+
 export type CreateSubscriptionRequest = {
   appId: string;
   deployKey: string;
   Manifest: string;
   Code: File;
+};
+
+export type GetSubscriptionRequest = {
+  appId: string;
+  deployKey: string;
 };
 
 export type CreateSubscriptionResponse = {
@@ -24,7 +31,7 @@ export type UpdateCode = {
 };
 
 export type SubscriptionItem = {
-  chainId: string;
+  chainId: ChainIdType;
   startBlockNumber: number;
   onlyConfirmed: boolean;
   transactions: {

@@ -54,7 +54,7 @@ export default function LogIn() {
     <div className='flex w-full flex-col items-center justify-center pb-10 text-center'>
       {contextHolder}
       <Image
-        src='/assets/svg/logo-banner.svg'
+        src='/assets/svg/login-logo.svg'
         alt='logo'
         width={240}
         height={240}

@@ -41,13 +41,17 @@ export type GetAppListResponse = {
   totalCount: number;
 };
 
+export type LevelType = 'Debug' | 'Error' | 'Warning' | 'Information';
+export type ChainIdType = 'tDVV' | 'tDVW' | 'AELF' | '';
+
 export type GetLogRequest = {
   appId: string;
   version: string;
   startTime: string;
   logId: string;
   searchKeyWord: string;
-  level: string;
+  chainId: ChainIdType;
+  levels: Array<LevelType>;
 };
 
 export type GetLogResponse = {
@@ -58,7 +62,7 @@ export type GetLogResponse = {
     eventId: number;
     time: string;
     message: string;
-    level: 'Debug' | 'Error' | 'Warning' | 'Information';
+    level: LevelType;
     exception: string;
     appId: string;
     version: string;

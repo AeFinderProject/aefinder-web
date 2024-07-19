@@ -12,3 +12,8 @@ export type GetAccessTokenRequest = {
   client_id: string;
   client_secret: string;
 };
+
+export type ResetPasswordRequest = {
+  userName: string;
+  newPassword: string;
+};

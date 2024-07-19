@@ -8,14 +8,11 @@ const MyDocument = () => (
   <Html lang='en'>
     <Head>
       <link
-        rel='preload'
-        href='https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap'
-        as='font'
-        type='font/woff2'
-        crossOrigin='anonymous'
+        href='https://fonts.googleapis.com/css2?family=Roboto&display=swap'
+        rel='stylesheet'
       />
     </Head>
-    <body>
+    <body style={{ fontFamily: 'Roboto' }}>
       <Main />
       <NextScript />
       <Script

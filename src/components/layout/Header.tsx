@@ -35,6 +35,10 @@ export default function Header() {
     router.push('/login');
   }, [router]);
 
+  const handleResetPassword = useCallback(() => {
+    router.push('/reset-password');
+  }, [router]);
+
   const handleLinkToHome = useCallback(() => {
     router.replace('/');
     setTimeout(() => {
@@ -64,7 +68,7 @@ export default function Header() {
             Docs
           </UnstyledLink>
           <div
-            className='border-gray-E0 relative inline-block min-h-10 cursor-pointer rounded border pl-[20px] pr-[30px] text-center leading-[40px]'
+            className='border-gray-E0 m-w-[150px] relative inline-block min-h-10 cursor-pointer rounded border pl-[20px] pr-[30px] text-center leading-[40px]'
             onClick={() => {
               setTimeout(() => {
                 setIsShowBox(!isShowBox);
@@ -91,7 +95,7 @@ export default function Header() {
                 !isShowBox && 'hidden'
               )}
             >
-              <UpOutlined className='border-b-none text-gray-E0 absolute hidden bg-white text-xs sm:right-[58px] sm:top-[-10px] sm:block' />
+              <UpOutlined className='border-b-none text-gray-E0 absolute hidden bg-white text-xs sm:right-[58px] sm:top-[-12px] sm:block' />
               <PrimaryLink
                 href='/dashboard'
                 className='hover:bg-gray-F5 w-full border-none px-[16px] sm:hidden'
@@ -106,11 +110,19 @@ export default function Header() {
                   Docs
                 </UnstyledLink>
               </div>
-              <div
-                className='hover:bg-gray-F5 border-none px-[16px] text-left sm:text-center'
-                onClick={() => handleLogout()}
-              >
-                Logout
+              <div>
+                <div
+                  className='hover:bg-gray-F5 text-nowrap border-none px-[16px] text-left sm:text-center'
+                  onClick={() => handleResetPassword()}
+                >
+                  Reset password
+                </div>
+                <div
+                  className='hover:bg-gray-F5 border-none px-[16px] text-left sm:text-center'
+                  onClick={() => handleLogout()}
+                >
+                  Logout
+                </div>
               </div>
             </div>
           </div>
