@@ -80,11 +80,10 @@ export default function LogIn() {
                 { required: true, message: 'Please input your password!' },
               ]}
             >
-              <Input.Password
+              <Input
                 placeholder='Password'
                 type='password'
                 className='rounded-md'
-                size='large'
               />
             </FormItem>
             <FormItem>
