@@ -54,7 +54,7 @@ export default function LogIn() {
     <div className='flex w-full flex-col items-center justify-center pb-10 text-center'>
       {contextHolder}
       <Image
-        src='/assets/svg/login-logo.png'
+        src='/assets/images/login-logo.png'
         alt='logo'
         width={240}
         height={240}
@@ -80,7 +80,7 @@ export default function LogIn() {
                 { required: true, message: 'Please input your password!' },
               ]}
             >
-              <Input
+              <Input.Password
                 placeholder='Password'
                 type='password'
                 className='rounded-md'

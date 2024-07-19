@@ -58,10 +58,12 @@ export default function DeployDrawer({
       );
     }
 
-    form.setFieldsValue({
-      Manifest: defaultManifest,
-    });
-  }, [currentVersion, subscriptions, form]);
+    if (type) {
+      form.setFieldsValue({
+        Manifest: defaultManifest,
+      });
+    }
+  }, [currentVersion, subscriptions, form, type]);
 
   const handleDeploy = useCallback(async () => {
     // type === 0 create deploy

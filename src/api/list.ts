@@ -23,6 +23,10 @@ export const AuthList = {
     target: '/connect/token',
     baseConfig: { method: 'POST' },
   },
+  resetPassword: {
+    target: '/api/users/reset/password',
+    baseConfig: { method: 'POST' },
+  },
 };
 
 export const appApiList = {

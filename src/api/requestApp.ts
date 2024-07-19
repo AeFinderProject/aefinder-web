@@ -12,6 +12,7 @@ import {
   GetLogResponse,
   ModifyAppRequest,
 } from '@/types/appType';
+import { ResetPasswordRequest } from '@/types/loginType';
 
 export const createApp = async (
   params: CreateAppRequest
@@ -66,5 +67,16 @@ export const getLog = async (
     return res;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'getLog error'));
+  }
+};
+
+export const resetPassword = async (
+  params: ResetPasswordRequest
+): Promise<boolean> => {
+  try {
+    const res: boolean = await request.auth.resetPassword({ data: params });
+    return res;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'resetPassword error'));
   }
 };
