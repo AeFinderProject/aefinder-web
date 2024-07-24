@@ -5,6 +5,7 @@ const theme: ThemeConfig = {
   token: {
     fontSize: 16,
     colorPrimary: '#127FFF',
+    fontFamily: 'Roboto',
   },
 };
 

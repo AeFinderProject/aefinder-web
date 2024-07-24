@@ -5,9 +5,11 @@ import UnstyledLink from '@/components/links/UnstyledLink';
 
 export default function Footer() {
   return (
-    <div className='w-full bg-white px-[40px] sm:px-[60px]'>
-      <div className='border-t-gray-F0 flex h-[64px] items-center justify-between border-t'>
-        <div className='text-gray-80 text-sm'>Copyright © 2024 AeFinder</div>
+    <div className='w-full'>
+      <div className='bg-gray-F7 flex h-[94px] flex-col items-start justify-center px-[40px]  sm:h-[64px] sm:flex-row sm:items-center sm:justify-between'>
+        <div className='text-gray-80 mb-[8px] text-sm leading-[22px] sm:mb-0'>
+          Copyright © 2024 AeFinder
+        </div>
         <div className='flex justify-between'>
           <UnstyledLink href='https://t.me/aefinder_assistant'>
             <Image

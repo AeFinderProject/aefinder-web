@@ -52,9 +52,10 @@ export default function Header() {
         src='/assets/svg/aefinder-logo.svg'
         alt='logo'
         width={150}
-        height={30}
+        height={24}
         onClick={handleLinkToHome}
         className='cursor-pointer'
+        style={{ width: '150px', height: '24px' }}
       />
       {pathname !== '/login' && pathname !== '/' && (
         <div>

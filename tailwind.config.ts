@@ -42,6 +42,7 @@ export default {
           F5: '#F5F5F5',
           D6: '#D6D6D6',
           AD: '#ADADAD',
+          F7: '#f7f9fd',
         },
         success: {
           normal: '#00B73E',

@@ -54,13 +54,13 @@ export default function LogIn() {
     <div className='flex w-full flex-col items-center justify-center pb-10 text-center'>
       {contextHolder}
       <Image
-        src='/assets/images/login-logo.png'
+        src='/assets/svg/login-logo.svg'
         alt='logo'
         width={240}
         height={240}
         className='sm:h-[320px] sm:w-[320px]'
       />
-      <div className='mx-auto w-[442px]'>
+      <div className='mx-auto w-[342px] sm:w-[442px]'>
         <div className='text-xl'>Welcome, please sign in to continue</div>
         <div className='border-gray-F0 mt-4 rounded-md border px-[24px] pt-[24px]'>
           <Form form={form} layout='vertical' onFinish={() => handleLogin()}>
