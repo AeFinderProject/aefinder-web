@@ -25,6 +25,7 @@ export default function Playground() {
     });
     localStorage.removeItem('graphiql:query');
     localStorage.removeItem('graphiql:tabState');
+    localStorage.setItem('graphiql:theme', 'light');
     return <GraphiQL fetcher={tempFetcher} editorTheme='Light' />;
   }, [appId, currentVersion]);
 
