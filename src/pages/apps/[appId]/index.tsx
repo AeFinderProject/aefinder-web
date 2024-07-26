@@ -52,6 +52,8 @@ export default function AppDetail() {
   }, [dispatch, deployDrawerVisible, router.query, appId]);
 
   useEffect(() => {
+    // when currentVersion is null, it means the app is not deployed
+    if (!currentVersion) return;
     const getSubscriptionsRes = async () => {
       if (appId && currentAppDetail?.deployKey) {
         const res = await getSubscriptions({

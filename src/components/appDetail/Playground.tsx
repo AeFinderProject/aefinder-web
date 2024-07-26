@@ -17,6 +17,8 @@ export default function Playground() {
   const { appId } = currentAppDetail;
 
   const getGraphiqlhUI = useCallback(() => {
+    // when currentVersion is null, it means the app is not deployed
+    if (!currentVersion) return;
     const tempFetcher = createGraphiQLFetcher({
       url: `${appApiList?.fetchQraphiql?.target}/${appId}/${currentVersion}`,
       headers: {
