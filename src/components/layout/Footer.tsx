@@ -17,7 +17,7 @@ export default function Footer() {
               alt='telegram'
               width={24}
               height={24}
-              className='mr-5'
+              className='mr-[22px]'
               style={{ width: '24px', height: '24px' }}
             />
           </UnstyledLink>
