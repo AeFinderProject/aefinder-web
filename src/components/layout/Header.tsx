@@ -92,7 +92,7 @@ export default function Header() {
             <div
               id='logout-container'
               className={clsx(
-                'h-13 border-gray-F0 fixed left-0 top-[71px] z-10 w-full border-b border-t bg-white bg-opacity-100 p-1 sm:absolute sm:top-[52px] sm:rounded sm:border',
+                'h-13 border-gray-F0 fixed left-0 top-[71px] z-10 w-full border-b border-t bg-white bg-opacity-100 p-1 sm:absolute sm:top-[52px] sm:min-w-[144px] sm:rounded sm:border',
                 !isShowBox && 'hidden'
               )}
             >

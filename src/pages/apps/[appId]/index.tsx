@@ -45,11 +45,13 @@ export default function AppDetail() {
         const res = await getAppDetail({ appId: String(appId) });
         dispatch(setCurrentAppDetail(res));
         // set default version
-        dispatch(setCurrentVersion(res.versions?.currentVersion));
+        if (res.versions?.currentVersion) {
+          dispatch(setCurrentVersion(res.versions?.currentVersion));
+        }
       }
     };
     getAppDetailTemp();
-  }, [dispatch, deployDrawerVisible, router.query, appId]);
+  }, [dispatch, deployDrawerVisible, appId]);
 
   useEffect(() => {
     // when currentVersion is null, it means the app is not deployed
