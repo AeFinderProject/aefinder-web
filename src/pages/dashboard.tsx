@@ -9,7 +9,12 @@ import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
 import Seo from '@/components/Seo';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setAppList } from '@/store/slices/appSlice';
+import {
+  setAppList,
+  setCurrentAppDetail,
+  setCurrentVersion,
+  setSubscriptions,
+} from '@/store/slices/appSlice';
 
 import { queryAuthToken } from '@/api/apiUtils';
 import { getAppList } from '@/api/requestApp';
@@ -25,6 +30,10 @@ export default function Dashboard() {
       await queryAuthToken();
       const { items = [] } = await getAppList();
       dispatch(setAppList(items));
+      // set appList and init currentAppDetail currentVersion subscriptions
+      dispatch(setCurrentAppDetail({}));
+      dispatch(setCurrentVersion(''));
+      dispatch(setSubscriptions({}));
     };
     getAppListTemp();
   }, [dispatch, createAppDrawerVisible]);

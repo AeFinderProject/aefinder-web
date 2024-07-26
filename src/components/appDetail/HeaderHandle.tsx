@@ -33,6 +33,9 @@ export default function HeaderHandle({
   const handleChangeVersion = useCallback(
     (currentVersion: string) => {
       dispatch(setCurrentVersion(currentVersion));
+      return () => {
+        dispatch(setCurrentVersion(''));
+      };
     },
     [dispatch]
   );
