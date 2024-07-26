@@ -113,7 +113,7 @@ export default function Header() {
               </div>
               <div>
                 <div
-                  className='hover:bg-gray-F5 text-nowrap border-none px-[16px] text-left sm:text-center'
+                  className='hover:bg-gray-F5 text-nowrap border-none pl-[10px] pr-[16px] text-left sm:text-center'
                   onClick={() => handleResetPassword()}
                 >
                   Reset password

@@ -18,10 +18,17 @@ export default function Footer() {
               width={24}
               height={24}
               className='mr-5'
+              style={{ width: '24px', height: '24px' }}
             />
           </UnstyledLink>
           <UnstyledLink href='https://twitter.com/AeFinder_Web3'>
-            <Image src='/assets/svg/x.svg' alt='x' width={24} height={24} />
+            <Image
+              src='/assets/svg/x.svg'
+              alt='x'
+              width={24}
+              height={24}
+              style={{ width: '24px', height: '24px' }}
+            />
           </UnstyledLink>
         </div>
       </div>
