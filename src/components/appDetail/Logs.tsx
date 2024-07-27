@@ -107,6 +107,8 @@ export default function Logs({ messageApi }: LogsProps) {
   }, [currentVersion]);
 
   const getLogs = useCallback(async () => {
+    // when currentVersion is null, it means the app is not deployed
+    if (!currentVersion) return;
     const res = await getLog({
       appId: currentAppDetail.appId,
       version: currentVersion,

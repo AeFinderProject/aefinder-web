@@ -60,7 +60,7 @@ export default function LogIn() {
         height={240}
         className='sm:h-[320px] sm:w-[320px]'
       />
-      <div className='mx-auto w-[442px]'>
+      <div className='mx-auto w-[342px] sm:w-[442px]'>
         <div className='text-xl'>Welcome, please sign in to continue</div>
         <div className='border-gray-F0 mt-4 rounded-md border px-[24px] pt-[24px]'>
           <Form form={form} layout='vertical' onFinish={() => handleLogin()}>

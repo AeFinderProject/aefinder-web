@@ -17,6 +17,8 @@ export default function Playground() {
   const { appId } = currentAppDetail;
 
   const getGraphiqlhUI = useCallback(() => {
+    // when currentVersion is null, it means the app is not deployed
+    if (!currentVersion) return;
     const tempFetcher = createGraphiQLFetcher({
       url: `${appApiList?.fetchQraphiql?.target}/${appId}/${currentVersion}`,
       headers: {
@@ -25,7 +27,8 @@ export default function Playground() {
     });
     localStorage.removeItem('graphiql:query');
     localStorage.removeItem('graphiql:tabState');
-    return <GraphiQL fetcher={tempFetcher} />;
+    localStorage.setItem('graphiql:theme', 'light');
+    return <GraphiQL fetcher={tempFetcher} editorTheme='Light' />;
   }, [appId, currentVersion]);
 
   return (
