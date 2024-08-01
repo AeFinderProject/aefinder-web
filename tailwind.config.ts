@@ -25,13 +25,14 @@ export default {
         },
         dark: {
           normal: '#1A1A1A',
+          primaryText: '#16161C',
         },
         blue: {
           brand: '#285EEF',
           normal: '#285EEF',
           hover: '#3B6CFF',
           click: '#1E52F0',
-          disable: '#A9BFFF',
+          disable: '#ACD2FF',
           bg: '#E2F0FF',
           link: '#127FFF',
         },
