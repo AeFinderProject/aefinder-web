@@ -177,7 +177,7 @@ export default function DownloadTempFile() {
             <div className='bg-gray-F5 mb-[24px] mt-[16px]  rounded-lg px-[12px] pb-[8px] pt-[10px]'>
               <Copy
                 label='Install AeFinder CLI using .NET'
-                content='aefinder init --name xxxx --directory xxx'
+                content='aefinder init --name xxx --directory xxx --appid xxx --key xxx'
                 isShowCopy={true}
               />
             </div>
@@ -203,14 +203,14 @@ export default function DownloadTempFile() {
             <div className='bg-gray-F5 mb-[16px] mt-[16px]  rounded-lg px-[12px] pb-[8px] pt-[10px]'>
               <Copy
                 label='Update Code via CLI'
-                content='aefinder update --code xxx.dll --appid xxx --key xxx'
+                content='aefinder update --version xxx --code xxx.dll --appid xxx --key xxx'
                 isShowCopy={true}
               />
             </div>
             <div className='bg-gray-F5 mb-[24px] mt-[16px]  rounded-lg px-[12px] pb-[8px] pt-[10px]'>
               <Copy
                 label='Update Manifest via CLI'
-                content='aefinder update --mainfest xxx.json --appid xxx --key xxx'
+                content='aefinder update --version xxx --mainfest xxx.json --appid xxx --key xxx'
                 isShowCopy={true}
               />
             </div>
