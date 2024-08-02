@@ -122,7 +122,7 @@ export default function DownloadTempFile() {
                 height={225}
               />
             </div>
-            <div className='text-gray-80 text-sm sm:mb-[24px]'>
+            <div className='text-gray-80 mb-[24px] text-sm sm:mb-[0px]'>
               After deployment, click the “Update” button to update your
               manifest (JSON) and code (DLL).
             </div>
