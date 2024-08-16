@@ -43,8 +43,7 @@ export const addSubscription = async (
         return res?.status === 200 ? res : res?.json();
       })
       .then((data) => {
-        // tip data error when status is 400 500
-        if (status === 400 || status === 500) {
+        if (status >= 400) {
           throw new Error(
             handleErrorMessage(data?.error, 'addSubscription error')
           );
@@ -115,10 +114,8 @@ export const updateCode = async (params: UpdateCode): Promise<boolean> => {
       })
       .then((data) => {
         // tip data error when status is 400 403 500
-        if (status !== 200) {
-          throw new Error(
-            handleErrorMessage(data?.error, 'addSubscription error')
-          );
+        if (status >= 400) {
+          throw new Error(handleErrorMessage(data?.error, 'updateCode error'));
         } else {
           return response;
         }
@@ -148,8 +145,8 @@ export const getSubscriptions = async (
       },
     })
       .then((res: Response) => {
-        if (res?.status !== 200) {
-          throw new Error(handleErrorMessage(res, 'addSubscription error'));
+        if (res?.status >= 400) {
+          throw new Error(handleErrorMessage(res, 'getSubscriptions error'));
         }
         return res?.json();
       })
