@@ -14,8 +14,7 @@ const networkHostMap = {
   testnet: {
     AeFinderHost: 'https://gcptest-indexer-api.aefinder.io',
     AeFinderAuthHost: 'https://gcptest-indexer-auth.aefinder.io',
-    CollectorEndpoint:
-      'http://otel-collector-testnet-collector.observability:4316',
+    CollectorEndpoint: 'https://otel.aelf.com/v1/traces',
   },
   mainnet: {
     AeFinderHost: 'https://indexer-api.aefinder.io',
