@@ -19,7 +19,7 @@ const networkHostMap = {
   mainnet: {
     AeFinderHost: 'https://indexer-api.aefinder.io',
     AeFinderAuthHost: 'https://indexer-auth.aefinder.io',
-    CollectorEndpoint: '',
+    CollectorEndpoint: 'https://otel.aelf.com/v1/traces',
   },
 };
 

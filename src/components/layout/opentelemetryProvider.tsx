@@ -31,6 +31,7 @@ export const OpentelemetryProvider = ({ children }: Props) => {
           /\/__nextjs_original-stack-frame/,
           /_rsc=/,
           /https:\/\/www\.google-analytics\.com\/g\/collect/,
+          /\/api\/apps\/log/,
         ],
         propagateTraceHeaderCorsUrls: ['https://httpbin.org'],
       },
