@@ -3,7 +3,7 @@ import { Tracer } from '@opentelemetry/sdk-trace-base';
 import { initWebTracerWithZone } from 'opentelemetry-launcher';
 import { createContext, ReactNode, useEffect, useMemo, useState } from 'react';
 
-import { AeFinderAuthHost, AeFinderHost, CollectorEndpoint } from '@/constant';
+import { CollectorEndpoint } from '@/constant';
 
 interface Props {
   readonly children: ReactNode;
@@ -35,9 +35,11 @@ export const OpentelemetryProvider = ({ children }: Props) => {
         ],
         propagateTraceHeaderCorsUrls: [
           'https://httpbin.org',
-          CollectorEndpoint,
-          AeFinderHost,
-          AeFinderAuthHost,
+          /otel.aelf.com\/v1\/traces/,
+          /gcptest-indexer-api\.aefinder\.io/,
+          /gcptest-indexer-auth\.aefinder\.io/,
+          /indexer-api\.aefinder\.io/,
+          /indexer-auth\.aefinder\.io/,
         ],
       },
     };
