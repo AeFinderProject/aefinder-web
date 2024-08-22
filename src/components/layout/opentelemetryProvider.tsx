@@ -3,7 +3,7 @@ import { Tracer } from '@opentelemetry/sdk-trace-base';
 import { initWebTracerWithZone } from 'opentelemetry-launcher';
 import { createContext, ReactNode, useEffect, useMemo, useState } from 'react';
 
-import { CollectorEndpoint } from '@/constant';
+import { AeFinderAuthHost, AeFinderHost, CollectorEndpoint } from '@/constant';
 
 interface Props {
   readonly children: ReactNode;
@@ -33,7 +33,12 @@ export const OpentelemetryProvider = ({ children }: Props) => {
           /https:\/\/www\.google-analytics\.com\/g\/collect/,
           /\/api\/apps\/log/,
         ],
-        propagateTraceHeaderCorsUrls: ['https://httpbin.org'],
+        propagateTraceHeaderCorsUrls: [
+          'https://httpbin.org',
+          CollectorEndpoint,
+          AeFinderHost,
+          AeFinderAuthHost,
+        ],
       },
     };
   }, [prefix]);
