@@ -2,6 +2,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd';
 import { Button, Collapse, Divider, Drawer, Form, Input, Upload } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
+import { RcFile } from 'antd/es/upload/interface';
 import { useCallback, useEffect, useState } from 'react';
 
 import { isValidJSON } from '@/lib/utils';
@@ -87,7 +88,7 @@ export default function DeployDrawer({
       return {
         uid: item.fileKey,
         name: item.fileName,
-        size: item.size,
+        size: item.fileSize,
       } as UploadFile;
     });
     setAdditionalJSONFileList(temp);
@@ -268,7 +269,7 @@ export default function DeployDrawer({
   ]);
 
   const additionalJSONBeforeUpload = useCallback(
-    (e: File) => {
+    (e: RcFile) => {
       // single file size  check < 120M
       if (e.size > 120 * 1024 * 1024) {
         messageApi.open({
@@ -309,6 +310,16 @@ export default function DeployDrawer({
       const index = additionalJSONFileList.findIndex(
         (item) => item.name === e.name
       );
+      // delete have uploaded attachment
+      if (
+        additionalJSONFileList[index]?.uid &&
+        !additionalJSONFileList[index]?.uid.startsWith('rc-upload')
+      ) {
+        setAttachmentDeleteFileKeyList([
+          ...attachmentDeleteFileKeyList,
+          additionalJSONFileList[index]?.uid,
+        ]);
+      }
       if (index !== -1) {
         setAdditionalJSONFileList(
           additionalJSONFileList.filter((item) => {
@@ -319,7 +330,12 @@ export default function DeployDrawer({
 
       return false;
     },
-    [messageApi, additionalJSONFileList, setAdditionalJSONFileList]
+    [
+      messageApi,
+      additionalJSONFileList,
+      setAdditionalJSONFileList,
+      attachmentDeleteFileKeyList,
+    ]
   );
 
   const handleAdditionalJSONChange = useCallback(
