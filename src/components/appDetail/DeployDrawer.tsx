@@ -305,22 +305,21 @@ export default function DeployDrawer({
         });
         return Upload.LIST_IGNORE;
       }
-      // name can't be the same
-      if (
-        additionalJSONFileList.some(
-          (item) => item.name === e.name && item.uid?.startsWith('rc-upload')
-        )
-      ) {
-        messageApi.open({
-          type: 'error',
-          content: 'File upload failed. name cannot be the same',
-          duration: 3,
-        });
-        return Upload.LIST_IGNORE;
+      // the same name will be covered
+      const index = additionalJSONFileList.findIndex(
+        (item) => item.name === e.name
+      );
+      if (index !== -1) {
+        setAdditionalJSONFileList(
+          additionalJSONFileList.filter((item) => {
+            return item.name !== e.name;
+          })
+        );
       }
+
       return true;
     },
-    [messageApi, additionalJSONFileList]
+    [messageApi, additionalJSONFileList, setAdditionalJSONFileList]
   );
 
   const handleAdditionalJSONChange = useCallback(
@@ -475,8 +474,7 @@ export default function DeployDrawer({
                   accept='.json'
                   beforeUpload={additionalJSONBeforeUpload}
                   maxCount={5}
-                  defaultFileList={additionalJSONFileList}
-                  // fileList={}
+                  fileList={additionalJSONFileList}
                   onChange={({ file, fileList }) =>
                     handleAdditionalJSONChange(file, fileList)
                   }
