@@ -33,9 +33,10 @@ export const addSubscription = async (
     // set formData additionalJSONFile
     if (additionalJSONFileList) {
       additionalJSONFileList.forEach((file) => {
-        // eslint-disable-next-line
-        file.originFileObj &&
+        if (file.originFileObj) {
+          // eslint-disable-next-line
           formData.append('attachmentList', file.originFileObj as any);
+        }
       });
     }
 
@@ -122,9 +123,10 @@ export const updateCode = async (
     // set formData additionalJSONFile
     if (additionalJSONFileList?.length) {
       additionalJSONFileList.forEach((file) => {
-        // eslint-disable-next-line
-        file.originFileObj &&
+        if (file.originFileObj) {
+          // eslint-disable-next-line
           formData.append('attachmentList', file.originFileObj as any);
+        }
       });
     }
     if (AttachmentDeleteFileKeyList) {
