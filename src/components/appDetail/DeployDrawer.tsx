@@ -202,7 +202,7 @@ export default function DeployDrawer({
         });
         return Upload.LIST_IGNORE;
       }
-      return true;
+      return false;
     },
     [messageApi]
   );
@@ -317,7 +317,7 @@ export default function DeployDrawer({
         );
       }
 
-      return true;
+      return false;
     },
     [messageApi, additionalJSONFileList, setAdditionalJSONFileList]
   );
