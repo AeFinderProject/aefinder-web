@@ -36,8 +36,8 @@ export type UpdateSubscriptionAttachmentRequest = {
   appId: string;
   deployKey: string;
   version: string;
-  additionalJSONFileList: UploadFile[];
-  attachmentDeleteFileKeyList: string[];
+  additionalJSONFileList?: UploadFile[];
+  attachmentDeleteFileKeyList?: string;
 };
 
 export type UpdateCodeRequest = {
