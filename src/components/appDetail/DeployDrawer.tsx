@@ -364,13 +364,13 @@ export default function DeployDrawer({
         deployKey: currentAppDetail?.deployKey || '',
         version: currentVersion ?? '',
         additionalJSONFileList: additionalJSONFileList,
-        attachmentDeleteFileKeyList: attachmentDeleteFileKeyList,
+        attachmentDeleteFileKeyList: attachmentDeleteFileKeyList.join(','),
       });
       if (res) {
         messageApi.open({
           type: 'success',
-          content: 'Update Manifest Successfully',
-          duration: 2,
+          content: 'Update attachment successfully',
+          duration: 3,
         });
         setDeployDrawerVisible(false);
         setAdditionalJSONFileList([]);
@@ -383,11 +383,11 @@ export default function DeployDrawer({
     currentAppDetail?.appId,
     currentAppDetail?.deployKey,
     currentVersion,
-    attachmentDeleteFileKeyList,
     messageApi,
     setDeployDrawerVisible,
     additionalJSONFileList,
     setAdditionalJSONFileList,
+    attachmentDeleteFileKeyList,
     setAttachmentDeleteFileKeyList,
   ]);
 

@@ -32,9 +32,11 @@ export const addSubscription = async (
     formData.append('Code', Code.originFileObj);
     // set formData additionalJSONFile
     if (additionalJSONFileList) {
-      additionalJSONFileList.forEach((file, index) => {
-        // eslint-disable-next-line
-        formData.append(`Attachment${index + 1}`, file.originFileObj as any);
+      additionalJSONFileList.forEach((file) => {
+        if (file.originFileObj) {
+          // eslint-disable-next-line
+          formData.append('attachmentList', file.originFileObj as any);
+        }
       });
     }
 
@@ -120,9 +122,11 @@ export const updateCode = async (
     }
     // set formData additionalJSONFile
     if (additionalJSONFileList?.length) {
-      additionalJSONFileList.forEach((file, index) => {
-        // eslint-disable-next-line
-        formData.append(`Attachment${index + 1}`, file.originFileObj as any);
+      additionalJSONFileList.forEach((file) => {
+        if (file.originFileObj) {
+          // eslint-disable-next-line
+          formData.append('attachmentList', file.originFileObj as any);
+        }
       });
     }
     if (AttachmentDeleteFileKeyList) {
@@ -213,6 +217,7 @@ export const getDevTemplate = async (
 export const updateSubscriptionAttachments = async (
   params: UpdateSubscriptionAttachmentRequest
 ): Promise<boolean> => {
+  let response = false;
   try {
     const {
       appId,
@@ -230,31 +235,49 @@ export const updateSubscriptionAttachments = async (
     if (additionalJSONFileList) {
       additionalJSONFileList.forEach((file) => {
         file?.originFileObj &&
-          formData.append(file.name?.split('.')[0], file.originFileObj);
+          formData.append('attachmentList', file.originFileObj);
       });
     }
-    formData.append(
-      'attachmentDeleteFileKeyList',
-      attachmentDeleteFileKeyList.join(',')
-    );
-
-    await request.subscription.updateSubscriptionAttachments({
-      query: version,
-      data: formData,
-      headers: {
-        Authorization: `${Authorization.token_type} ${Authorization.access_token}`,
-      },
-    });
-    // no content -> default true
-    return true;
-  } catch (error) {
-    if (error === 'No Content') {
-      return true;
-    } else {
-      throw new Error(
-        handleErrorMessage(error, 'updateSubscriptionAttachments error')
+    if (attachmentDeleteFileKeyList) {
+      formData.append(
+        'attachmentDeleteFileKeyList',
+        attachmentDeleteFileKeyList
       );
     }
+
+    let status = 0;
+    await fetch(
+      `${SubscriptionsApiList.updateSubscriptionAttachments.target}/${version}`,
+      {
+        method: 'PUT',
+        body: formData,
+        headers: {
+          Authorization: `${Authorization.token_type} ${Authorization.access_token}`,
+        },
+      }
+    )
+      .then((res: Response) => {
+        response = res?.ok;
+        status = res?.status;
+        return res?.status === 200 ? res : res?.json();
+      })
+      .then((data) => {
+        // tip data error when status is 400 403 500
+        if (status >= 400) {
+          throw new Error(
+            handleErrorMessage(
+              data?.error,
+              'updateSubscriptionAttachments error'
+            )
+          );
+        } else {
+          return response;
+        }
+      });
+    return true;
+  } catch (error) {
+    console.log('error', error);
+    return response;
   }
 };
 
