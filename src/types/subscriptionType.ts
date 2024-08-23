@@ -40,11 +40,13 @@ export type UpdateSubscriptionAttachmentRequest = {
   attachmentDeleteFileKeyList: string[];
 };
 
-export type UpdateCode = {
+export type UpdateCodeRequest = {
   appId: string;
   deployKey: string;
   version: string;
   Code: File;
+  additionalJSONFileList?: UploadFile[];
+  AttachmentDeleteFileKeyList?: string;
 };
 
 export type SubscriptionItem = {
