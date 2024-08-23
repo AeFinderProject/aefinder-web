@@ -7,9 +7,12 @@ import { SubscriptionsApiList } from './list';
 import {
   CreateSubscriptionRequest,
   GetDevTemplateRequest,
+  GetSubscriptionAttachmentRequest,
+  GetSubscriptionAttachmentResponse,
   GetSubscriptionRequest,
   GetSubscriptionResponse,
   UpdateCode,
+  UpdateSubscriptionAttachmentRequest,
   UpdateSubscriptionRequest,
 } from '@/types/subscriptionType';
 
@@ -19,7 +22,7 @@ export const addSubscription = async (
   let response = false;
   // deploy true or false
   try {
-    const { appId, deployKey, Code, Manifest } = params;
+    const { appId, deployKey, Code, Manifest, additionalJSONFileList } = params;
     const Authorization = await getAccessToken({
       client_id: appId,
       client_secret: deployKey,
@@ -27,6 +30,13 @@ export const addSubscription = async (
     const formData = new FormData();
     formData.append('Manifest', Manifest);
     formData.append('Code', Code.originFileObj);
+    // set formData additionalJSONFile
+    if (additionalJSONFileList) {
+      additionalJSONFileList.forEach((file, index) => {
+        // eslint-disable-next-line
+        formData.append(`Attachment${index + 1}`, file.originFileObj as any);
+      });
+    }
 
     let status = 0;
     await fetch(`${SubscriptionsApiList.addSubscription.target}`, {
@@ -67,8 +77,7 @@ export const updateSubscription = async (
       client_id: appId,
       client_secret: deployKey,
     });
-    const formData = new FormData();
-    formData.append('Manifest', Manifest);
+
     await request.subscription.updateSubscription({
       query: version,
       data: JSON.parse(Manifest),
@@ -172,6 +181,92 @@ export const getDevTemplate = async (
       },
     });
     return res;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'getSubscription error'));
+  }
+};
+
+export const updateSubscriptionAttachments = async (
+  params: UpdateSubscriptionAttachmentRequest
+): Promise<boolean> => {
+  try {
+    const {
+      appId,
+      deployKey,
+      version,
+      additionalJSONFileList,
+      attachmentDeleteFileKeyList,
+    } = params;
+    const Authorization = await getAccessToken({
+      client_id: appId,
+      client_secret: deployKey,
+    });
+    const formData = new FormData();
+    // set formData additionalJSONFile
+    if (additionalJSONFileList) {
+      additionalJSONFileList.forEach((file) => {
+        file?.originFileObj &&
+          formData.append(file.name?.split('.')[0], file.originFileObj);
+      });
+    }
+    formData.append(
+      'attachmentDeleteFileKeyList',
+      attachmentDeleteFileKeyList.join(',')
+    );
+
+    await request.subscription.updateSubscriptionAttachments({
+      query: version,
+      data: formData,
+      headers: {
+        Authorization: `${Authorization.token_type} ${Authorization.access_token}`,
+      },
+    });
+    // no content -> default true
+    return true;
+  } catch (error) {
+    if (error === 'No Content') {
+      return true;
+    } else {
+      throw new Error(
+        handleErrorMessage(error, 'updateSubscriptionAttachments error')
+      );
+    }
+  }
+};
+
+export const getSubscriptionsAttachments = async (
+  params: GetSubscriptionAttachmentRequest
+): Promise<GetSubscriptionAttachmentResponse> => {
+  let response = {} as GetSubscriptionAttachmentResponse;
+  try {
+    const { appId, deployKey, version } = params;
+    const Authorization = await getAccessToken({
+      client_id: appId,
+      client_secret: deployKey,
+    });
+
+    await fetch(
+      `${SubscriptionsApiList.getSubscriptionsAttachments}/${version}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `${Authorization.token_type} ${Authorization.access_token}`,
+        },
+      }
+    )
+      .then((res: Response) => {
+        if (res?.status >= 400) {
+          throw new Error(
+            handleErrorMessage(res, 'getSubscriptionsAttachments error')
+          );
+        }
+        return res?.json();
+      })
+      .then((data) => {
+        response = data;
+        return data as GetSubscriptionAttachmentResponse;
+      });
+    return response;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'getSubscription error'));
   }
