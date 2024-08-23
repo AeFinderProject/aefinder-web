@@ -87,6 +87,7 @@ export default function DeployDrawer({
       return {
         uid: item.fileKey,
         name: item.fileName,
+        size: item.size,
       } as UploadFile;
     });
     setAdditionalJSONFileList(temp);
@@ -268,12 +269,28 @@ export default function DeployDrawer({
 
   const additionalJSONBeforeUpload = useCallback(
     (e: File) => {
-      // size check 150M
-      if (e.size > 150 * 1024 * 1024) {
+      // single file size  check < 120M
+      if (e.size > 120 * 1024 * 1024) {
         messageApi.open({
           type: 'error',
           content:
-            'File upload failed. Please choose a file within the size limit.',
+            'File upload failed. Please choose a file within the size limit 120M.',
+          duration: 3,
+        });
+        return Upload.LIST_IGNORE;
+      }
+      // check all file: the total maximum size is 120M.
+      let totalSize = e.size;
+      additionalJSONFileList.forEach((item) => {
+        if (item.uid?.startsWith('rc-upload')) {
+          totalSize += item?.size || 0;
+        }
+      });
+      if (totalSize > 120 * 1024 * 1024) {
+        messageApi.open({
+          type: 'error',
+          content:
+            'File upload failed. Please choose a file within the size limit 120M.',
           duration: 3,
         });
         return Upload.LIST_IGNORE;
@@ -289,7 +306,11 @@ export default function DeployDrawer({
         return Upload.LIST_IGNORE;
       }
       // name can't be the same
-      if (additionalJSONFileList.some((item) => item.name === e.name)) {
+      if (
+        additionalJSONFileList.some(
+          (item) => item.name === e.name && item.uid?.startsWith('rc-upload')
+        )
+      ) {
         messageApi.open({
           type: 'error',
           content: 'File upload failed. name cannot be the same',
@@ -446,7 +467,7 @@ export default function DeployDrawer({
                 }
                 return e && e.fileList;
               }}
-              extra='Format supported: JSON. Max size 150MB.'
+              extra='Format supported: JSON. Max size 120MB.'
             >
               <div className='relative flex'>
                 <Upload
