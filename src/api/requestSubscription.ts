@@ -11,7 +11,7 @@ import {
   GetSubscriptionAttachmentResponse,
   GetSubscriptionRequest,
   GetSubscriptionResponse,
-  UpdateCode,
+  UpdateCodeRequest,
   UpdateSubscriptionAttachmentRequest,
   UpdateSubscriptionRequest,
 } from '@/types/subscriptionType';
@@ -96,17 +96,41 @@ export const updateSubscription = async (
   }
 };
 
-export const updateCode = async (params: UpdateCode): Promise<boolean> => {
+export const updateCode = async (
+  params: UpdateCodeRequest
+): Promise<boolean> => {
   // update Code true or false
   let response = false;
   try {
-    const { appId, deployKey, version, Code } = params;
+    const {
+      appId,
+      deployKey,
+      version,
+      Code,
+      additionalJSONFileList,
+      AttachmentDeleteFileKeyList,
+    } = params;
     const Authorization = await getAccessToken({
       client_id: appId,
       client_secret: deployKey,
     });
     const formData = new FormData();
-    formData.append('Code', Code.originFileObj);
+    if (Code) {
+      formData.append('Code', Code.originFileObj);
+    }
+    // set formData additionalJSONFile
+    if (additionalJSONFileList?.length) {
+      additionalJSONFileList.forEach((file, index) => {
+        // eslint-disable-next-line
+        formData.append(`Attachment${index + 1}`, file.originFileObj as any);
+      });
+    }
+    if (AttachmentDeleteFileKeyList) {
+      formData.append(
+        'AttachmentDeleteFileKeyList',
+        AttachmentDeleteFileKeyList
+      );
+    }
 
     let status = 0;
     await fetch(`${SubscriptionsApiList.updateCode.target}/${version}`, {

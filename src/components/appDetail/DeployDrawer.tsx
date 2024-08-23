@@ -208,17 +208,28 @@ export default function DeployDrawer({
 
   const handleUpdateCode = useCallback(async () => {
     const Code = form.getFieldValue('code') && form.getFieldValue('code')[0];
-    // check code value not null
-    if (!Code) {
+    const tempAdditionalJSONFileList = additionalJSONFileList?.filter(
+      (file) => {
+        return file?.uid?.startsWith('rc-upload');
+      }
+    );
+    const tempAttachmentDeleteFileKeyList =
+      attachmentDeleteFileKeyList.join(',');
+    // check code tempAdditionalJSONFileList tempAttachmentDeleteFileKeyList value not null
+    if (
+      !Code &&
+      tempAdditionalJSONFileList?.length === 0 &&
+      tempAttachmentDeleteFileKeyList === ''
+    ) {
       messageApi.open({
         type: 'warning',
-        content: 'Please update Code',
+        content: 'Please update Code or Attachment',
         duration: 3,
       });
       return;
     }
 
-    if (!beforeUpload(Code)) return;
+    if (Code && !beforeUpload(Code)) return;
 
     try {
       setUpdateCodeLoading(true);
@@ -227,13 +238,15 @@ export default function DeployDrawer({
         deployKey: currentAppDetail?.deployKey || '',
         version: version ?? '',
         Code: Code,
+        additionalJSONFileList: tempAdditionalJSONFileList,
+        AttachmentDeleteFileKeyList: tempAttachmentDeleteFileKeyList,
       });
       setUpdateCodeLoading(false);
       if (haveUpdateCodeOk) {
         messageApi.open({
           type: 'success',
           content: 'Update Code Successfully',
-          duration: 1,
+          duration: 3,
         });
         setDeployDrawerVisible(false);
       }
@@ -249,6 +262,8 @@ export default function DeployDrawer({
     setDeployDrawerVisible,
     form,
     beforeUpload,
+    additionalJSONFileList,
+    attachmentDeleteFileKeyList,
   ]);
 
   const additionalJSONBeforeUpload = useCallback(
@@ -419,19 +434,6 @@ export default function DeployDrawer({
             <Button icon={<UploadOutlined />}>Click to upload</Button>
           </Upload>
         </FormItem>
-        {type === 1 && (
-          <FormItem>
-            <Button
-              size='large'
-              className='w-[180px]'
-              type='primary'
-              loading={updateCodeLoading}
-              onClick={() => handleUpdateCode()}
-            >
-              Update code
-            </Button>
-          </FormItem>
-        )}
         <Collapse defaultActiveKey={[]} size='small'>
           <Panel header='Attachment upload' key='1'>
             <FormItem
@@ -480,6 +482,19 @@ export default function DeployDrawer({
             )}
           </Panel>
         </Collapse>
+        {type === 1 && (
+          <FormItem>
+            <Button
+              size='large'
+              className='mt-[20px] w-[180px]'
+              type='primary'
+              loading={updateCodeLoading}
+              onClick={() => handleUpdateCode()}
+            >
+              Update code
+            </Button>
+          </FormItem>
+        )}
         <Divider />
         <FormItem>
           {type === 0 && (
