@@ -87,4 +87,5 @@ export type GetSubscriptionAttachmentResponse = {
   version: string;
   appId: string;
   fileName: string;
+  size: number;
 }[];
