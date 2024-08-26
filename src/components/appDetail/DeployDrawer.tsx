@@ -231,7 +231,14 @@ export default function DeployDrawer({
       return;
     }
 
-    if (Code && !beforeUpload(Code)) return;
+    if (Code && Code?.size > 12 * 1024 * 1024) {
+      messageApi.open({
+        type: 'error',
+        content:
+          'File upload failed. Please choose a file within the size limit.',
+      });
+      return;
+    }
 
     try {
       setUpdateCodeLoading(true);
@@ -263,7 +270,6 @@ export default function DeployDrawer({
     messageApi,
     setDeployDrawerVisible,
     form,
-    beforeUpload,
     additionalJSONFileList,
     attachmentDeleteFileKeyList,
   ]);
