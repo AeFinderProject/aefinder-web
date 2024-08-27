@@ -1,4 +1,4 @@
-import JSZip from 'jszip';
+import pako from 'pako';
 
 import { handleErrorMessage } from '@/lib/utils';
 
@@ -116,12 +116,11 @@ const readAndCompressFile = async (file: File): Promise<Blob> => {
     reader.readAsText(file);
   });
 
-  const zip = new JSZip();
-  zip.file(file.name, fileContent);
-  const compressedBlob = await zip.generateAsync({ type: 'blob' });
-  return new File([compressedBlob], `${file.name}.zip`, {
+  const compressedData = pako.deflate(fileContent, { to: 'string' });
+  const compressedFile = new File([compressedData], `${file.name}.zip`, {
     type: 'application/zip',
   });
+  return compressedFile;
 };
 
 export const updateCode = async (
@@ -146,7 +145,7 @@ export const updateCode = async (
     const formData = new FormData();
     if (Code) {
       const compressedFile = await readAndCompressFile(Code.originFileObj);
-      formData.append('Code', compressedFile, Code.name);
+      formData.append('Code', compressedFile);
     }
     // set formData additionalJSONFile
     if (additionalJSONFileList?.length) {
@@ -158,7 +157,7 @@ export const updateCode = async (
           if (compressedFile?.size) {
             console.log(compressedFile?.size / (1024 * 1024), 'MB');
           }
-          formData.append('attachmentList', compressedFile, file.name);
+          formData.append('attachmentList', compressedFile);
         }
       }
     }

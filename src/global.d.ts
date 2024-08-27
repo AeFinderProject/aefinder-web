@@ -12,3 +12,4 @@ declare interface File extends Blob {
 declare module 'query-string';
 declare module 'react-copy-to-clipboard';
 declare module 'qs';
+declare module 'pako';
