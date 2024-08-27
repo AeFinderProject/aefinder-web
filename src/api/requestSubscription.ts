@@ -1,3 +1,5 @@
+import JSZip from 'jszip';
+
 import { handleErrorMessage } from '@/lib/utils';
 
 import { getAccessToken } from './apiUtils';
@@ -98,6 +100,27 @@ export const updateSubscription = async (
   }
 };
 
+const readAndCompressFile = async (file: File): Promise<Blob> => {
+  const reader = new FileReader();
+
+  const fileContent = await new Promise<string>((resolve, reject) => {
+    reader.onload = (event) => {
+      const result = event.target?.result;
+      if (typeof result === 'string') {
+        resolve(result);
+      } else {
+        reject(new Error('Is not a string'));
+      }
+    };
+    reader.onerror = (error) => reject(error);
+    reader.readAsText(file);
+  });
+
+  const zip = new JSZip();
+  zip.file(file.name, fileContent);
+  return await zip.generateAsync({ type: 'blob' });
+};
+
 export const updateCode = async (
   params: UpdateCodeRequest
 ): Promise<boolean> => {
@@ -116,16 +139,23 @@ export const updateCode = async (
       client_id: appId,
       client_secret: deployKey,
     });
+    // add zip file
     const formData = new FormData();
     if (Code) {
-      formData.append('Code', Code.originFileObj);
+      const compressedBlob = await readAndCompressFile(Code.originFileObj);
+      formData.append('Code', compressedBlob, Code.name);
     }
     // set formData additionalJSONFile
     if (additionalJSONFileList?.length) {
-      additionalJSONFileList.forEach((file) => {
+      additionalJSONFileList.forEach(async (file) => {
         if (file.originFileObj) {
           // eslint-disable-next-line
-          formData.append('attachmentList', file.originFileObj as any);
+          const compressedBlob = await readAndCompressFile(file.originFileObj);
+          console.log(compressedBlob);
+          if (compressedBlob?.size) {
+            console.log(compressedBlob?.size / (1024 * 1024), 'MB');
+          }
+          formData.append('attachmentList', compressedBlob, file.name);
         }
       });
     }

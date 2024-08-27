@@ -287,21 +287,21 @@ export default function DeployDrawer({
         return Upload.LIST_IGNORE;
       }
       // check all file: the total maximum size is 120M.
-      let totalSize = e.size;
-      additionalJSONFileList.forEach((item) => {
-        if (item.uid?.startsWith('rc-upload')) {
-          totalSize += item?.size || 0;
-        }
-      });
-      if (totalSize > 120 * 1024 * 1024) {
-        messageApi.open({
-          type: 'error',
-          content:
-            'File upload failed. Please choose a file within the size limit 120M.',
-          duration: 3,
-        });
-        return Upload.LIST_IGNORE;
-      }
+      // let totalSize = e.size;
+      // additionalJSONFileList.forEach((item) => {
+      //   if (item.uid?.startsWith('rc-upload')) {
+      //     totalSize += item?.size || 0;
+      //   }
+      // });
+      // if (totalSize > 120 * 1024 * 1024) {
+      //   messageApi.open({
+      //     type: 'error',
+      //     content:
+      //       'File upload failed. Please choose a file within the size limit 120M.',
+      //     duration: 3,
+      //   });
+      //   return Upload.LIST_IGNORE;
+      // }
       // name check
       const regRule = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
       if (!regRule.test(e.name.split('.')[0])) {
