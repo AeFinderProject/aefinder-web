@@ -118,7 +118,10 @@ const readAndCompressFile = async (file: File): Promise<Blob> => {
 
   const zip = new JSZip();
   zip.file(file.name, fileContent);
-  return await zip.generateAsync({ type: 'blob' });
+  const compressedBlob = await zip.generateAsync({ type: 'blob' });
+  return new File([compressedBlob], `${file.name}.zip`, {
+    type: 'application/zip',
+  });
 };
 
 export const updateCode = async (
@@ -142,22 +145,22 @@ export const updateCode = async (
     // add zip file
     const formData = new FormData();
     if (Code) {
-      const compressedBlob = await readAndCompressFile(Code.originFileObj);
-      formData.append('Code', compressedBlob, Code.name);
+      const compressedFile = await readAndCompressFile(Code.originFileObj);
+      formData.append('Code', compressedFile, Code.name);
     }
     // set formData additionalJSONFile
     if (additionalJSONFileList?.length) {
-      additionalJSONFileList.forEach(async (file) => {
+      for (const file of additionalJSONFileList) {
         if (file.originFileObj) {
           // eslint-disable-next-line
-          const compressedBlob = await readAndCompressFile(file.originFileObj);
-          console.log(compressedBlob);
-          if (compressedBlob?.size) {
-            console.log(compressedBlob?.size / (1024 * 1024), 'MB');
+          const compressedFile = await readAndCompressFile(file.originFileObj);
+          console.log(compressedFile);
+          if (compressedFile?.size) {
+            console.log(compressedFile?.size / (1024 * 1024), 'MB');
           }
-          formData.append('attachmentList', compressedBlob, file.name);
+          formData.append('attachmentList', compressedFile, file.name);
         }
-      });
+      }
     }
     if (AttachmentDeleteFileKeyList) {
       formData.append(
