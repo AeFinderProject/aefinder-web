@@ -116,7 +116,11 @@ const readAndCompressFile = async (file: File): Promise<Blob> => {
     reader.readAsText(file);
   });
 
-  const compressedData = pako.deflate(fileContent, { to: 'uint8array' });
+  const compressedData = pako.deflate(fileContent, {
+    to: 'uint8array',
+    level: 9,
+    gzip: true,
+  });
   const compressedFile = new File([compressedData], `${file.name}.zip`, {
     type: 'application/zip',
   });
