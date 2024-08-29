@@ -1,5 +1,6 @@
 import { message } from 'antd';
 import clsx, { ClassValue } from 'clsx';
+import pako from 'pako';
 import { DependencyList, useCallback, useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
 
@@ -128,4 +129,29 @@ export const formatStr2Ellipsis = (
   const pre = address.substring(0, digits[0]);
   const suffix = address.substring(len - digits[1]);
   return `${pre}...${suffix}`;
+};
+
+export const readAndCompressFile = async (file: File): Promise<Blob> => {
+  const reader = new FileReader();
+
+  const fileContent = await new Promise<string>((resolve, reject) => {
+    reader.onload = (event) => {
+      const result = event.target?.result;
+      if (typeof result === 'string') {
+        resolve(result);
+      } else {
+        reject(new Error('Is not a string'));
+      }
+    };
+    reader.onerror = (error) => reject(error);
+    reader.readAsText(file);
+  });
+
+  const compressedData = pako.deflate(fileContent, {
+    to: 'uint8array',
+  });
+  const compressedFile = new File([compressedData], `${file.name}.zip`, {
+    type: 'application/zip',
+  });
+  return compressedFile;
 };

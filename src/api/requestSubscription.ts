@@ -1,6 +1,4 @@
-import pako from 'pako';
-
-import { handleErrorMessage } from '@/lib/utils';
+import { handleErrorMessage, readAndCompressFile } from '@/lib/utils';
 
 import { getAccessToken } from './apiUtils';
 import { request } from './index';
@@ -34,12 +32,12 @@ export const addSubscription = async (
     formData.append('Code', Code.originFileObj);
     // set formData additionalJSONFile
     if (additionalJSONFileList) {
-      additionalJSONFileList.forEach((file) => {
+      for (const file of additionalJSONFileList) {
         if (file.originFileObj) {
-          // eslint-disable-next-line
-          formData.append('attachmentList', file.originFileObj as any);
+          const compressedFile = await readAndCompressFile(file.originFileObj);
+          formData.append('attachmentList', compressedFile);
         }
-      });
+      }
     }
 
     let status = 0;
@@ -100,31 +98,6 @@ export const updateSubscription = async (
   }
 };
 
-const readAndCompressFile = async (file: File): Promise<Blob> => {
-  const reader = new FileReader();
-
-  const fileContent = await new Promise<string>((resolve, reject) => {
-    reader.onload = (event) => {
-      const result = event.target?.result;
-      if (typeof result === 'string') {
-        resolve(result);
-      } else {
-        reject(new Error('Is not a string'));
-      }
-    };
-    reader.onerror = (error) => reject(error);
-    reader.readAsText(file);
-  });
-
-  const compressedData = pako.deflate(fileContent, {
-    to: 'uint8array',
-  });
-  const compressedFile = new File([compressedData], `${file.name}.zip`, {
-    type: 'application/zip',
-  });
-  return compressedFile;
-};
-
 export const updateCode = async (
   params: UpdateCodeRequest
 ): Promise<boolean> => {
@@ -143,22 +116,15 @@ export const updateCode = async (
       client_id: appId,
       client_secret: deployKey,
     });
-    // add zip file
     const formData = new FormData();
     if (Code) {
-      const compressedFile = await readAndCompressFile(Code.originFileObj);
-      formData.append('Code', compressedFile);
+      formData.append('Code', Code.originFileObj);
     }
-    // set formData additionalJSONFile
+    // set formData additionalJSONFile  add zip file
     if (additionalJSONFileList?.length) {
       for (const file of additionalJSONFileList) {
         if (file.originFileObj) {
-          // eslint-disable-next-line
           const compressedFile = await readAndCompressFile(file.originFileObj);
-          console.log(compressedFile);
-          if (compressedFile?.size) {
-            console.log(compressedFile?.size / (1024 * 1024), 'MB');
-          }
           formData.append('attachmentList', compressedFile);
         }
       }
