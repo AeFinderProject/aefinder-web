@@ -71,6 +71,11 @@ export const SubscriptionsApiList = {
     target: `${AeFinderHost}/api/dev-template`,
     baseConfig: { method: 'POST' },
   },
+  updateSubscriptionAttachments: {
+    target: `${AeFinderHost}/api/apps/subscriptions/attachments`,
+    baseConfig: { method: 'PUT' },
+  },
+  getSubscriptionsAttachments: `${AeFinderHost}/api/apps/subscriptions/attachments`,
 };
 
 /**
