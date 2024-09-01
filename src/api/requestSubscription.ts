@@ -1,4 +1,4 @@
-import { handleErrorMessage } from '@/lib/utils';
+import { handleErrorMessage, readAndCompressFile } from '@/lib/utils';
 
 import { getAccessToken } from './apiUtils';
 import { request } from './index';
@@ -32,12 +32,12 @@ export const addSubscription = async (
     formData.append('Code', Code.originFileObj);
     // set formData additionalJSONFile
     if (additionalJSONFileList) {
-      additionalJSONFileList.forEach((file) => {
+      for (const file of additionalJSONFileList) {
         if (file.originFileObj) {
-          // eslint-disable-next-line
-          formData.append('attachmentList', file.originFileObj as any);
+          const compressedFile = await readAndCompressFile(file.originFileObj);
+          formData.append('attachmentList', compressedFile);
         }
-      });
+      }
     }
 
     let status = 0;
@@ -120,14 +120,14 @@ export const updateCode = async (
     if (Code) {
       formData.append('Code', Code.originFileObj);
     }
-    // set formData additionalJSONFile
+    // set formData additionalJSONFile  add zip file
     if (additionalJSONFileList?.length) {
-      additionalJSONFileList.forEach((file) => {
+      for (const file of additionalJSONFileList) {
         if (file.originFileObj) {
-          // eslint-disable-next-line
-          formData.append('attachmentList', file.originFileObj as any);
+          const compressedFile = await readAndCompressFile(file.originFileObj);
+          formData.append('attachmentList', compressedFile);
         }
-      });
+      }
     }
     if (AttachmentDeleteFileKeyList) {
       formData.append(
