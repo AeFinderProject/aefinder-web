@@ -27,7 +27,7 @@ export const addSubscription = async (
   params: CreateSubscriptionRequest
 ): Promise<boolean> => {
   const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest) {
+  if (isGuest === 'true') {
     return addSubscriptionGuest(params);
   }
 
@@ -85,7 +85,7 @@ export const updateSubscription = async (
   params: UpdateSubscriptionRequest
 ): Promise<boolean> => {
   const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest) {
+  if (isGuest === 'true') {
     return updateSubscriptionGuest(params);
   }
 
@@ -118,7 +118,7 @@ export const updateCode = async (
   params: UpdateCodeRequest
 ): Promise<boolean> => {
   const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest) {
+  if (isGuest === 'true') {
     return updateCodeGuest(params);
   }
 
@@ -189,7 +189,7 @@ export const getSubscriptions = async (
   params: GetSubscriptionRequest
 ): Promise<GetSubscriptionResponse> => {
   const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest) {
+  if (isGuest === 'true') {
     return getSubscriptionsGuest(params);
   }
 
@@ -311,7 +311,7 @@ export const getSubscriptionsAttachments = async (
   params: GetSubscriptionAttachmentRequest
 ): Promise<GetSubscriptionAttachmentResponse> => {
   const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest) {
+  if (isGuest === 'true') {
     return getSubscriptionsAttachmentsGuest(params);
   }
 

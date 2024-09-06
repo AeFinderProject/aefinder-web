@@ -214,7 +214,7 @@ export default function DeployDrawer({
     const isGuest = sessionStorage.getItem('isGuest');
     const tempAdditionalJSONFileList = additionalJSONFileList?.filter(
       (file) => {
-        if (isGuest) {
+        if (isGuest === 'true') {
           // if isGuest -> upload all
           return true;
         }

@@ -26,7 +26,7 @@ export const createApp = async (
   params: CreateAppRequest
 ): Promise<CreateAppResponse> => {
   const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest) {
+  if (isGuest === 'true') {
     return createAppGuest(params);
   }
 
@@ -42,7 +42,7 @@ export const modifyApp = async (
   params: ModifyAppRequest
 ): Promise<CreateAppResponse> => {
   const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest) {
+  if (isGuest === 'true') {
     return modifyAppGuest(params);
   }
 
@@ -59,7 +59,7 @@ export const getAppDetail = async (
   params: GetAppDetailRequest
 ): Promise<GetAppDetailResponse> => {
   const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest) {
+  if (isGuest === 'true') {
     return getAppDetailGuest(params);
   }
   try {
@@ -73,7 +73,7 @@ export const getAppDetail = async (
 
 export const getAppList = async (): Promise<GetAppListResponse> => {
   const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest) {
+  if (isGuest === 'true') {
     return getAppListGuest();
   }
 
@@ -89,7 +89,7 @@ export const getLog = async (
   params: GetLogRequest
 ): Promise<GetLogResponse[]> => {
   const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest) {
+  if (isGuest === 'true') {
     return getAppLogGuest(params);
   }
 
@@ -105,7 +105,7 @@ export const resetPassword = async (
   params: ResetPasswordRequest
 ): Promise<boolean> => {
   const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest) {
+  if (isGuest === 'true') {
     return resetPasswordGuest(params);
   }
 
