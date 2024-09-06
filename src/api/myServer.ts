@@ -2,7 +2,8 @@ import axios, { CancelTokenSource } from 'axios';
 
 import { BaseConfig, RequestConfig, UrlObj } from './apiType';
 import { getRequestConfig, spliceUrl } from './apiUtils';
-import service from './axios';
+import axiosService from './axiosService';
+import guestService from './guestService';
 import { DEFAULT_METHOD } from './list';
 
 const myServer = new Function();
@@ -43,7 +44,20 @@ myServer.prototype.send = function (base: BaseConfig, config: RequestConfig) {
     }
     cancelTokenSources.set(cancelTokenSourceKey, source);
   }
-  return service({
+  // if guest mode, use guest service
+  const isGuest = sessionStorage.getItem('isGuest');
+  console.log('isGuest', isGuest);
+  if (isGuest === 'true' && '/api/dev-template' !== url) {
+    console.log('guestService ===>');
+    return guestService({
+      ...axiosConfig,
+      url: typeof base === 'string' ? base : base.target,
+      method,
+      query,
+      cancelToken: source.token,
+    });
+  }
+  return axiosService({
     ...axiosConfig,
     url: url || spliceUrl(typeof base === 'string' ? base : base.target, query),
     method,

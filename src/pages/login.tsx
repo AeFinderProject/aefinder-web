@@ -10,6 +10,7 @@ import { useAppDispatch } from '@/store/hooks';
 import { setUsername } from '@/store/slices/commonSlice';
 
 import { queryAuthApi, resetLocalJWT } from '@/api/apiUtils';
+import db from '@/api/guestDB';
 
 export default function LogIn() {
   const [form] = Form.useForm();
@@ -23,6 +24,7 @@ export default function LogIn() {
     // clear localStorage jwt
     if (pathname === '/login') {
       resetLocalJWT();
+      sessionStorage.setItem('isGuest', 'false');
     }
   }, [pathname]);
 
@@ -36,6 +38,7 @@ export default function LogIn() {
   }, [dispatch, form, router, messageApi]);
 
   const handleLogin = useDebounceCallback(async () => {
+    sessionStorage.setItem('isGuest', 'false');
     const res = await queryAuthApi({
       username: form.getFieldValue('username'),
       password: form.getFieldValue('password'),
@@ -48,6 +51,18 @@ export default function LogIn() {
         content: 'Wrong user name or password, please retry',
       });
     }
+  }, []);
+
+  const handleGuestLogin = useDebounceCallback(async () => {
+    // if Guest Login, set isGuest to true
+    sessionStorage.setItem('isGuest', 'true');
+    await db.open();
+    await queryAuthApi({
+      username: 'Guest',
+      password: 'Guest',
+    });
+    dispatch(setUsername('Guest'));
+    router.push('/dashboard');
   }, []);
 
   return (
@@ -93,6 +108,14 @@ export default function LogIn() {
                 htmlType='submit'
               >
                 Sign In
+              </Button>
+            </FormItem>
+            <FormItem>
+              <Button
+                className='mx-auto h-[48px] w-full'
+                onClick={handleGuestLogin}
+              >
+                Continue as Guest
               </Button>
             </FormItem>
           </Form>

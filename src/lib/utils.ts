@@ -155,3 +155,7 @@ export const readAndCompressFile = async (file: File): Promise<Blob> => {
   });
   return compressedFile;
 };
+
+export function generateUid() {
+  return Math.random().toString(36).substring(2, 21);
+}
