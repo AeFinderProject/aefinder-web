@@ -18,14 +18,11 @@ import {
 import { IBaseRequest } from './apiType';
 
 const GuestService = function (params: IBaseRequest) {
-  console.log(params);
   const { url, method, query, data } = params;
-  console.log(url, method);
   switch (url + '/' + method) {
     case '/api/apps/POST':
       return createAppGuest(data);
     case '/api/apps/PUT':
-      console.log('modifyAppGuest', data);
       return modifyAppGuest({ appId: query, ...data });
     case '/api/apps/GET':
       // get app detail

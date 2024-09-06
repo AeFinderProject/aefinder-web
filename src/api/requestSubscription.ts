@@ -61,7 +61,6 @@ export const addSubscription = async (
       },
     })
       .then((res: Response) => {
-        console.log('res', res);
         response = res?.ok;
         status = res?.status;
         return res?.status === 200 ? res : res?.json();

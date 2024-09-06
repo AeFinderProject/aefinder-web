@@ -83,7 +83,7 @@ export default function DeployDrawer({
       deployKey: currentAppDetail?.deployKey || '',
       version: currentVersion ?? '',
     });
-    console.log(response);
+
     // set additionalJSONFileList
     const temp = response?.map((item) => {
       return {

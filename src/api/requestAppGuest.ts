@@ -54,9 +54,7 @@ export const modifyAppGuest = async (
 ): Promise<CreateAppResponse> => {
   const { appId, description, sourceCodeUrl } = params;
   // step 1 check if appId exists
-  console.log('appId', appId);
   const existingApp = await db.appTable.get(appId);
-  console.log(existingApp);
   if (!existingApp) {
     throw new Error(`AppId ${appId} does not exist.`);
   }
@@ -68,7 +66,6 @@ export const modifyAppGuest = async (
     updateTime,
   });
   const res = await db.appTable.get(appId);
-  console.log(res);
   return res as CreateAppResponse;
 };
 

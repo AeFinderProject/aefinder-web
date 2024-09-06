@@ -1,6 +1,6 @@
 import 'dexie';
 
-import { SubscriptionItems } from '../types/subscriptionType';
+import { SubscriptionItems } from './subscriptionType';
 
 declare module 'dexie' {
   interface Dexie {
@@ -31,6 +31,14 @@ declare module 'dexie' {
     pendingVersion: string;
   }
 
+  interface SubscriptionTable {
+    id?: number;
+    appId: string;
+    version: string;
+    status: number;
+    subscriptionManifest: SubscriptionItems;
+  }
+
   interface AttachmentTable {
     id?: number;
     appId: string;
@@ -55,13 +63,5 @@ declare module 'dexie' {
     timestamp: string;
     environment: string;
     app_log: AppLogItem;
-  }
-
-  interface SubscriptionTable {
-    id?: number;
-    appId: string;
-    version: string;
-    status: number;
-    subscriptionManifest: SubscriptionItems;
   }
 }

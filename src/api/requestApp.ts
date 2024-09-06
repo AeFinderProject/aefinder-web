@@ -63,7 +63,6 @@ export const getLog = async (
 ): Promise<GetLogResponse[]> => {
   try {
     const res: GetLogResponse[] = await request.app.getLog({ params });
-    console.log(res);
     return res;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'getLog error'));

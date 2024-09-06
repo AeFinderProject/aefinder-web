@@ -28,15 +28,15 @@ export default function CreateAppStep2({
   const FormItem = Form.Item;
   const dispatch = useAppDispatch();
   const [description, setDescription] = useState<string>(
-    currentAppDetail.description
+    currentAppDetail?.description
   );
   const [sourceCodeUrl, setSourceCodeUrl] = useState<string>(
-    currentAppDetail.sourceCodeUrl
+    currentAppDetail?.sourceCodeUrl
   );
 
   const handleModify = useCallback(async () => {
     const res = await modifyApp({
-      appId: currentAppDetail.appId,
+      appId: currentAppDetail?.appId,
       description: description,
       sourceCodeUrl: sourceCodeUrl,
     });
@@ -49,7 +49,7 @@ export default function CreateAppStep2({
       setCreateAppDrawerVisible(false);
     }
   }, [
-    currentAppDetail.appId,
+    currentAppDetail?.appId,
     setCreateAppDrawerVisible,
     messageApi,
     dispatch,

@@ -10,7 +10,6 @@ import { useAppDispatch } from '@/store/hooks';
 import { setUsername } from '@/store/slices/commonSlice';
 
 import { queryAuthApi, resetLocalJWT } from '@/api/apiUtils';
-import db from '@/api/guestDB';
 
 export default function LogIn() {
   const [form] = Form.useForm();
@@ -56,7 +55,6 @@ export default function LogIn() {
   const handleGuestLogin = useDebounceCallback(async () => {
     // if Guest Login, set isGuest to true
     sessionStorage.setItem('isGuest', 'true');
-    await db.open();
     await queryAuthApi({
       username: 'Guest',
       password: 'Guest',
