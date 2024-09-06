@@ -1,6 +1,14 @@
 import { handleErrorMessage } from '@/lib/utils';
 
 import { request } from './index';
+import {
+  createAppGuest,
+  getAppDetailGuest,
+  getAppListGuest,
+  getAppLogGuest,
+  modifyAppGuest,
+  resetPasswordGuest,
+} from './requestAppGuest';
 
 import {
   CreateAppRequest,
@@ -17,6 +25,11 @@ import { ResetPasswordRequest } from '@/types/loginType';
 export const createApp = async (
   params: CreateAppRequest
 ): Promise<CreateAppResponse> => {
+  const isGuest = sessionStorage.getItem('isGuest');
+  if (isGuest) {
+    return createAppGuest(params);
+  }
+
   try {
     const res = await request.app.createApp({ data: params });
     return res;
@@ -28,6 +41,11 @@ export const createApp = async (
 export const modifyApp = async (
   params: ModifyAppRequest
 ): Promise<CreateAppResponse> => {
+  const isGuest = sessionStorage.getItem('isGuest');
+  if (isGuest) {
+    return modifyAppGuest(params);
+  }
+
   try {
     const { appId, ...rest } = params;
     const res = await request.app.modifyApp({ query: appId, data: rest });
@@ -40,6 +58,10 @@ export const modifyApp = async (
 export const getAppDetail = async (
   params: GetAppDetailRequest
 ): Promise<GetAppDetailResponse> => {
+  const isGuest = sessionStorage.getItem('isGuest');
+  if (isGuest) {
+    return getAppDetailGuest(params);
+  }
   try {
     const { appId } = params;
     const res = await request.app.getAppDetail({ query: appId });
@@ -50,6 +72,11 @@ export const getAppDetail = async (
 };
 
 export const getAppList = async (): Promise<GetAppListResponse> => {
+  const isGuest = sessionStorage.getItem('isGuest');
+  if (isGuest) {
+    return getAppListGuest();
+  }
+
   try {
     const res = await request.app.getAppList();
     return res;
@@ -61,6 +88,11 @@ export const getAppList = async (): Promise<GetAppListResponse> => {
 export const getLog = async (
   params: GetLogRequest
 ): Promise<GetLogResponse[]> => {
+  const isGuest = sessionStorage.getItem('isGuest');
+  if (isGuest) {
+    return getAppLogGuest(params);
+  }
+
   try {
     const res: GetLogResponse[] = await request.app.getLog({ params });
     return res;
@@ -72,6 +104,11 @@ export const getLog = async (
 export const resetPassword = async (
   params: ResetPasswordRequest
 ): Promise<boolean> => {
+  const isGuest = sessionStorage.getItem('isGuest');
+  if (isGuest) {
+    return resetPasswordGuest(params);
+  }
+
   try {
     const res: boolean = await request.auth.resetPassword({ data: params });
     return res;
