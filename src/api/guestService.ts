@@ -19,6 +19,7 @@ import { IBaseRequest } from './apiType';
 
 const GuestService = function (params: IBaseRequest) {
   const { url, method, query, data } = params;
+  console.log('GuestService', params);
   switch (url + '/' + method) {
     case '/api/apps/POST':
       return createAppGuest(data);

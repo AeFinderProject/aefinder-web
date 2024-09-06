@@ -46,6 +46,7 @@ myServer.prototype.send = function (base: BaseConfig, config: RequestConfig) {
   }
   // if guest mode, use guest service
   const isGuest = sessionStorage.getItem('isGuest');
+  console.log('isGuest', isGuest);
   if (isGuest === 'true' && '/api/dev-template' !== url) {
     console.log('isGuest guestService ===>');
     return guestService({
