@@ -65,6 +65,7 @@ export type SubscriptionItem = {
 
 export type SubscriptionItems = {
   subscriptionItems: SubscriptionItem[];
+  SubscriptionItems?: SubscriptionItem[];
 };
 
 export type VersionType = {

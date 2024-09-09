@@ -1,6 +1,7 @@
 import { ApolloClient, gql, InMemoryCache } from '@apollo/client';
 import { MockedProvider } from '@apollo/client/testing';
 import { GraphiQL } from 'graphiql';
+import { useEffect } from 'react';
 
 import 'graphiql/graphiql.css';
 
@@ -194,6 +195,12 @@ query GetUser {
 `;
 
 export default function GuestPlayground() {
+  useEffect(() => {
+    localStorage.removeItem('graphiql:query');
+    localStorage.removeItem('graphiql:tabState');
+    localStorage.setItem('graphiql:theme', 'light');
+  }, []);
+
   return (
     <MockedProvider mocks={mocks} addTypename={false}>
       <GraphiQL defaultQuery={defaultQuery} fetcher={graphQLFetcher} />
