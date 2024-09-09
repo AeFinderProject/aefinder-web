@@ -55,6 +55,7 @@ declare module 'dexie' {
     level: LevelType;
     exception: string;
     appId: string;
+    chainId: string;
     version: string;
   }
 

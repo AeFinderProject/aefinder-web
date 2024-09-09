@@ -65,6 +65,7 @@ export type GetLogResponse = {
     level: LevelType;
     exception: string;
     appId: string;
+    chainId: string;
     version: string;
   };
 };

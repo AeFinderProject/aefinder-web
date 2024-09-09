@@ -1,6 +1,7 @@
 import { handleErrorMessage } from '@/lib/utils';
 
 import db from '@/api/guestDB';
+import { GuestLog } from '@/constant/guestLog';
 
 import {
   AppStatusType,
@@ -110,71 +111,39 @@ export const getAppLogGuest = async (
   params: GetLogRequest
 ): Promise<GetLogResponse[]> => {
   try {
-    console.log(params);
+    const { searchKeyWord, chainId, levels } = params;
     // step 1 check if there is a log list, if not exists, init log list
     let logList = await db.appLogTable.toArray();
     if (!logList.length) {
-      await db.appLogTable.add({
-        log_id: 'zV8VwZEBQbYYxJdAV6Fv1',
-        timestamp: '2024-09-05T07:28:07.023Z',
-        environment: 'sohoIndexerTest2.0',
-        app_log: {
-          eventId: 1,
-          time: '2024-09-05T07:28:06.8283127Z',
-          message:
-            'Processing blocks. ChainId: "AELF", BlockHeight: 7248496-7248595, Confirmed: True',
-          level: 'Information',
-          exception: '',
-          appId: 'conf002',
-          version: '26c721a30ff744d889e8e30685a7949c',
-        },
-      });
-      await db.appLogTable.add({
-        log_id: 'zV8VwZEBQbYYxJdAV6Fv2',
-        timestamp: '2024-09-05T07:28:07.023Z',
-        environment: 'sohoIndexerTest2.1',
-        app_log: {
-          eventId: 1,
-          time: '2024-09-05T07:28:06.8283127Z',
-          message: '["AELF"] test warning log',
-          level: 'Warning',
-          exception: '',
-          appId: 'conf002',
-          version: '26c721a30ff744d889e8e30685a7949c',
-        },
-      });
-      await db.appLogTable.add({
-        log_id: 'zV8VwZEBQbYYxJdAV6Fv3',
-        timestamp: '2024-09-05T07:28:07.023Z',
-        environment: 'sohoIndexerTest2.2',
-        app_log: {
-          eventId: 1,
-          time: '2024-09-05T07:28:06.8283127Z',
-          message:
-            'Processing block. ChainId: "AELF", BlockHash: "e10c9c5908f06f4291ceac35fde2d83ccc94c477a93184b222e83be44dc78934", BlockHeight: 7248595.',
-          level: 'Debug',
-          exception: '',
-          appId: 'conf002',
-          version: '26c721a30ff744d889e8e30685a7949c',
-        },
-      });
-      await db.appLogTable.add({
-        log_id: 'zV8VwZEBQbYYxJdAV6Fv4',
-        timestamp: '2024-09-05T07:28:07.023Z',
-        environment: 'sohoIndexerTest2.3',
-        app_log: {
-          eventId: 1,
-          time: '2024-09-05T07:28:06.8283127Z',
-          message:
-            'Processing block. ChainId: "AELF", BlockHash: "e10c9c5908f06f4291ceac35fde2d83ccc94c477a93184b222e83be44dc78934", BlockHeight: 7248595.',
-          level: 'Error',
-          exception: '',
-          appId: 'conf002',
-          version: '26c721a30ff744d889e8e30685a7949c',
-        },
-      });
+      await db.appLogTable.bulkAdd(GuestLog);
     }
     logList = await db.appLogTable.toArray();
+    // step 2 filter log list
+    if (searchKeyWord) {
+      logList = logList.filter((item) => {
+        return item?.app_log?.message?.includes(searchKeyWord);
+      });
+    }
+    if (chainId) {
+      logList = logList.filter((item) => {
+        return item?.app_log?.chainId === chainId;
+      });
+    }
+
+    if (levels.length) {
+      logList = logList.filter((item) => {
+        return levels.includes(item?.app_log?.level);
+      });
+    }
+
+    // step 3 timestamp change as now
+    if (logList.length) {
+      logList.map((item) => {
+        const now = new Date();
+        item.app_log.time = now.toISOString();
+      });
+    }
+
     return logList;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'getLog error'));
