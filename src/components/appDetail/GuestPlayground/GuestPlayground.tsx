@@ -39,10 +39,8 @@ export default function GuestPlayground() {
       const regex = /id:\s*"(.*?)"/;
       const match = graphQLParams?.query?.match(regex);
       // step 2 check if id is valid
-      console.log('match', match);
       const idValue = match ? match[1] : '-1';
-      console.log('idValue', idValue);
-      if (idValue < '20' && idValue >= '0') {
+      if (idValue <= '20' && idValue > '0') {
         const result = await db.playgroundTable.get(Number(idValue));
         if (!result) {
           const resultArray = generateDataArray();

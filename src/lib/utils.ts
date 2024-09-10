@@ -163,7 +163,7 @@ export function generateUid() {
 export const generateDataArray = () => {
   const dataArray = [];
 
-  for (let i = 0; i < 20; i++) {
+  for (let i = 1; i <= 20; i++) {
     const dataObject = {
       address: `0x${Math.random().toString(16).slice(2, 42).toUpperCase()}`,
       poolCount: `${Math.floor(Math.random() * 1000000) + 10000}`,
