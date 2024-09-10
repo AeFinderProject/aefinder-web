@@ -9,6 +9,7 @@ declare module 'dexie' {
     subscriptionTable: Dexie.Table<SubscriptionTable, number>;
     attachmentTable: Dexie.Table<AttachmentTable, number>;
     appLogTable: Dexie.Table<AppLogTable, string>;
+    playgroundTable: Dexie.Table<PlaygroundTable, number>;
   }
 
   interface AppTable {
@@ -64,5 +65,13 @@ declare module 'dexie' {
     timestamp: string;
     environment: string;
     app_log: AppLogItem;
+  }
+
+  interface PlaygroundTable {
+    id?: number;
+    address: string;
+    poolCount: string;
+    txCount: string;
+    totalVolumeUSD: string;
   }
 }

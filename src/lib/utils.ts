@@ -159,3 +159,19 @@ export const readAndCompressFile = async (file: File): Promise<Blob> => {
 export function generateUid() {
   return Math.random().toString(36).substring(2, 21);
 }
+
+export const generateDataArray = () => {
+  const dataArray = [];
+
+  for (let i = 0; i < 20; i++) {
+    const dataObject = {
+      address: `0x${Math.random().toString(16).slice(2, 42).toUpperCase()}`,
+      poolCount: `${Math.floor(Math.random() * 1000000) + 10000}`,
+      totalVolumeUSD: `${(Math.random() * 1e12).toFixed(18)}`,
+      txCount: `${Math.floor(Math.random() * 1000000) + 100000}`,
+    };
+    dataArray.push(dataObject);
+  }
+
+  return dataArray;
+};
