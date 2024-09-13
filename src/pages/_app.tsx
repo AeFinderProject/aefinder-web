@@ -26,7 +26,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <LoginProviderDynamic>
         <ConfigProvider theme={theme}>
           <Layout>
-            <Seo templateTitle='AeFinder' />
+            <Seo templateTitle='AeIndexer' />
             <Component {...pageProps} />
           </Layout>
         </ConfigProvider>

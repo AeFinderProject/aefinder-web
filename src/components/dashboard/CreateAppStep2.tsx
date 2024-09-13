@@ -14,7 +14,7 @@ import { CreateAppResponse } from '@/types/appType';
 type CreateAppStep2Props = {
   readonly type: 0 | 1; // 0: create, 1: modify
   readonly currentAppDetail: CreateAppResponse;
-  setCreateAppDrawerVisible: (value: boolean) => void;
+  readonly setCreateAppDrawerVisible: (value: boolean) => void;
   readonly messageApi: MessageInstance;
 };
 
@@ -43,7 +43,7 @@ export default function CreateAppStep2({
     if (res) {
       messageApi.open({
         type: 'success',
-        content: 'edit app success',
+        content: 'edit aeIndexer success',
       });
       dispatch(setCurrentAppDetail(res));
       setCreateAppDrawerVisible(false);
@@ -64,7 +64,7 @@ export default function CreateAppStep2({
       className={type === 0 ? 'mt-6' : 'mt-0'}
       onFinish={() => handleModify()}
     >
-      <FormItem name='appName' label='App Name'>
+      <FormItem name='appName' label='AeIndexer Name'>
         <Copy
           className='relative top-[-6px]'
           content={currentAppDetail?.appName}
@@ -85,7 +85,7 @@ export default function CreateAppStep2({
       >
         <Input
           value={description}
-          placeholder='App description'
+          placeholder='AeIndexer description'
           className='rounded-md'
           maxLength={500}
           onChange={(e) => setDescription(e.target.value)}
@@ -98,7 +98,7 @@ export default function CreateAppStep2({
       >
         <Input
           value={sourceCodeUrl}
-          placeholder='App sourceCodeUrl'
+          placeholder='AeIndexer sourceCodeUrl'
           className='rounded-md'
           maxLength={200}
           onChange={(e) => setSourceCodeUrl(e.target.value)}

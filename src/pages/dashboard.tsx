@@ -54,9 +54,9 @@ export default function Dashboard() {
             type='primary'
             icon={<PlusOutlined />}
             onClick={() => setCreateAppDrawerVisible(true)}
-            className='h-[40px] w-[140px] text-sm'
+            className='h-[40px] w-[160px] text-sm'
           >
-            Create app
+            Create AeIndexer
           </Button>
         </div>
       </div>
@@ -69,10 +69,10 @@ export default function Dashboard() {
             height={190}
           />
           <div className='mb-2 mt-6 text-2xl text-black'>
-            No apps created yet
+            No AeIndexer created yet
           </div>
           <div className='text-gray-80 w-[380px] text-center sm:w-[580px]'>
-            AeFinder is a powerful decentralised protocol used for indexing and
+            AeIndexer is a powerful decentralised protocol used for indexing and
             querying the data of the blockchain. It makes it possible to query
             data that are difficult to query directly.
           </div>
