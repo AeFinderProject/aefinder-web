@@ -44,7 +44,7 @@ export default function HeaderHandle({
     <div className='border-gray-F0 flex h-[130px] items-center justify-between border-b pt-[14px]'>
       <div>
         <Image
-          src='/assets/svg/app-default-bg.png'
+          src='/assets/svg/app-default-bg.svg'
           alt='logo'
           width={32}
           height={32}
