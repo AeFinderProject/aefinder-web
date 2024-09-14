@@ -1,6 +1,6 @@
 import { IBaseRequest } from './apiType';
 import { spliceUrl } from './apiUtils';
-import service from './axios';
+import axiosService from './axiosService';
 import { DEFAULT_METHOD, EXPAND_APIS, EXPAND_REQ_TYPES } from './list';
 import myServer from './myServer';
 
@@ -10,7 +10,7 @@ function baseRequest({
   query = '',
   ...c
 }: IBaseRequest) {
-  return service({
+  return axiosService({
     ...c,
     url: spliceUrl(url, query),
     method,

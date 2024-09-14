@@ -1,4 +1,4 @@
-# AeFinder
+# AeIndexer
 
 In the project directory, you can run:
 
@@ -10,11 +10,11 @@ Install dependencies.
 
 ### yarn build:dev
 
-Runs the app in the development mode.
+Runs the AeIndexer in the development mode.
 
 ### yarn build:pro
 
-Runs the app in the production mode.
+Runs the AeIndexer in the production mode.
 
 ### yarn start
 

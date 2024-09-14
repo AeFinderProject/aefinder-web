@@ -3,6 +3,13 @@ import { handleErrorMessage, readAndCompressFile } from '@/lib/utils';
 import { getAccessToken } from './apiUtils';
 import { request } from './index';
 import { SubscriptionsApiList } from './list';
+import {
+  addSubscriptionGuest,
+  getSubscriptionsAttachmentsGuest,
+  getSubscriptionsGuest,
+  updateCodeGuest,
+  updateSubscriptionGuest,
+} from './requestSubscriptionGuest';
 
 import {
   CreateSubscriptionRequest,
@@ -19,6 +26,11 @@ import {
 export const addSubscription = async (
   params: CreateSubscriptionRequest
 ): Promise<boolean> => {
+  const isGuest = sessionStorage.getItem('isGuest');
+  if (isGuest === 'true') {
+    return addSubscriptionGuest(params);
+  }
+
   let response = false;
   // deploy true or false
   try {
@@ -49,7 +61,6 @@ export const addSubscription = async (
       },
     })
       .then((res: Response) => {
-        console.log('res', res);
         response = res?.ok;
         status = res?.status;
         return res?.status === 200 ? res : res?.json();
@@ -73,6 +84,11 @@ export const addSubscription = async (
 export const updateSubscription = async (
   params: UpdateSubscriptionRequest
 ): Promise<boolean> => {
+  const isGuest = sessionStorage.getItem('isGuest');
+  if (isGuest === 'true') {
+    return updateSubscriptionGuest(params);
+  }
+
   try {
     const { appId, deployKey, version, Manifest } = params;
     const Authorization = await getAccessToken({
@@ -101,6 +117,11 @@ export const updateSubscription = async (
 export const updateCode = async (
   params: UpdateCodeRequest
 ): Promise<boolean> => {
+  const isGuest = sessionStorage.getItem('isGuest');
+  if (isGuest === 'true') {
+    return updateCodeGuest(params);
+  }
+
   // update Code true or false
   let response = false;
   try {
@@ -167,6 +188,11 @@ export const updateCode = async (
 export const getSubscriptions = async (
   params: GetSubscriptionRequest
 ): Promise<GetSubscriptionResponse> => {
+  const isGuest = sessionStorage.getItem('isGuest');
+  if (isGuest === 'true') {
+    return getSubscriptionsGuest(params);
+  }
+
   let response = {} as GetSubscriptionResponse;
   try {
     const { appId, deployKey } = params;
@@ -284,6 +310,11 @@ export const updateSubscriptionAttachments = async (
 export const getSubscriptionsAttachments = async (
   params: GetSubscriptionAttachmentRequest
 ): Promise<GetSubscriptionAttachmentResponse> => {
+  const isGuest = sessionStorage.getItem('isGuest');
+  if (isGuest === 'true') {
+    return getSubscriptionsAttachmentsGuest(params);
+  }
+
   let response = {} as GetSubscriptionAttachmentResponse;
   try {
     const { appId, deployKey, version } = params;

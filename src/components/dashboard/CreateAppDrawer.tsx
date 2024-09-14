@@ -9,9 +9,9 @@ import CreateAppStep2 from '@/components/dashboard/CreateAppStep2';
 import { CreateAppResponse } from '@/types/appType';
 
 type CreateAppDrawerProps = {
-  readonly type: 0 | 1; // 0 create app, 1 modify app
+  readonly type: 0 | 1; // 0 create AeIndexer, 1 modify AeIndexer
   readonly createAppDrawerVisible: boolean;
-  setCreateAppDrawerVisible: (visible: boolean) => void;
+  readonly setCreateAppDrawerVisible: (visible: boolean) => void;
   readonly appDetail?: CreateAppResponse;
   readonly messageApi: MessageInstance;
 };
@@ -40,7 +40,7 @@ export default function CreateAppDrawer({
 
   return (
     <Drawer
-      title={current === 0 ? 'Create App' : 'Edit App'}
+      title={current === 0 ? 'Create AeIndexer' : 'Edit AeIndexer'}
       open={createAppDrawerVisible}
       onClose={() => setCreateAppDrawerVisible(false)}
       destroyOnClose={true}
@@ -51,7 +51,7 @@ export default function CreateAppDrawer({
           current={current}
           items={[
             {
-              title: 'App Name',
+              title: 'AeIndexer Name',
             },
             {
               title: 'Enter Detail',

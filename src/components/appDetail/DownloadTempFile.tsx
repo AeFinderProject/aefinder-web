@@ -172,7 +172,7 @@ export default function DownloadTempFile() {
               2. INIT
             </div>
             <div className='text-gray-80 text-sm'>
-              Initialise your AeFinder App.
+              Initialise your AeFinder.
             </div>
             <div className='bg-gray-F5 mb-[24px] mt-[16px]  rounded-lg px-[12px] pb-[8px] pt-[10px]'>
               <Copy
@@ -185,11 +185,11 @@ export default function DownloadTempFile() {
               3. DEPLOY
             </div>
             <div className='text-gray-80 text-sm'>
-              Build and deploy your App.
+              Build and deploy your AeFinder.
             </div>
             <div className='bg-gray-F5 mb-[24px] mt-[16px]  rounded-lg px-[12px] pb-[8px] pt-[10px]'>
               <Copy
-                label='Deploy AeFinder App via CLI'
+                label='Deploy AeFinder via CLI'
                 content='aefinder deploy --code xxx.dll --mainfest xxx.json --appid xxx --key xxx'
                 isShowCopy={true}
               />
@@ -198,7 +198,7 @@ export default function DownloadTempFile() {
               4. UPDATE
             </div>
             <div className='text-gray-80 text-sm'>
-              Use the CLI to update your App’s code and manifest.
+              Use the CLI to update your AeFinder’s code and manifest.
             </div>
             <div className='bg-gray-F5 mb-[16px] mt-[16px]  rounded-lg px-[12px] pb-[8px] pt-[10px]'>
               <Copy
