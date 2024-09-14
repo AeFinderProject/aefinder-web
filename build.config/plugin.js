@@ -3,7 +3,6 @@ module.exports = [
     return {
       ...nextConfig,
       assetPrefix: '/assets',
-      basePath: '/assets',
     };
   },
 ];
