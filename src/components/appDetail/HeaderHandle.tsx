@@ -126,7 +126,7 @@ export default function HeaderHandle({
       {updateDeployDrawerVisible && (
         <DeployDrawer
           type={1}
-          title='Update app'
+          title='Update AeIndexer'
           version={currentVersion}
           deployDrawerVisible={updateDeployDrawerVisible}
           setDeployDrawerVisible={setUpdateDeployDrawerVisible}

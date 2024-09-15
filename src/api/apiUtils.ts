@@ -6,7 +6,7 @@ import { handleErrorMessage } from '@/lib/utils';
 import { AeFinderAuthHost } from '@/constant';
 
 import { BaseConfig, RequestConfig } from './apiType';
-import service from './axios';
+import service from './axiosService';
 import myEvents from './myEvent';
 export function spliceUrl(baseUrl: string, extendArg?: string) {
   return extendArg ? baseUrl + '/' + extendArg : baseUrl;
@@ -99,6 +99,23 @@ export const queryAuthApi = async (config: QueryAuthApiExtraRequest) => {
   let token_type = '';
   let access_token = '';
   try {
+    const isGuest = sessionStorage.getItem('isGuest');
+    if (isGuest === 'true') {
+      token_type = 'Bearer';
+      access_token = 'Guest';
+      if (localStorage) {
+        setLocalJWT('LocalJWTData', {
+          token_type,
+          access_token,
+          expires_in: 3600,
+          username: config.username,
+        });
+      }
+      return {
+        token_type,
+        access_token,
+      };
+    }
     const res = await axios.post<JWTData>(
       `${AeFinderAuthHost}/connect/token`,
       queryString.stringify(data),
@@ -155,6 +172,17 @@ export const getAccessToken = async (config: GetAccessTokenRequest) => {
   let token_type = '';
   let access_token = '';
   try {
+    // if Guest account, use guest access token as default
+    const isGuest = sessionStorage.getItem('isGuest');
+    if (isGuest === 'true') {
+      token_type = 'Bearer';
+      access_token = 'Guest';
+      return {
+        token_type,
+        access_token,
+      };
+    }
+
     const res = await axios.post<JWTData>(
       `${AeFinderAuthHost}/connect/token`,
       queryString.stringify(data),

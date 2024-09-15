@@ -51,6 +51,7 @@ export type UpdateCodeRequest = {
 
 export type SubscriptionItem = {
   chainId: ChainIdType;
+  ChainId?: ChainIdType;
   startBlockNumber: number;
   onlyConfirmed: boolean;
   transactions: {
@@ -65,6 +66,7 @@ export type SubscriptionItem = {
 
 export type SubscriptionItems = {
   subscriptionItems: SubscriptionItem[];
+  SubscriptionItems?: SubscriptionItem[];
 };
 
 export type VersionType = {

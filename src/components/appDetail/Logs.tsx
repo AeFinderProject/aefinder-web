@@ -44,17 +44,23 @@ export default function Logs({ messageApi }: LogsProps) {
   useEffect(() => {
     const tempList = [] as Array<ChainIdType>;
     if (subscriptions?.currentVersion?.version === currentVersion) {
-      subscriptions?.currentVersion?.subscriptionManifest?.subscriptionItems?.forEach(
-        (item) => {
-          tempList.push(item.chainId);
-        }
-      );
+      const subscriptionItems =
+        subscriptions?.currentVersion?.subscriptionManifest
+          ?.subscriptionItems ||
+        subscriptions?.currentVersion?.subscriptionManifest?.SubscriptionItems;
+      subscriptionItems?.forEach((item) => {
+        const chainId = item.chainId || item.ChainId;
+        chainId && tempList.push(chainId);
+      });
     } else if (subscriptions?.pendingVersion?.version === currentVersion) {
-      subscriptions?.pendingVersion?.subscriptionManifest?.subscriptionItems?.forEach(
-        (item) => {
-          tempList.push(item.chainId);
-        }
-      );
+      const subscriptionItems =
+        subscriptions?.pendingVersion?.subscriptionManifest
+          ?.subscriptionItems ||
+        subscriptions?.pendingVersion?.subscriptionManifest?.SubscriptionItems;
+      subscriptionItems?.forEach((item) => {
+        const chainId = item.chainId || item.ChainId;
+        chainId && tempList.push(chainId);
+      });
     }
     setChainIdList(tempList);
   }, [currentVersion, subscriptions]);

@@ -57,7 +57,7 @@ export default function ResetPassword() {
       if (!res) {
         messageApi.open({
           type: 'success',
-          content: 'Password reset successfully, please login again',
+          content: 'Password reset successfully',
         });
         setTimeout(() => {
           setIsShowLoading(false);

@@ -123,7 +123,7 @@ export default function AppDetail() {
       {deployDrawerVisible && (
         <DeployDrawer
           type={0}
-          title='Deploy app'
+          title='Deploy AeIndexer'
           deployDrawerVisible={deployDrawerVisible}
           setDeployDrawerVisible={setDeployDrawerVisible}
           messageApi={messageApi}

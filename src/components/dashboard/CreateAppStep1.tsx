@@ -7,10 +7,10 @@ import { createApp } from '@/api/requestApp';
 import { CreateAppResponse } from '@/types/appType';
 
 type CreateAppStep1Props = {
-  setCurrent: (value: 0 | 1) => void;
-  setCreateAppDrawerVisible: (visible: boolean) => void;
+  readonly setCurrent: (value: 0 | 1) => void;
+  readonly setCreateAppDrawerVisible: (visible: boolean) => void;
   readonly currentAppDetail: CreateAppResponse;
-  setCurrentAppDetail: (value: CreateAppResponse) => void;
+  readonly setCurrentAppDetail: (value: CreateAppResponse) => void;
   readonly messageApi: MessageInstance;
 };
 
@@ -32,7 +32,7 @@ export default function CreateAppStep1({
     setCurrentAppDetail(res);
     messageApi.open({
       type: 'success',
-      content: 'Create app success, next edit detail',
+      content: 'Create AeIndexer success, next edit detail',
     });
     setCurrent(1);
   }, [setCurrent, form, setCurrentAppDetail, messageApi]);
@@ -46,12 +46,12 @@ export default function CreateAppStep1({
     >
       <FormItem
         name='appName'
-        label='App Name'
-        rules={[{ required: true, message: 'Please input app name!' }]}
+        label='AeIndexer Name'
+        rules={[{ required: true, message: 'Please input AeIndexer name!' }]}
       >
         <Input
           value={currentAppDetail?.appName}
-          placeholder='App name'
+          placeholder='AeIndexer name'
           className='rounded-md'
           minLength={2}
           maxLength={20}

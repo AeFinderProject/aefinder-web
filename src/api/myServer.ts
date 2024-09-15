@@ -2,7 +2,7 @@ import axios, { CancelTokenSource } from 'axios';
 
 import { BaseConfig, RequestConfig, UrlObj } from './apiType';
 import { getRequestConfig, spliceUrl } from './apiUtils';
-import service from './axios';
+import axiosService from './axiosService';
 import { DEFAULT_METHOD } from './list';
 
 const myServer = new Function();
@@ -43,7 +43,8 @@ myServer.prototype.send = function (base: BaseConfig, config: RequestConfig) {
     }
     cancelTokenSources.set(cancelTokenSourceKey, source);
   }
-  return service({
+
+  return axiosService({
     ...axiosConfig,
     url: url || spliceUrl(typeof base === 'string' ? base : base.target, query),
     method,
