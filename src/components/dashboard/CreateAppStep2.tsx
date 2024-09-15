@@ -43,7 +43,7 @@ export default function CreateAppStep2({
     if (res) {
       messageApi.open({
         type: 'success',
-        content: 'edit aeIndexer success',
+        content: 'edit AeIndexer success',
       });
       dispatch(setCurrentAppDetail(res));
       setCreateAppDrawerVisible(false);

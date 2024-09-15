@@ -72,7 +72,7 @@ export default function Dashboard() {
             No AeIndexer created yet
           </div>
           <div className='text-gray-80 w-[380px] text-center sm:w-[580px]'>
-            AeIndexer is a powerful decentralised protocol used for indexing and
+            AeFinder is a powerful decentralised protocol used for indexing and
             querying the data of the blockchain. It makes it possible to query
             data that are difficult to query directly.
           </div>

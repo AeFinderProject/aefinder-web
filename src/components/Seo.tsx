@@ -2,10 +2,10 @@
 import Head from 'next/head';
 
 const defaultMeta = {
-  title: 'AeIndexer',
+  title: 'AeFinder',
   siteName: 'Finding data is easier',
   description:
-    'AeIndexer is a powerful decentralised protocol used for indexing and querying the data of the blockchain',
+    'AeFinder is a powerful decentralised protocol used for indexing and querying the data of the blockchain',
   url: 'https://aefinder.io/',
   type: 'website',
   robots: 'follow, index',

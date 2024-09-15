@@ -32,7 +32,7 @@ export default function CreateAppStep1({
     setCurrentAppDetail(res);
     messageApi.open({
       type: 'success',
-      content: 'Create aeIndexer success, next edit detail',
+      content: 'Create AeIndexer success, next edit detail',
     });
     setCurrent(1);
   }, [setCurrent, form, setCurrentAppDetail, messageApi]);
@@ -47,7 +47,7 @@ export default function CreateAppStep1({
       <FormItem
         name='appName'
         label='AeIndexer Name'
-        rules={[{ required: true, message: 'Please input aeIndexer name!' }]}
+        rules={[{ required: true, message: 'Please input AeIndexer name!' }]}
       >
         <Input
           value={currentAppDetail?.appName}
