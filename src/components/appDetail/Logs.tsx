@@ -49,7 +49,8 @@ export default function Logs({ messageApi }: LogsProps) {
           ?.subscriptionItems ||
         subscriptions?.currentVersion?.subscriptionManifest?.SubscriptionItems;
       subscriptionItems?.forEach((item) => {
-        tempList.push(item.chainId);
+        const chainId = item.chainId || item.ChainId;
+        chainId && tempList.push(chainId);
       });
     } else if (subscriptions?.pendingVersion?.version === currentVersion) {
       const subscriptionItems =
@@ -57,7 +58,8 @@ export default function Logs({ messageApi }: LogsProps) {
           ?.subscriptionItems ||
         subscriptions?.pendingVersion?.subscriptionManifest?.SubscriptionItems;
       subscriptionItems?.forEach((item) => {
-        tempList.push(item.chainId);
+        const chainId = item.chainId || item.ChainId;
+        chainId && tempList.push(chainId);
       });
     }
     setChainIdList(tempList);
