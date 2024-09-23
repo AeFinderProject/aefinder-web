@@ -1,8 +1,9 @@
 'use client';
-
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
+import type { TourProps } from 'antd';
+import { Tour } from 'antd';
 import { GraphiQL } from 'graphiql';
-import { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import 'graphiql/graphiql.css';
 
@@ -12,12 +13,59 @@ import { appApiList } from '@/api/list';
 
 import GuestPlayground from './GuestPlayground/GuestPlayground';
 
-export default function Playground() {
+import { CurrentTourStepEnum } from '@/types/appType';
+
+type PlaygroundProps = {
+  readonly isNeedRefresh: boolean;
+};
+
+export default function Playground({ isNeedRefresh }: PlaygroundProps) {
+  const PlaygroundRef = useRef<HTMLDivElement>(null);
+  const [openPlaygroundTour, setOpenPlaygroundTour] = useState(false);
   const { currentAppDetail, currentVersion } = useAppSelector(
     (state) => state.app
   );
   const { appId } = currentAppDetail;
   const isGuest = sessionStorage.getItem('isGuest');
+  const currentTourStep = localStorage.getItem('currentTourStep');
+  const currentTab = localStorage.getItem('currentTab');
+
+  const PlaygroundSteps: TourProps['steps'] = [
+    {
+      title: <div className='text-dark-normal font-semibold'>Playground</div>,
+      description:
+        'Playground allows you to explore AeIndexer data through the web interface.',
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      target: () => PlaygroundRef.current!,
+      nextButtonProps: {
+        children: 'OK',
+        className: 'w-[290px] h-[40px] relative right-[10px]',
+      },
+      style: {
+        width: '320px',
+      },
+      placement: 'top',
+    },
+  ];
+
+  useEffect(() => {
+    console.log(isGuest, currentTourStep, currentTab);
+    if (
+      isGuest === 'true' &&
+      currentTourStep === CurrentTourStepEnum.UpdateAeIndexer &&
+      currentTab === 'playground'
+    ) {
+      setOpenPlaygroundTour(true);
+    }
+  }, [isGuest, currentTourStep, currentTab, isNeedRefresh]);
+
+  const handlePlaygroundCloseTour = useCallback(() => {
+    localStorage.setItem(
+      'currentTourStep',
+      CurrentTourStepEnum.PlaygroundAeIndexer
+    );
+    setOpenPlaygroundTour(false);
+  }, []);
 
   const getGraphiqlhUI = useCallback(() => {
     // when currentVersion is null, it means the app is not deployed
@@ -35,8 +83,18 @@ export default function Playground() {
   }, [appId, currentVersion]);
 
   return (
-    <div id='graphiql-box' className='relative h-[756px] w-full'>
+    <div
+      id='graphiql-box'
+      ref={PlaygroundRef}
+      className='relative h-[756px] w-full'
+    >
       {isGuest === 'true' ? <GuestPlayground /> : getGraphiqlhUI()}
+      <Tour
+        open={openPlaygroundTour}
+        onClose={() => handlePlaygroundCloseTour()}
+        steps={PlaygroundSteps}
+        onFinish={() => handlePlaygroundCloseTour()}
+      />
     </div>
   );
 }

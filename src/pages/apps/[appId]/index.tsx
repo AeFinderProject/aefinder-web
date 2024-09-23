@@ -25,18 +25,20 @@ import { getSubscriptions } from '@/api/requestSubscription';
 import { AppStatusType } from '@/types/appType';
 
 export default function AppDetail() {
-  const [deployDrawerVisible, setDeployDrawerVisible] = useState(false);
+  const dispatch = useAppDispatch();
   const router = useRouter();
-  const { appId } = router.query;
+
+  const [deployDrawerVisible, setDeployDrawerVisible] = useState(false);
   // currentTable default playground -> click change logs
   const [currentTable, setCurrentTable] = useState<string>(
     localStorage.getItem('currentTab') ?? 'playground'
   );
+  const [isNeedRefresh, setIsNeedRefresh] = useState(false);
   const { currentAppDetail, currentVersion } = useAppSelector(
     (state) => state.app
   );
-  const dispatch = useAppDispatch();
   const [messageApi, contextHolder] = message.useMessage();
+  const { appId } = router.query;
 
   useEffect(() => {
     const getAppDetailTemp = async () => {
@@ -87,6 +89,8 @@ export default function AppDetail() {
       <HeaderHandle
         setDeployDrawerVisible={setDeployDrawerVisible}
         messageApi={messageApi}
+        isNeedRefresh={isNeedRefresh}
+        setIsNeedRefresh={setIsNeedRefresh}
       />
       <DetailBox currentAppDetail={currentAppDetail} />
       {currentAppDetail.status === AppStatusType.Deployed && (
@@ -100,13 +104,16 @@ export default function AppDetail() {
             {
               key: 'playground',
               label: 'Playground',
-              children: <Playground />,
+              children: <Playground isNeedRefresh={isNeedRefresh} />,
               disabled: window?.innerWidth < 640,
+              forceRender: true,
             },
             {
               key: 'logs',
               label: 'Logs',
-              children: <Logs messageApi={messageApi} />,
+              children: (
+                <Logs messageApi={messageApi} isNeedRefresh={isNeedRefresh} />
+              ),
               forceRender: true,
             },
             {
