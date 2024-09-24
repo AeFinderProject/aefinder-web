@@ -183,6 +183,8 @@
   height: 40px;
 }
 
-.custom-tour-popover .custom-tour-popover-content .custom-tour-popover-close {
-  left: 740px;
+@media screen and (min-width: 640px) {
+  .custom-tour-popover .custom-tour-popover-content .custom-tour-popover-close {
+    left: 740px;
+  }
 }
