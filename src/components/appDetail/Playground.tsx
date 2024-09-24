@@ -17,9 +17,13 @@ import { CurrentTourStepEnum } from '@/types/appType';
 
 type PlaygroundProps = {
   readonly isNeedRefresh: boolean;
+  readonly currentTable: string;
 };
 
-export default function Playground({ isNeedRefresh }: PlaygroundProps) {
+export default function Playground({
+  isNeedRefresh,
+  currentTable,
+}: PlaygroundProps) {
   const PlaygroundRef = useRef<HTMLDivElement>(null);
   const [openPlaygroundTour, setOpenPlaygroundTour] = useState(false);
   const { currentAppDetail, currentVersion } = useAppSelector(
@@ -28,7 +32,6 @@ export default function Playground({ isNeedRefresh }: PlaygroundProps) {
   const { appId } = currentAppDetail;
   const isGuest = sessionStorage.getItem('isGuest');
   const currentTourStep = localStorage.getItem('currentTourStep');
-  const currentTab = localStorage.getItem('currentTab');
 
   const PlaygroundSteps: TourProps['steps'] = [
     {
@@ -49,15 +52,14 @@ export default function Playground({ isNeedRefresh }: PlaygroundProps) {
   ];
 
   useEffect(() => {
-    console.log(isGuest, currentTourStep, currentTab);
     if (
       isGuest === 'true' &&
       currentTourStep === CurrentTourStepEnum.UpdateAeIndexer &&
-      currentTab === 'playground'
+      currentTable === 'playground'
     ) {
       setOpenPlaygroundTour(true);
     }
-  }, [isGuest, currentTourStep, currentTab, isNeedRefresh]);
+  }, [isGuest, currentTourStep, currentTable, isNeedRefresh]);
 
   const handlePlaygroundCloseTour = useCallback(() => {
     localStorage.setItem(
@@ -94,6 +96,7 @@ export default function Playground({ isNeedRefresh }: PlaygroundProps) {
         onClose={() => handlePlaygroundCloseTour()}
         steps={PlaygroundSteps}
         onFinish={() => handlePlaygroundCloseTour()}
+        placement='top'
       />
     </div>
   );

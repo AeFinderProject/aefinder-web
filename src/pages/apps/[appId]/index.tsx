@@ -104,7 +104,12 @@ export default function AppDetail() {
             {
               key: 'playground',
               label: 'Playground',
-              children: <Playground isNeedRefresh={isNeedRefresh} />,
+              children: (
+                <Playground
+                  isNeedRefresh={isNeedRefresh}
+                  currentTable={currentTable}
+                />
+              ),
               disabled: window?.innerWidth < 640,
               forceRender: true,
             },
@@ -112,7 +117,11 @@ export default function AppDetail() {
               key: 'logs',
               label: 'Logs',
               children: (
-                <Logs messageApi={messageApi} isNeedRefresh={isNeedRefresh} />
+                <Logs
+                  messageApi={messageApi}
+                  isNeedRefresh={isNeedRefresh}
+                  currentTable={currentTable}
+                />
               ),
               forceRender: true,
             },

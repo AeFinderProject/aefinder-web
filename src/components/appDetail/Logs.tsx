@@ -33,9 +33,14 @@ const Option = Select.Option;
 type LogsProps = {
   readonly messageApi: MessageInstance;
   readonly isNeedRefresh: boolean;
+  readonly currentTable: string;
 };
 
-export default function Logs({ messageApi, isNeedRefresh }: LogsProps) {
+export default function Logs({
+  messageApi,
+  isNeedRefresh,
+  currentTable,
+}: LogsProps) {
   const LogRef = useRef<HTMLDivElement>(null);
   const [openLogTour, setOpenLogTour] = useState(false);
   const [search, setSearch] = useState<string>('');
@@ -52,7 +57,6 @@ export default function Logs({ messageApi, isNeedRefresh }: LogsProps) {
 
   const isGuest = sessionStorage.getItem('isGuest');
   const currentTourStep = localStorage.getItem('currentTourStep');
-  const currentTab = localStorage.getItem('currentTab');
   const isMobile = window?.innerWidth < 640;
 
   const LogSteps: TourProps['steps'] = [
@@ -76,7 +80,7 @@ export default function Logs({ messageApi, isNeedRefresh }: LogsProps) {
     if (
       isGuest === 'true' &&
       currentTourStep === CurrentTourStepEnum.PlaygroundAeIndexer &&
-      currentTab === 'logs' &&
+      currentTable === 'logs' &&
       !isMobile
     ) {
       setOpenLogTour(true);
@@ -84,12 +88,12 @@ export default function Logs({ messageApi, isNeedRefresh }: LogsProps) {
     if (
       isGuest === 'true' &&
       currentTourStep === CurrentTourStepEnum.UpdateAeIndexer &&
-      currentTab === 'logs' &&
+      currentTable === 'logs' &&
       isMobile
     ) {
       setOpenLogTour(true);
     }
-  }, [isGuest, currentTourStep, currentTab, isMobile, isNeedRefresh]);
+  }, [isGuest, currentTourStep, currentTable, isMobile, isNeedRefresh]);
 
   useEffect(() => {
     const tempList = [] as Array<ChainIdType>;
@@ -327,6 +331,7 @@ export default function Logs({ messageApi, isNeedRefresh }: LogsProps) {
         onClose={() => handleLogCloseTour()}
         steps={LogSteps}
         onFinish={() => handleLogCloseTour()}
+        placement='top'
       />
     </div>
   );
