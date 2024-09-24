@@ -6,11 +6,10 @@ import {
   SyncOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
-import type { TourProps } from 'antd';
-import { Button, Input, Select, Tag, Tour } from 'antd';
+import { Button, Input, Select, Tag } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
 import dayjs from 'dayjs';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useThrottleCallback } from '@/lib/utils';
 
@@ -21,28 +20,15 @@ import { LogsColor, LogsText } from '@/constant';
 
 import LogsItem from './LogsItem';
 
-import {
-  ChainIdType,
-  CurrentTourStepEnum,
-  GetLogResponse,
-  LevelType,
-} from '@/types/appType';
+import { ChainIdType, GetLogResponse, LevelType } from '@/types/appType';
 
 const Option = Select.Option;
 
 type LogsProps = {
   readonly messageApi: MessageInstance;
-  readonly isNeedRefresh: boolean;
-  readonly currentTable: string;
 };
 
-export default function Logs({
-  messageApi,
-  isNeedRefresh,
-  currentTable,
-}: LogsProps) {
-  const LogRef = useRef<HTMLDivElement>(null);
-  const [openLogTour, setOpenLogTour] = useState(false);
+export default function Logs({ messageApi }: LogsProps) {
   const [search, setSearch] = useState<string>('');
   const [filterBy, setFilterBy] = useState<Array<LevelType>>([]);
   const [sortBy, setSortBy] = useState<string>('Newest');
@@ -54,46 +40,6 @@ export default function Logs({
   const { currentAppDetail, currentVersion, subscriptions } = useAppSelector(
     (state) => state.app
   );
-
-  const isGuest = sessionStorage.getItem('isGuest');
-  const currentTourStep = localStorage.getItem('currentTourStep');
-  const isMobile = window?.innerWidth < 640;
-
-  const LogSteps: TourProps['steps'] = [
-    {
-      title: <div className='text-dark-normal font-semibold'>Logs</div>,
-      description: 'You can use the Logs tab to investigate errors and debug.',
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      target: () => LogRef.current!,
-      nextButtonProps: {
-        children: 'OK',
-        className: 'w-[290px] h-[40px] relative right-[10px]',
-      },
-      style: {
-        width: '320px',
-      },
-      placement: 'top',
-    },
-  ];
-
-  useEffect(() => {
-    if (
-      isGuest === 'true' &&
-      currentTourStep === CurrentTourStepEnum.PlaygroundAeIndexer &&
-      currentTable === 'logs' &&
-      !isMobile
-    ) {
-      setOpenLogTour(true);
-    }
-    if (
-      isGuest === 'true' &&
-      currentTourStep === CurrentTourStepEnum.UpdateAeIndexer &&
-      currentTable === 'logs' &&
-      isMobile
-    ) {
-      setOpenLogTour(true);
-    }
-  }, [isGuest, currentTourStep, currentTable, isMobile, isNeedRefresh]);
 
   useEffect(() => {
     const tempList = [] as Array<ChainIdType>;
@@ -118,11 +64,6 @@ export default function Logs({
     }
     setChainIdList(tempList);
   }, [currentVersion, subscriptions]);
-
-  const handleLogCloseTour = useCallback(() => {
-    localStorage.setItem('currentTourStep', CurrentTourStepEnum.LogAeIndexer);
-    setOpenLogTour(false);
-  }, []);
 
   const handleSearch = useThrottleCallback((value) => {
     setLogsList([]);
@@ -215,7 +156,7 @@ export default function Logs({
   });
 
   return (
-    <div ref={LogRef}>
+    <div>
       <div className='mb-[16px] flex flex-col md:flex-row md:items-center md:justify-between'>
         <div className='mb-3 whitespace-nowrap md:mb-0'>
           <Input
@@ -326,13 +267,6 @@ export default function Logs({
         })}
         {logsList.length === 0 && <div className='text-center'>loading...</div>}
       </div>
-      <Tour
-        open={openLogTour}
-        onClose={() => handleLogCloseTour()}
-        steps={LogSteps}
-        onFinish={() => handleLogCloseTour()}
-        placement='top'
-      />
     </div>
   );
 }

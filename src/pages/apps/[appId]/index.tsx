@@ -1,7 +1,8 @@
 'use client';
-import { message, Tabs } from 'antd';
+import type { TourProps } from 'antd';
+import { message, Tabs, Tour } from 'antd';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import DeployDrawer from '@/components/appDetail/DeployDrawer';
 import DetailBox from '@/components/appDetail/DetailBox';
@@ -22,12 +23,15 @@ import { queryAuthToken } from '@/api/apiUtils';
 import { getAppDetail } from '@/api/requestApp';
 import { getSubscriptions } from '@/api/requestSubscription';
 
+import { CurrentTourStepEnum } from '@/types/appType';
 import { AppStatusType } from '@/types/appType';
 
 export default function AppDetail() {
   const dispatch = useAppDispatch();
   const router = useRouter();
-
+  const PlaygroundRef = useRef<HTMLDivElement>(null);
+  const LogRef = useRef<HTMLDivElement>(null);
+  const [openPlaygroundTour, setOpenPlaygroundTour] = useState(false);
   const [deployDrawerVisible, setDeployDrawerVisible] = useState(false);
   // currentTable default playground -> click change logs
   const [currentTable, setCurrentTable] = useState<string>(
@@ -39,7 +43,44 @@ export default function AppDetail() {
   );
   const [messageApi, contextHolder] = message.useMessage();
   const { appId } = router.query;
+  const isGuest = sessionStorage.getItem('isGuest');
+  const currentTourStep = localStorage.getItem('currentTourStep');
 
+  const PlaygroundSteps: TourProps['steps'] = [
+    {
+      title: <div className='text-dark-normal font-semibold'>Playground</div>,
+      description:
+        'Playground allows you to explore AeIndexer data through the web interface.',
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      target: () => PlaygroundRef.current!,
+      prevButtonProps: {
+        className: 'w-[82px] h-[26px] relative right-[10px]',
+      },
+      nextButtonProps: {
+        className: 'w-[82px] h-[26px] relative right-[10px]',
+      },
+      style: {
+        width: '320px',
+      },
+      placement: 'top',
+    },
+    {
+      title: <div className='text-dark-normal font-semibold'>Logs</div>,
+      description: 'You can use the Logs tab to investigate errors and debug.',
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      target: () => LogRef.current!,
+      prevButtonProps: {
+        className: 'w-[82px] h-[26px] relative right-[10px]',
+      },
+      nextButtonProps: {
+        className: 'w-[82px] h-[26px] relative right-[10px]',
+      },
+      style: {
+        width: '320px',
+      },
+      placement: 'top',
+    },
+  ];
   useEffect(() => {
     const getAppDetailTemp = async () => {
       await queryAuthToken();
@@ -83,6 +124,23 @@ export default function AppDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (
+      isGuest === 'true' &&
+      currentTourStep === CurrentTourStepEnum.UpdateAeIndexer
+    ) {
+      setOpenPlaygroundTour(true);
+    }
+  }, [isGuest, currentTourStep, isNeedRefresh]);
+
+  const handlePlaygroundCloseTour = useCallback(() => {
+    localStorage.setItem(
+      'currentTourStep',
+      CurrentTourStepEnum.PlaygroundAeIndexer
+    );
+    setOpenPlaygroundTour(false);
+  }, []);
+
   return (
     <div className='px-[16px] pb-[20px] sm:px-[40px] sm:pb-[40px]'>
       {contextHolder}
@@ -103,26 +161,15 @@ export default function AppDetail() {
           items={[
             {
               key: 'playground',
-              label: 'Playground',
-              children: (
-                <Playground
-                  isNeedRefresh={isNeedRefresh}
-                  currentTable={currentTable}
-                />
-              ),
+              label: <div ref={PlaygroundRef}>Playground</div>,
+              children: <Playground />,
               disabled: window?.innerWidth < 640,
               forceRender: true,
             },
             {
               key: 'logs',
-              label: 'Logs',
-              children: (
-                <Logs
-                  messageApi={messageApi}
-                  isNeedRefresh={isNeedRefresh}
-                  currentTable={currentTable}
-                />
-              ),
+              label: <div ref={LogRef}>Logs</div>,
+              children: <Logs messageApi={messageApi} />,
               forceRender: true,
             },
             {
@@ -145,6 +192,13 @@ export default function AppDetail() {
           messageApi={messageApi}
         />
       )}
+      <Tour
+        open={openPlaygroundTour}
+        onClose={() => handlePlaygroundCloseTour()}
+        steps={PlaygroundSteps}
+        onFinish={() => handlePlaygroundCloseTour()}
+        placement='top'
+      />
     </div>
   );
 }
