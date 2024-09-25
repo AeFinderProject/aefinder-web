@@ -157,7 +157,7 @@ export default function AppDetail() {
           onChange={(key) => handleTabChange(key)}
           centered={window?.innerWidth > 640}
           size='large'
-          className='mt-[12px] min-h-[600px]'
+          className='mt-[12px] min-h-[600px] overflow-hidden'
           items={[
             {
               key: 'playground',

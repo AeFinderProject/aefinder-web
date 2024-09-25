@@ -26,7 +26,7 @@ export default function Manifest() {
   }, [currentVersion, subscriptions]);
 
   return (
-    <div>
+    <div className='w-full overflow-auto'>
       <ReactJson src={manifestJson}></ReactJson>
     </div>
   );
