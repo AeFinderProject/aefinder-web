@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { Image } from 'antd';
 
 type TourStepProps = {
   readonly step: 1 | 2 | 3;
@@ -17,12 +17,13 @@ export default function TourStep({ step }: TourStepProps) {
         </div>
       </div>
       {step === 1 && (
-        <div className='mb-[80px] flex w-[380px] flex-col items-start justify-center rounded-tr-lg p-[32px] sm:mb-0 sm:w-[460px]'>
+        <div className='justify-top mb-[80px] flex w-[380px] flex-col items-start rounded-tr-lg p-[32px] sm:mb-0 sm:w-[460px]'>
           <Image
             src='/assets/svg/tour-step1.svg'
             alt='step1'
-            width={316}
-            height={264}
+            width={350}
+            height={223}
+            preview={false}
             className='mb-[24px] self-center'
           />
           <Image
@@ -30,6 +31,7 @@ export default function TourStep({ step }: TourStepProps) {
             alt='step-icon1'
             width={38}
             height={38}
+            preview={false}
           />
           <div className='text-dark-normal my-[10px] text-[20px] leading-7'>
             Create and Deploy AeFinder AeIndexer
@@ -41,12 +43,13 @@ export default function TourStep({ step }: TourStepProps) {
         </div>
       )}
       {step === 2 && (
-        <div className='mb-[80px] flex w-[380px] flex-col items-start justify-center rounded-tr-lg p-[32px] sm:mb-0 sm:w-[460px]'>
+        <div className='justify-top mb-[80px] flex w-[380px] flex-col items-start rounded-tr-lg p-[32px] sm:mb-0 sm:w-[460px]'>
           <Image
             src='/assets/svg/tour-step2.svg'
             alt='step2'
-            width={240}
-            height={264}
+            width={350}
+            height={223}
+            preview={false}
             className='mb-[24px] self-center'
           />
           <Image
@@ -54,6 +57,7 @@ export default function TourStep({ step }: TourStepProps) {
             alt='step-icon2'
             width={38}
             height={38}
+            preview={false}
           />
           <div className='text-dark-normal my-[10px] text-[20px] leading-7'>
             Index, Retrieve, and Manage Blockchain Data
@@ -65,12 +69,13 @@ export default function TourStep({ step }: TourStepProps) {
         </div>
       )}
       {step === 3 && (
-        <div className='mb-[80px] flex w-[380px] flex-col items-start justify-center rounded-tr-lg p-[32px] sm:mb-0 sm:w-[460px]'>
+        <div className='justify-top mb-[80px] flex w-[380px] flex-col items-start rounded-tr-lg p-[32px] sm:mb-0 sm:w-[460px]'>
           <Image
             src='/assets/svg/tour-step3.svg'
             alt='step3'
-            width={268}
-            height={264}
+            width={350}
+            height={223}
+            preview={false}
             className='mb-[24px] self-center'
           />
           <Image
@@ -78,6 +83,7 @@ export default function TourStep({ step }: TourStepProps) {
             alt='step-icon3'
             width={38}
             height={38}
+            preview={false}
           />
           <div className='text-dark-normal my-[10px] text-[20px] leading-7'>
             Explore Developer Tools
