@@ -11,6 +11,8 @@ import { setUsername } from '@/store/slices/commonSlice';
 
 import { queryAuthApi, resetLocalJWT } from '@/api/apiUtils';
 
+import { CurrentTourStepEnum } from '@/types/appType';
+
 export default function LogIn() {
   const [form] = Form.useForm();
   const FormItem = Form.Item;
@@ -18,14 +20,23 @@ export default function LogIn() {
   const router = useRouter();
   const pathname = usePathname();
   const [messageApi, contextHolder] = message.useMessage();
+  const currentTourStep = localStorage.getItem('currentTourStep');
+
+  const initialTourValues = useCallback(() => {
+    // check first isTourDashboard isTourCreateApp isTourHaveCreateApp
+    if (currentTourStep === null) {
+      localStorage.setItem('currentTourStep', CurrentTourStepEnum.InitTour);
+    }
+  }, [currentTourStep]);
 
   useEffect(() => {
     // clear localStorage jwt
     if (pathname === '/login') {
       resetLocalJWT();
       sessionStorage.setItem('isGuest', 'false');
+      initialTourValues();
     }
-  }, [pathname]);
+  }, [pathname, initialTourValues]);
 
   const loginSuccessActive = useCallback(() => {
     dispatch(setUsername(form.getFieldValue('username')));

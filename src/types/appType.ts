@@ -69,3 +69,14 @@ export type GetLogResponse = {
     version: string;
   };
 };
+
+export enum CurrentTourStepEnum {
+  InitTour = 'InitTour',
+  CreateAeIndexer = 'CreateAeIndexer',
+  HaveCreateAeIndexer = 'HaveCreateAeIndexer',
+  DeployAeIndexer = 'DeployAeIndexer',
+  HaveDeployAeIndexer = 'HaveDeployAeIndexer',
+  UpdateAeIndexer = 'UpdateAeIndexer',
+  PlaygroundAeIndexer = 'PlaygroundAeIndexer',
+  LogAeIndexer = 'LogAeIndexer',
+}

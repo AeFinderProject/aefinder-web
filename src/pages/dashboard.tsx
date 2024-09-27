@@ -1,11 +1,13 @@
 'use client';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, message } from 'antd';
+import type { GetRef, TourProps } from 'antd';
+import { Button, message, Tour } from 'antd';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import AppItemCard from '@/components/dashboard/AppItemCard';
 import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
+import TourStep from '@/components/dashboard/TourStep';
 import Seo from '@/components/Seo';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -19,11 +21,69 @@ import {
 import { queryAuthToken } from '@/api/apiUtils';
 import { getAppList } from '@/api/requestApp';
 
+import { CurrentTourStepEnum } from '@/types/appType';
+
 export default function Dashboard() {
   const dispatch = useAppDispatch();
+  const createRef = useRef<GetRef<typeof Button>>(null);
   const [createAppDrawerVisible, setCreateAppDrawerVisible] = useState(false);
   const appList = useAppSelector((state) => state.app.appList);
   const [messageApi, contextHolder] = message.useMessage();
+  const [openTour, setOpenTour] = useState<boolean>(false);
+  const [openCreateTour, setOpenCreateTour] = useState(false);
+  const currentTourStep = localStorage.getItem('currentTourStep');
+  const isMobile = window?.innerWidth < 640;
+
+  const steps: TourProps['steps'] = [
+    {
+      title: null,
+      description: <TourStep step={1} />,
+      style: {
+        width: isMobile ? '380px' : '780px',
+      },
+    },
+    {
+      title: null,
+      description: <TourStep step={2} />,
+      style: {
+        width: isMobile ? '380px' : '780px',
+      },
+    },
+    {
+      title: null,
+      description: <TourStep step={3} />,
+      style: {
+        width: isMobile ? '380px' : '780px',
+      },
+    },
+  ];
+
+  const createSteps: TourProps['steps'] = [
+    {
+      title: (
+        <div className='text-dark-normal font-semibold'>Create AeIndexer</div>
+      ),
+      description: 'Get started by creating an AeIndexer.',
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      target: () => createRef.current!,
+      nextButtonProps: {
+        children: 'Ok',
+        className: 'w-[290px] h-[40px] relative right-[10px]',
+      },
+      style: {
+        width: '320px',
+      },
+    },
+  ];
+
+  useEffect(() => {
+    if (currentTourStep === CurrentTourStepEnum.InitTour) {
+      setOpenTour(true);
+    }
+    if (currentTourStep === CurrentTourStepEnum.CreateAeIndexer) {
+      setOpenCreateTour(true);
+    }
+  }, [currentTourStep]);
 
   useEffect(() => {
     const getAppListTemp = async () => {
@@ -37,6 +97,24 @@ export default function Dashboard() {
     };
     getAppListTemp();
   }, [dispatch, createAppDrawerVisible]);
+
+  const handleCloseTour = useCallback(() => {
+    localStorage.setItem(
+      'currentTourStep',
+      CurrentTourStepEnum.CreateAeIndexer
+    );
+    setOpenTour(false);
+  }, []);
+
+  const handleCreateCloseTour = useCallback(() => {
+    if (currentTourStep === CurrentTourStepEnum.CreateAeIndexer) {
+      localStorage.setItem(
+        'currentTourStep',
+        CurrentTourStepEnum.HaveCreateAeIndexer
+      );
+    }
+    setOpenCreateTour(false);
+  }, [currentTourStep]);
 
   return (
     <div>
@@ -53,8 +131,12 @@ export default function Dashboard() {
           <Button
             type='primary'
             icon={<PlusOutlined />}
-            onClick={() => setCreateAppDrawerVisible(true)}
+            onClick={() => {
+              handleCreateCloseTour();
+              setCreateAppDrawerVisible(true);
+            }}
             className='h-[40px] w-[160px] text-sm'
+            ref={createRef}
           >
             Create AeIndexer
           </Button>
@@ -87,6 +169,20 @@ export default function Dashboard() {
           messageApi={messageApi}
         />
       )}
+      <Tour
+        open={openTour}
+        onClose={() => handleCloseTour()}
+        steps={steps}
+        prefixCls='custom-tour-popover'
+      />
+      <Tour
+        open={openCreateTour}
+        onClose={() => handleCreateCloseTour()}
+        steps={createSteps}
+        onFinish={() => {
+          setOpenCreateTour(false);
+        }}
+      />
     </div>
   );
 }

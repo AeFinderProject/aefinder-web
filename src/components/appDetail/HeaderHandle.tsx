@@ -1,8 +1,9 @@
 import { EditOutlined, SyncOutlined } from '@ant-design/icons';
-import { Button, Select } from 'antd';
+import type { GetRef, TourProps } from 'antd';
+import { Button, Select, Tour } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
 import Image from 'next/image';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import DeployDrawer from '@/components/appDetail/DeployDrawer';
 import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
@@ -10,18 +11,26 @@ import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setCurrentVersion } from '@/store/slices/appSlice';
 
-import { AppStatusType } from '@/types/appType';
+import { AppStatusType, CurrentTourStepEnum } from '@/types/appType';
 
 type HeaderHandleProps = {
-  setDeployDrawerVisible: (visible: boolean) => void;
+  readonly setDeployDrawerVisible: (visible: boolean) => void;
   readonly messageApi: MessageInstance;
+  readonly isNeedRefresh: boolean;
+  readonly setIsNeedRefresh: (isNeedRefresh: boolean) => void;
 };
 
 export default function HeaderHandle({
   setDeployDrawerVisible,
   messageApi,
+  isNeedRefresh,
+  setIsNeedRefresh,
 }: HeaderHandleProps) {
   const dispatch = useAppDispatch();
+  const DeployRef = useRef<GetRef<typeof Button>>(null);
+  const UpdateRef = useRef<GetRef<typeof Button>>(null);
+  const [openDeployTour, setOpenDeployTour] = useState(false);
+  const [openUpdateTour, setOpenUpdateTour] = useState(false);
   const username = useAppSelector((state) => state.common.username);
   const [editAppDrawerVisible, setEditAppDrawerVisible] = useState(false);
   const [updateDeployDrawerVisible, setUpdateDeployDrawerVisible] =
@@ -29,6 +38,58 @@ export default function HeaderHandle({
   const { currentAppDetail, currentVersion } = useAppSelector(
     (state) => state.app
   );
+  const currentTourStep = localStorage.getItem('currentTourStep');
+
+  const DeploySteps: TourProps['steps'] = [
+    {
+      title: (
+        <div className='text-dark-normal font-semibold'>Deploy AeIndexer</div>
+      ),
+      description:
+        'After setting up an AeIndexer, you can click on “Deploy...” button to deploy the AeIndexer.',
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      target: () => DeployRef.current!,
+      nextButtonProps: {
+        children: 'Ok',
+        className: 'w-[290px] h-[40px] relative right-[10px]',
+      },
+      style: {
+        width: '320px',
+      },
+    },
+  ];
+
+  const UpdateSteps: TourProps['steps'] = [
+    {
+      title: (
+        <div className='text-dark-normal font-semibold'>Update AeIndexer</div>
+      ),
+      description: 'You can update the AeIndexer after it has been deployed.',
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      target: () => UpdateRef.current!,
+      nextButtonProps: {
+        children: 'Ok',
+        className: 'w-[290px] h-[40px] relative right-[10px]',
+      },
+      style: {
+        width: '320px',
+      },
+    },
+  ];
+
+  useEffect(() => {
+    if (currentTourStep === CurrentTourStepEnum.DeployAeIndexer) {
+      setTimeout(() => {
+        setOpenDeployTour(true);
+      }, 2000);
+    }
+    if (
+      currentTourStep === CurrentTourStepEnum.HaveDeployAeIndexer &&
+      currentAppDetail.status === AppStatusType.Deployed
+    ) {
+      setOpenUpdateTour(true);
+    }
+  }, [currentTourStep, currentAppDetail, currentAppDetail.appName]);
 
   const handleChangeVersion = useCallback(
     (currentVersion: string) => {
@@ -39,6 +100,28 @@ export default function HeaderHandle({
     },
     [dispatch]
   );
+
+  const handleDeployCloseTour = useCallback(() => {
+    if (currentTourStep === CurrentTourStepEnum.DeployAeIndexer) {
+      localStorage.setItem(
+        'currentTourStep',
+        CurrentTourStepEnum.HaveDeployAeIndexer
+      );
+    }
+    setOpenDeployTour(false);
+  }, [currentTourStep]);
+
+  const handleUpdateCloseTour = useCallback(() => {
+    if (currentTourStep === CurrentTourStepEnum.HaveDeployAeIndexer) {
+      localStorage.setItem(
+        'currentTourStep',
+        CurrentTourStepEnum.UpdateAeIndexer
+      );
+      setIsNeedRefresh(!isNeedRefresh);
+    }
+    setOpenUpdateTour(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentTourStep]);
 
   return (
     <div className='border-gray-F0 flex h-[130px] items-center justify-between border-b pt-[14px]'>
@@ -73,7 +156,14 @@ export default function HeaderHandle({
             <EditOutlined className='align-middle' />
             Edit
           </Button>
-          <Button type='primary' onClick={() => setDeployDrawerVisible(true)}>
+          <Button
+            ref={DeployRef}
+            type='primary'
+            onClick={() => {
+              handleDeployCloseTour();
+              setDeployDrawerVisible(true);
+            }}
+          >
             Deploy...
           </Button>
         </div>
@@ -99,7 +189,11 @@ export default function HeaderHandle({
             icon={<SyncOutlined />}
             type='text'
             iconPosition='start'
-            onClick={() => setUpdateDeployDrawerVisible(true)}
+            onClick={() => {
+              handleUpdateCloseTour();
+              setUpdateDeployDrawerVisible(true);
+            }}
+            ref={UpdateRef}
           >
             Update
           </Button>
@@ -133,6 +227,18 @@ export default function HeaderHandle({
           messageApi={messageApi}
         />
       )}
+      <Tour
+        open={openDeployTour}
+        onClose={() => handleDeployCloseTour()}
+        steps={DeploySteps}
+        onFinish={() => handleDeployCloseTour()}
+      />
+      <Tour
+        open={openUpdateTour}
+        onClose={() => handleUpdateCloseTour()}
+        steps={UpdateSteps}
+        onFinish={() => handleUpdateCloseTour()}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 {
   "name": "aefinder",
-  "version": "2.17.0",
+  "version": "2.18.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -37,6 +37,7 @@
     "next": "14.0.1",
     "next-compose-plugins": "^2.2.1",
     "pako": "^2.1.0",
+    "opentelemetry-launcher": "^0.0.3",
     "qs": "^6.12.3",
     "query-string": "^9.0.0",
     "react": "18.2.0",

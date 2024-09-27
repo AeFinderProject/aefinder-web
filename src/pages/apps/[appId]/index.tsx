@@ -1,7 +1,8 @@
 'use client';
-import { message, Tabs } from 'antd';
+import type { TourProps } from 'antd';
+import { message, Tabs, Tour } from 'antd';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import DeployDrawer from '@/components/appDetail/DeployDrawer';
 import DetailBox from '@/components/appDetail/DetailBox';
@@ -22,22 +23,63 @@ import { queryAuthToken } from '@/api/apiUtils';
 import { getAppDetail } from '@/api/requestApp';
 import { getSubscriptions } from '@/api/requestSubscription';
 
+import { CurrentTourStepEnum } from '@/types/appType';
 import { AppStatusType } from '@/types/appType';
 
 export default function AppDetail() {
-  const [deployDrawerVisible, setDeployDrawerVisible] = useState(false);
+  const dispatch = useAppDispatch();
   const router = useRouter();
-  const { appId } = router.query;
+  const PlaygroundRef = useRef<HTMLDivElement>(null);
+  const LogRef = useRef<HTMLDivElement>(null);
+  const [openPlaygroundTour, setOpenPlaygroundTour] = useState(false);
+  const [deployDrawerVisible, setDeployDrawerVisible] = useState(false);
   // currentTable default playground -> click change logs
   const [currentTable, setCurrentTable] = useState<string>(
     localStorage.getItem('currentTab') ?? 'playground'
   );
+  const [isNeedRefresh, setIsNeedRefresh] = useState(false);
   const { currentAppDetail, currentVersion } = useAppSelector(
     (state) => state.app
   );
-  const dispatch = useAppDispatch();
   const [messageApi, contextHolder] = message.useMessage();
+  const { appId } = router.query;
+  const currentTourStep = localStorage.getItem('currentTourStep');
 
+  const PlaygroundSteps: TourProps['steps'] = [
+    {
+      title: <div className='text-dark-normal font-semibold'>Playground</div>,
+      description:
+        'Playground allows you to explore AeIndexer data through the web interface.',
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      target: () => PlaygroundRef.current!,
+      prevButtonProps: {
+        className: 'w-[82px] h-[26px] relative right-[10px]',
+      },
+      nextButtonProps: {
+        className: 'w-[82px] h-[26px] relative right-[10px]',
+      },
+      style: {
+        width: '320px',
+      },
+      placement: 'top',
+    },
+    {
+      title: <div className='text-dark-normal font-semibold'>Logs</div>,
+      description: 'You can use the Logs tab to investigate errors and debug.',
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      target: () => LogRef.current!,
+      prevButtonProps: {
+        className: 'w-[82px] h-[26px] relative right-[10px]',
+      },
+      nextButtonProps: {
+        className: 'w-[82px] h-[26px] relative right-[10px]',
+      },
+      style: {
+        width: '320px',
+      },
+      placement: 'top',
+    },
+  ];
   useEffect(() => {
     const getAppDetailTemp = async () => {
       await queryAuthToken();
@@ -81,12 +123,28 @@ export default function AppDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (currentTourStep === CurrentTourStepEnum.UpdateAeIndexer) {
+      setOpenPlaygroundTour(true);
+    }
+  }, [currentTourStep, isNeedRefresh]);
+
+  const handlePlaygroundCloseTour = useCallback(() => {
+    localStorage.setItem(
+      'currentTourStep',
+      CurrentTourStepEnum.PlaygroundAeIndexer
+    );
+    setOpenPlaygroundTour(false);
+  }, []);
+
   return (
     <div className='px-[16px] pb-[20px] sm:px-[40px] sm:pb-[40px]'>
       {contextHolder}
       <HeaderHandle
         setDeployDrawerVisible={setDeployDrawerVisible}
         messageApi={messageApi}
+        isNeedRefresh={isNeedRefresh}
+        setIsNeedRefresh={setIsNeedRefresh}
       />
       <DetailBox currentAppDetail={currentAppDetail} />
       {currentAppDetail.status === AppStatusType.Deployed && (
@@ -95,17 +153,18 @@ export default function AppDetail() {
           onChange={(key) => handleTabChange(key)}
           centered={window?.innerWidth > 640}
           size='large'
-          className='mt-[12px] min-h-[600px]'
+          className='mt-[12px] min-h-[600px] overflow-hidden'
           items={[
             {
               key: 'playground',
-              label: 'Playground',
+              label: <div ref={PlaygroundRef}>Playground</div>,
               children: <Playground />,
               disabled: window?.innerWidth < 640,
+              forceRender: true,
             },
             {
               key: 'logs',
-              label: 'Logs',
+              label: <div ref={LogRef}>Logs</div>,
               children: <Logs messageApi={messageApi} />,
               forceRender: true,
             },
@@ -129,6 +188,13 @@ export default function AppDetail() {
           messageApi={messageApi}
         />
       )}
+      <Tour
+        open={openPlaygroundTour}
+        onClose={() => handlePlaygroundCloseTour()}
+        steps={PlaygroundSteps}
+        onFinish={() => handlePlaygroundCloseTour()}
+        placement='top'
+      />
     </div>
   );
 }
