@@ -81,7 +81,7 @@ export default function HeaderHandle({
     if (currentTourStep === CurrentTourStepEnum.DeployAeIndexer) {
       setTimeout(() => {
         setOpenDeployTour(true);
-      }, 500);
+      }, 1000);
     }
     if (
       currentTourStep === CurrentTourStepEnum.HaveDeployAeIndexer &&
@@ -89,7 +89,7 @@ export default function HeaderHandle({
     ) {
       setOpenUpdateTour(true);
     }
-  }, [currentTourStep, currentAppDetail]);
+  }, [currentTourStep, currentAppDetail, currentAppDetail.appName]);
 
   const handleChangeVersion = useCallback(
     (currentVersion: string) => {
