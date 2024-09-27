@@ -38,7 +38,7 @@ export default function TourStep({ step }: TourStepProps) {
           </div>
           <div className='text-gray-80 text-[16px] leading-6'>
             Seamlessly build, customize, and deploy applications designed to
-            index and manage blockchain data effortlessly.
+            index and query blockchain data effortlessly.
           </div>
         </div>
       )}
