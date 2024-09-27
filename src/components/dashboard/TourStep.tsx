@@ -19,7 +19,7 @@ export default function TourStep({ step }: TourStepProps) {
       {step === 1 && (
         <div className='justify-top mb-[80px] flex w-[380px] flex-col items-start rounded-tr-lg p-[32px] sm:mb-0 sm:w-[460px]'>
           <Image
-            src='/assets/svg/tour-step1.svg'
+            src='/assets/svg/tourStep1.svg'
             alt='step1'
             width={350}
             height={223}
@@ -45,7 +45,7 @@ export default function TourStep({ step }: TourStepProps) {
       {step === 2 && (
         <div className='justify-top mb-[80px] flex w-[380px] flex-col items-start rounded-tr-lg p-[32px] sm:mb-0 sm:w-[460px]'>
           <Image
-            src='/assets/svg/tour-step2.svg'
+            src='/assets/svg/tourStep2.svg'
             alt='step2'
             width={350}
             height={223}
@@ -71,7 +71,7 @@ export default function TourStep({ step }: TourStepProps) {
       {step === 3 && (
         <div className='justify-top mb-[80px] flex w-[380px] flex-col items-start rounded-tr-lg p-[32px] sm:mb-0 sm:w-[460px]'>
           <Image
-            src='/assets/svg/tour-step3.svg'
+            src='/assets/svg/tourStep3.svg'
             alt='step3'
             width={350}
             height={223}
