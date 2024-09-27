@@ -20,14 +20,24 @@ const LoginProviderDynamic = dynamic(
   { ssr: false }
 );
 
+const OpentelemetryProvider = dynamic(
+  () =>
+    import('@/components/layout/opentelemetryProvider').then(
+      (mod) => mod.OpentelemetryProvider
+    ),
+  { ssr: false }
+);
+
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <StoreProvider>
       <LoginProviderDynamic>
         <ConfigProvider theme={theme}>
           <Layout>
-            <Seo templateTitle='AeFinder' />
-            <Component {...pageProps} />
+            <OpentelemetryProvider>
+              <Seo templateTitle='AeFinder' />
+              <Component {...pageProps} />
+            </OpentelemetryProvider>
           </Layout>
         </ConfigProvider>
       </LoginProviderDynamic>
