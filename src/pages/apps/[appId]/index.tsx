@@ -43,7 +43,6 @@ export default function AppDetail() {
   );
   const [messageApi, contextHolder] = message.useMessage();
   const { appId } = router.query;
-  const isGuest = sessionStorage.getItem('isGuest');
   const currentTourStep = localStorage.getItem('currentTourStep');
 
   const PlaygroundSteps: TourProps['steps'] = [
@@ -125,13 +124,10 @@ export default function AppDetail() {
   }, []);
 
   useEffect(() => {
-    if (
-      isGuest === 'true' &&
-      currentTourStep === CurrentTourStepEnum.UpdateAeIndexer
-    ) {
+    if (currentTourStep === CurrentTourStepEnum.UpdateAeIndexer) {
       setOpenPlaygroundTour(true);
     }
-  }, [isGuest, currentTourStep, isNeedRefresh]);
+  }, [currentTourStep, isNeedRefresh]);
 
   const handlePlaygroundCloseTour = useCallback(() => {
     localStorage.setItem(

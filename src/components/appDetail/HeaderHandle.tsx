@@ -38,7 +38,6 @@ export default function HeaderHandle({
   const { currentAppDetail, currentVersion } = useAppSelector(
     (state) => state.app
   );
-  const isGuest = sessionStorage.getItem('isGuest');
   const currentTourStep = localStorage.getItem('currentTourStep');
 
   const DeploySteps: TourProps['steps'] = [
@@ -79,22 +78,18 @@ export default function HeaderHandle({
   ];
 
   useEffect(() => {
-    if (
-      isGuest === 'true' &&
-      currentTourStep === CurrentTourStepEnum.DeployAeIndexer
-    ) {
+    if (currentTourStep === CurrentTourStepEnum.DeployAeIndexer) {
       setTimeout(() => {
         setOpenDeployTour(true);
       }, 500);
     }
     if (
-      isGuest === 'true' &&
       currentTourStep === CurrentTourStepEnum.HaveDeployAeIndexer &&
       currentAppDetail.status === AppStatusType.Deployed
     ) {
       setOpenUpdateTour(true);
     }
-  }, [isGuest, currentTourStep, currentAppDetail]);
+  }, [currentTourStep, currentAppDetail]);
 
   const handleChangeVersion = useCallback(
     (currentVersion: string) => {
@@ -107,23 +102,17 @@ export default function HeaderHandle({
   );
 
   const handleDeployCloseTour = useCallback(() => {
-    if (
-      isGuest === 'true' &&
-      currentTourStep === CurrentTourStepEnum.DeployAeIndexer
-    ) {
+    if (currentTourStep === CurrentTourStepEnum.DeployAeIndexer) {
       localStorage.setItem(
         'currentTourStep',
         CurrentTourStepEnum.HaveDeployAeIndexer
       );
     }
     setOpenDeployTour(false);
-  }, [isGuest, currentTourStep]);
+  }, [currentTourStep]);
 
   const handleUpdateCloseTour = useCallback(() => {
-    if (
-      isGuest === 'true' &&
-      currentTourStep === CurrentTourStepEnum.HaveDeployAeIndexer
-    ) {
+    if (currentTourStep === CurrentTourStepEnum.HaveDeployAeIndexer) {
       localStorage.setItem(
         'currentTourStep',
         CurrentTourStepEnum.UpdateAeIndexer
@@ -132,7 +121,7 @@ export default function HeaderHandle({
     }
     setOpenUpdateTour(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isGuest, currentTourStep]);
+  }, [currentTourStep]);
 
   return (
     <div className='border-gray-F0 flex h-[130px] items-center justify-between border-b pt-[14px]'>

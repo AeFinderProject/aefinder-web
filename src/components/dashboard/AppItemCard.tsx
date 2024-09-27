@@ -20,7 +20,6 @@ export default function AppItemCard({ appList }: AppItemProps) {
   const router = useRouter();
   const listRef = useRef<HTMLDivElement>(null);
   const [openListTour, setOpenListTour] = useState(false);
-  const isGuest = sessionStorage.getItem('isGuest');
   const currentTourStep = localStorage.getItem('currentTourStep');
 
   const ListSteps: TourProps['steps'] = [
@@ -43,26 +42,20 @@ export default function AppItemCard({ appList }: AppItemProps) {
   ];
 
   useEffect(() => {
-    if (
-      isGuest === 'true' &&
-      currentTourStep === CurrentTourStepEnum.HaveCreateAeIndexer
-    ) {
+    if (currentTourStep === CurrentTourStepEnum.HaveCreateAeIndexer) {
       setOpenListTour(true);
     }
-  }, [isGuest, currentTourStep]);
+  }, [currentTourStep]);
 
   const handleListCloseTour = useCallback(() => {
-    if (
-      isGuest === 'true' &&
-      currentTourStep === CurrentTourStepEnum.HaveCreateAeIndexer
-    ) {
+    if (currentTourStep === CurrentTourStepEnum.HaveCreateAeIndexer) {
       localStorage.setItem(
         'currentTourStep',
         CurrentTourStepEnum.DeployAeIndexer
       );
     }
     setOpenListTour(false);
-  }, [isGuest, currentTourStep]);
+  }, [currentTourStep]);
 
   const handleAppDetail = useCallback(
     (appId: string) => {
@@ -76,14 +69,14 @@ export default function AppItemCard({ appList }: AppItemProps) {
   return (
     <div className='px-[16px] pb-[30px] sm:px-[40px] sm:py-[24px]'>
       <Row gutter={24}>
-        {appList.map((item) => (
+        {appList.map((item, index) => (
           <Col
             key={item.appId}
             className='gutter-row p-[16px]'
             xs={12}
             sm={8}
             lg={6}
-            ref={listRef}
+            ref={index === 0 ? listRef : null}
           >
             <div
               onClick={() => handleAppDetail(item.appId)}

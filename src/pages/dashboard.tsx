@@ -31,7 +31,6 @@ export default function Dashboard() {
   const [messageApi, contextHolder] = message.useMessage();
   const [openTour, setOpenTour] = useState<boolean>(false);
   const [openCreateTour, setOpenCreateTour] = useState(false);
-  const isGuest = sessionStorage.getItem('isGuest');
   const currentTourStep = localStorage.getItem('currentTourStep');
   const isMobile = window?.innerWidth < 640;
 
@@ -78,19 +77,13 @@ export default function Dashboard() {
   ];
 
   useEffect(() => {
-    if (
-      isGuest === 'true' &&
-      currentTourStep === CurrentTourStepEnum.InitTour
-    ) {
+    if (currentTourStep === CurrentTourStepEnum.InitTour) {
       setOpenTour(true);
     }
-    if (
-      isGuest === 'true' &&
-      currentTourStep === CurrentTourStepEnum.CreateAeIndexer
-    ) {
+    if (currentTourStep === CurrentTourStepEnum.CreateAeIndexer) {
       setOpenCreateTour(true);
     }
-  }, [isGuest, currentTourStep]);
+  }, [currentTourStep]);
 
   useEffect(() => {
     const getAppListTemp = async () => {
@@ -114,17 +107,14 @@ export default function Dashboard() {
   }, []);
 
   const handleCreateCloseTour = useCallback(() => {
-    if (
-      isGuest === 'true' &&
-      currentTourStep === CurrentTourStepEnum.CreateAeIndexer
-    ) {
+    if (currentTourStep === CurrentTourStepEnum.CreateAeIndexer) {
       localStorage.setItem(
         'currentTourStep',
         CurrentTourStepEnum.HaveCreateAeIndexer
       );
     }
     setOpenCreateTour(false);
-  }, [isGuest, currentTourStep]);
+  }, [currentTourStep]);
 
   return (
     <div>
