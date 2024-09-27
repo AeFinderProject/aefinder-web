@@ -1,10 +1,16 @@
 'use client';
-import { Col, Row } from 'antd';
+import type { TourProps } from 'antd';
+import { Col, Row, Tour } from 'antd';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { AppStatusType, CreateAppResponse } from '@/types/appType';
+import {
+  AppStatusType,
+  CreateAppResponse,
+  CurrentTourStepEnum,
+} from '@/types/appType';
 
 type AppItemProps = {
   readonly appList: CreateAppResponse[];
@@ -12,10 +18,60 @@ type AppItemProps = {
 
 export default function AppItemCard({ appList }: AppItemProps) {
   const router = useRouter();
+  const listRef = useRef<HTMLDivElement>(null);
+  const [openListTour, setOpenListTour] = useState(false);
+  const isGuest = sessionStorage.getItem('isGuest');
+  const currentTourStep = localStorage.getItem('currentTourStep');
 
-  const handleAppDetail = (appId: string) => {
-    router.push(`/apps/${appId}`);
-  };
+  const ListSteps: TourProps['steps'] = [
+    {
+      title: (
+        <div className='text-dark-normal font-semibold'>AeIndexer list</div>
+      ),
+      description: 'You can find all your AeFinder AeIndexers here.',
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      target: () => listRef.current!,
+      nextButtonProps: {
+        children: 'Ok',
+        className: 'w-[290px] h-[40px] relative right-[10px]',
+      },
+      style: {
+        width: '320px',
+      },
+      placement: 'top',
+    },
+  ];
+
+  useEffect(() => {
+    if (
+      isGuest === 'true' &&
+      currentTourStep === CurrentTourStepEnum.HaveCreateAeIndexer
+    ) {
+      setOpenListTour(true);
+    }
+  }, [isGuest, currentTourStep]);
+
+  const handleListCloseTour = useCallback(() => {
+    if (
+      isGuest === 'true' &&
+      currentTourStep === CurrentTourStepEnum.HaveCreateAeIndexer
+    ) {
+      localStorage.setItem(
+        'currentTourStep',
+        CurrentTourStepEnum.DeployAeIndexer
+      );
+    }
+    setOpenListTour(false);
+  }, [isGuest, currentTourStep]);
+
+  const handleAppDetail = useCallback(
+    (appId: string) => {
+      // currentTourStep change to DeployAeIndexer
+      handleListCloseTour();
+      router.push(`/apps/${appId}`);
+    },
+    [handleListCloseTour, router]
+  );
 
   return (
     <div className='px-[16px] pb-[30px] sm:px-[40px] sm:py-[24px]'>
@@ -27,6 +83,7 @@ export default function AppItemCard({ appList }: AppItemProps) {
             xs={12}
             sm={8}
             lg={6}
+            ref={listRef}
           >
             <div
               onClick={() => handleAppDetail(item.appId)}
@@ -57,6 +114,14 @@ export default function AppItemCard({ appList }: AppItemProps) {
           </Col>
         ))}
       </Row>
+      <Tour
+        open={openListTour}
+        onClose={() => handleListCloseTour()}
+        steps={ListSteps}
+        onFinish={() => {
+          setOpenListTour(false);
+        }}
+      />
     </div>
   );
 }

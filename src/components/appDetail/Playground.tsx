@@ -1,8 +1,7 @@
 'use client';
-
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
 import { GraphiQL } from 'graphiql';
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
 
 import 'graphiql/graphiql.css';
 

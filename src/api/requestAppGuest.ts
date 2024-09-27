@@ -19,12 +19,14 @@ import { ResetPasswordRequest } from '@/types/loginType';
 export const createAppGuest = async (
   params: CreateAppRequest
 ): Promise<CreateAppResponse> => {
-  const { appName } = params;
+  let { appName } = params;
+  appName = appName?.trim().replaceAll(/\s/g, '');
   // step 1 check appName exist
   const appId = await db.appTable.get({ appName });
   if (appId) {
     throw new Error('App name already exists');
   }
+  // appId is appName , but delete blank space
   const currentAppDetail: CreateAppResponse = {
     appId: appName,
     appName,
