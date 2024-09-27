@@ -81,7 +81,7 @@ export default function HeaderHandle({
     if (currentTourStep === CurrentTourStepEnum.DeployAeIndexer) {
       setTimeout(() => {
         setOpenDeployTour(true);
-      }, 1000);
+      }, 2000);
     }
     if (
       currentTourStep === CurrentTourStepEnum.HaveDeployAeIndexer &&
