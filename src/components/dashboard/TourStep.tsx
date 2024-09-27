@@ -60,11 +60,11 @@ export default function TourStep({ step }: TourStepProps) {
             preview={false}
           />
           <div className='text-dark-normal my-[10px] text-[20px] leading-7'>
-            Index, Retrieve, and Manage Blockchain Data
+            Index and Retrieve Blockchain Data
           </div>
           <div className='text-gray-80 text-[16px] leading-6'>
-            Utilize your deployed AeFinder AeIndexer to organize and access data
-            on the aelf blockchain with ease.
+            Utilize your deployed AeIndexer to organize and access data on the
+            aelf blockchain with ease.
           </div>
         </div>
       )}

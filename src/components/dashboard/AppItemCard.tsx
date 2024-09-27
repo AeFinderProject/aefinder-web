@@ -27,7 +27,7 @@ export default function AppItemCard({ appList }: AppItemProps) {
       title: (
         <div className='text-dark-normal font-semibold'>AeIndexer list</div>
       ),
-      description: 'You can find all your AeFinder AeIndexers here.',
+      description: 'You can find all your AeIndexers here.',
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       target: () => listRef.current!,
       nextButtonProps: {

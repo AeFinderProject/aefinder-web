@@ -46,7 +46,7 @@ export default function HeaderHandle({
         <div className='text-dark-normal font-semibold'>Deploy AeIndexer</div>
       ),
       description:
-        'After setting up an AeFinder AeIndexer, you can click on “Deploy...” button to deploy the AeIndexer.',
+        'After setting up an AeIndexer, you can click on “Deploy...” button to deploy the AeIndexer.',
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       target: () => DeployRef.current!,
       nextButtonProps: {
