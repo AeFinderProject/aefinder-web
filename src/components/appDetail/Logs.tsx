@@ -11,7 +11,7 @@ import { MessageInstance } from 'antd/es/message/interface';
 import dayjs from 'dayjs';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { useThrottleCallback } from '@/lib/utils';
+import { convertChainId, useThrottleCallback } from '@/lib/utils';
 
 import { useAppSelector } from '@/store/hooks';
 
@@ -183,11 +183,11 @@ export default function Logs({ messageApi }: LogsProps) {
               marginRight: '8px',
             }}
           >
-            <Option value=''>All Chain</Option>
+            <Option value=''>All Chains</Option>
             {chainIdList.length > 0 &&
               chainIdList.map((item) => (
                 <Option key={item} value={item}>
-                  {item}
+                  {convertChainId(item)}
                 </Option>
               ))}
           </Select>

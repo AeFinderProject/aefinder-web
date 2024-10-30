@@ -4,6 +4,8 @@ import pako from 'pako';
 import { DependencyList, useCallback, useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
 
+import { ChainIdType } from '@/types/appType';
+
 /** Merge classes with tailwind-merge with clsx full feature */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -175,3 +177,15 @@ export const generateDataArray = () => {
 
   return dataArray;
 };
+
+export function convertChainId(chainId: ChainIdType) {
+  switch (chainId) {
+    case 'AELF':
+      return 'aelf MainChain';
+    case 'tDVV':
+    case 'tDVW':
+      return 'aelf dAppChain';
+    default:
+      return chainId;
+  }
+}
