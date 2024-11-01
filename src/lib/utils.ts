@@ -1,6 +1,7 @@
 'use client';
 
 import { message } from 'antd';
+import BN, { isBN } from 'bn.js';
 import clsx, { ClassValue } from 'clsx';
 import pako from 'pako';
 import { DependencyList, useCallback, useRef } from 'react';
@@ -248,4 +249,8 @@ export function getOtherExploreLink(
       return `${prefix}/address/${data}`;
     }
   }
+}
+
+export function zeroFill(str: string | BN) {
+  return isBN(str) ? str.toString(16, 64) : str.padStart(64, '0');
 }

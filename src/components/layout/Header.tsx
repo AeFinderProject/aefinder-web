@@ -178,7 +178,7 @@ export default function Header() {
                 </UnstyledLink>
               </div>
               <div>
-                {!address && !walletInfo?.address && (
+                {!address && (
                   <div
                     className='hover:bg-gray-F5 text-nowrap border-none pl-[10px] pr-[16px] text-left'
                     onClick={handleBindSignInWallet}
@@ -193,14 +193,12 @@ export default function Header() {
                     Bind sign in wallet
                   </div>
                 )}
-                {(address || walletInfo?.address) && (
+                {address && (
                   <div
                     className='hover:bg-gray-F5 hover:text-blue-link text-nowrap border-none pl-[10px] pr-[16px] text-left'
                     onClick={() => {
                       openWithBlank(
-                        `https://testnet.aelfscan.io/${CHAIN_ID}/address/${
-                          address || walletInfo?.address
-                        }`
+                        `https://testnet.aelfscan.io/${CHAIN_ID}/address/${address}`
                       );
                     }}
                   >

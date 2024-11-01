@@ -1,6 +1,8 @@
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { IPortkeyProvider, MethodsWallet } from '@portkey/provider-types';
 
+import { zeroFill } from '@/lib/utils';
+
 export default function useDiscoverProvider() {
   const { walletInfo } = useConnectWallet();
   const discoverProvider = async () => {
@@ -34,14 +36,10 @@ export default function useDiscoverProvider() {
       payload: isSupportManagerSignature ? { hexData } : { data: signInfo },
     });
     if (!signature || signature.recoveryParam == null) return {};
-    const signatureStr = [
-      signature.r.toString(16, 64),
-      signature.s.toString(16, 64),
-      `0${signature.recoveryParam.toString()}`,
-    ].join('');
-    const signatureLength = signatureStr?.length;
-    console.log('signatureStr', signatureStr);
-    console.log('signatureStr length ---', signatureLength);
+    const signatureR = zeroFill(signature.r);
+    const signatureS = zeroFill(signature.s);
+    const signatureRE = `0${signature.recoveryParam.toString()}`;
+    const signatureStr = `${signatureR}${signatureS}${signatureRE}`;
 
     return { signatureStr };
   };

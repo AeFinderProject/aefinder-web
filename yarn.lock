@@ -5598,6 +5598,13 @@
   dependencies:
     "@babel/types" "^7.20.7"
 
+"@types/bn.js@^5.1.6":
+  version "5.1.6"
+  resolved "https://registry.yarnpkg.com/@types/bn.js/-/bn.js-5.1.6.tgz#9ba818eec0c85e4d3c679518428afdf611d03203"
+  integrity sha512-Xh8vSwUeMKeYYrj3cX4lGQgFSF/N03r+tv4AiLl1SucqV+uTQpxRcnM8AkXKHwYP9ZPXOYXRr2KPXpVlIvqh9w==
+  dependencies:
+    "@types/node" "*"
+
 "@types/codemirror@^0.0.90":
   version "0.0.90"
   resolved "https://registry.yarnpkg.com/@types/codemirror/-/codemirror-0.0.90.tgz#9c5edafce2a780b4f8bc5e3b699fe1f4727c8f17"
