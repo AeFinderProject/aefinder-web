@@ -38,8 +38,8 @@ export default function Header() {
   const getUsersInfoTemp = useCallback(async () => {
     if (pathname !== '/' && pathname !== '/login') {
       const res = await getUsersInfo();
-      if (res?.address) {
-        setAddress(res?.address);
+      if (res?.walletAddress) {
+        setAddress(res?.walletAddress);
       }
       dispatch(setUsername(res?.userName));
     }

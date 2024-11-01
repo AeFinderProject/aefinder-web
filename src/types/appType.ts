@@ -44,7 +44,7 @@ export type GetAppListResponse = {
 export type UserInfoType = {
   userName: string;
   email: string;
-  address: string;
+  walletAddress: string;
 };
 
 export type LevelType = 'Debug' | 'Error' | 'Warning' | 'Information';

@@ -27,10 +27,12 @@ export const useGetWalletSignParams = () => {
     console.log('isConnected', isConnected);
     console.log('walletInfo', walletInfo);
     let wallet = walletInfo;
+    let isConnect = isConnected;
     if (!isConnected || !walletInfo) {
       wallet = await connectWallet();
+      isConnect = true;
     }
-    if (!isConnected || !wallet) return null;
+    if (!isConnect || !wallet) return null;
     const timestamp = Date.now();
     const plainTextOrigin = `${wallet?.address}-${timestamp}`;
     const signInfo = AElf.utils.sha256(plainTextOrigin);
@@ -50,7 +52,7 @@ export const useGetWalletSignParams = () => {
         signature = signatureStr || '';
       } catch (error) {
         console.log(error);
-        isConnected && disConnectWallet();
+        isConnect && disConnectWallet();
         return null;
       }
     } else {
@@ -64,7 +66,7 @@ export const useGetWalletSignParams = () => {
       });
       if (sign?.errorMessage) {
         message.error(sign?.errorMessage);
-        isConnected && disConnectWallet();
+        isConnect && disConnectWallet();
         return null;
       }
       signature = sign?.signature ?? '';

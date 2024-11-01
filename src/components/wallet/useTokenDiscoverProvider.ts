@@ -39,6 +39,9 @@ export default function useDiscoverProvider() {
       signature.s.toString(16, 64),
       `0${signature.recoveryParam.toString()}`,
     ].join('');
+    const signatureLength = signatureStr?.length;
+    console.log('signatureStr', signatureStr);
+    console.log('signatureStr length ---', signatureLength);
 
     return { signatureStr };
   };
