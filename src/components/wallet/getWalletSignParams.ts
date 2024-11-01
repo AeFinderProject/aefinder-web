@@ -14,7 +14,7 @@ signature: `;
 
 export const useGetWalletSignParams = () => {
   const {
-    walletInfo: wallet,
+    walletInfo,
     walletType,
     getSignature,
     disConnectWallet,
@@ -22,13 +22,12 @@ export const useGetWalletSignParams = () => {
   } = useConnectWallet();
   const { getSignatureAndPublicKey } = useDiscoverProvider();
 
-  const isConnectWallet = isConnected;
-
   const getReqParams: () => Promise<null | QueryWalletAuthExtra> = async () => {
-    if (!isConnected || !wallet) return null;
-
+    console.log('isConnected', isConnected);
+    console.log('walletInfo', walletInfo);
+    if (!isConnected || !walletInfo) return null;
     const timestamp = Date.now();
-    const plainTextOrigin = `${wallet?.address}-${timestamp}`;
+    const plainTextOrigin = `${walletInfo?.address}-${timestamp}`;
     const signInfo = AElf.utils.sha256(plainTextOrigin);
     const discoverSignHex = Buffer.from(
       hexDataCopywriter + plainTextOrigin
@@ -46,21 +45,21 @@ export const useGetWalletSignParams = () => {
         signature = signatureStr || '';
       } catch (error) {
         console.log(error);
-        isConnectWallet && disConnectWallet();
+        isConnected && disConnectWallet();
         return null;
       }
     } else {
       const sign = await getSignature({
         appName: 'aefinder-web',
-        address: wallet?.address,
+        address: walletInfo?.address,
         signInfo:
           walletType === WalletTypeEnum.aa
-            ? Buffer.from(`${wallet?.address}-${timestamp}`).toString('hex')
+            ? Buffer.from(`${walletInfo?.address}-${timestamp}`).toString('hex')
             : AElf.utils.sha256(plainTextOrigin),
       });
       if (sign?.errorMessage) {
         message.error(sign?.errorMessage);
-        isConnectWallet && disConnectWallet();
+        isConnected && disConnectWallet();
         return null;
       }
       signature = sign?.signature ?? '';
@@ -68,14 +67,14 @@ export const useGetWalletSignParams = () => {
 
     // ------------ request api ---------
     const { caHash, originChainId } = await getCaHashAndOriginChainIdByWallet(
-      wallet,
+      walletInfo,
       walletType
     );
     const reqParams = {
       timestamp,
       signature,
       chain_id: originChainId,
-      address: wallet?.address,
+      address: walletInfo?.address,
     } as QueryWalletAuthExtra;
 
     if (caHash) {

@@ -1,10 +1,11 @@
 'use client';
 
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
+import { sleep } from '@portkey/utils';
 import { Button, message } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useGetWalletSignParams } from '@/components/wallet/getWalletSignParams';
 
@@ -15,8 +16,9 @@ interface LogInButtonProps {
 }
 
 export default function LogInButton({ className }: LogInButtonProps) {
-  const { connectWallet, disConnectWallet, isConnected } = useConnectWallet();
+  const { connectWallet, disConnectWallet, walletInfo } = useConnectWallet();
   const [messageApi, contextHolder] = message.useMessage();
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { getReqParams } = useGetWalletSignParams();
 
@@ -29,19 +31,31 @@ export default function LogInButton({ className }: LogInButtonProps) {
   }, [router, messageApi]);
 
   const handleWalletLogin = useCallback(async () => {
-    if (!isConnected) {
+    setLoading(true);
+    if (!walletInfo) {
       await connectWallet();
-    } else {
+      await sleep(1000);
+    }
+    try {
       const reqParams = await getReqParams();
       if (reqParams && reqParams?.address) {
         await queryWalletAuthLogin(reqParams);
         loginSuccessActive();
-      } else {
-        await disConnectWallet;
       }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log('error', error);
+      messageApi.open({
+        type: 'error',
+        content: 'wallet login with error',
+      });
+      await disConnectWallet;
+    } finally {
+      setLoading(false);
     }
   }, [
-    isConnected,
+    walletInfo,
+    messageApi,
     connectWallet,
     disConnectWallet,
     getReqParams,
@@ -63,6 +77,7 @@ export default function LogInButton({ className }: LogInButtonProps) {
         />
       }
       iconPosition='start'
+      loading={loading}
     >
       {contextHolder}
       Connect wallet

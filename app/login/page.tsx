@@ -1,6 +1,6 @@
 'use client';
 // eslint-disable-next-line
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -24,6 +24,7 @@ export default function LogIn() {
   const pathname = usePathname();
   const [messageApi, contextHolder] = message.useMessage();
   const currentTourStep = localStorage.getItem('currentTourStep');
+  const [loading, setLoading] = useState(false);
 
   const initialTourValues = useCallback(() => {
     // check first isTourDashboard isTourCreateApp isTourHaveCreateApp
@@ -50,6 +51,7 @@ export default function LogIn() {
   }, [router, messageApi]);
 
   const handleLogin = useDebounceCallback(async () => {
+    setLoading(true);
     sessionStorage.setItem('isGuest', 'false');
     const res = await queryAuthApi({
       username: form.getFieldValue('username'),
@@ -63,9 +65,11 @@ export default function LogIn() {
         content: 'Wrong user name or password, please retry',
       });
     }
-  }, []);
+    setLoading(false);
+  }, [setLoading]);
 
   const handleGuestLogin = useDebounceCallback(async () => {
+    setLoading(true);
     // if Guest Login, set isGuest to true
     sessionStorage.setItem('isGuest', 'true');
     await queryAuthApi({
@@ -73,8 +77,9 @@ export default function LogIn() {
       password: 'Guest',
     });
     dispatch(setUsername('Guest'));
+    setLoading(false);
     router.push('/dashboard');
-  }, []);
+  }, [setLoading]);
 
   return (
     <div className='flex w-full flex-col items-center justify-center pb-10 text-center'>
@@ -127,6 +132,7 @@ export default function LogIn() {
               <Button
                 className='mx-auto h-[48px] w-full md:w-[48%]'
                 onClick={handleGuestLogin}
+                loading={loading}
               >
                 Continue as Guest
               </Button>
