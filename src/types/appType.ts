@@ -41,6 +41,12 @@ export type GetAppListResponse = {
   totalCount: number;
 };
 
+export type UserInfoType = {
+  userName: string;
+  email: string;
+  address: string;
+};
+
 export type LevelType = 'Debug' | 'Error' | 'Warning' | 'Information';
 export type ChainIdType = 'tDVV' | 'tDVW' | 'AELF' | '';
 

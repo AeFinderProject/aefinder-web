@@ -1,3 +1,5 @@
+'use client';
+
 import { message } from 'antd';
 import clsx, { ClassValue } from 'clsx';
 import pako from 'pako';
@@ -189,3 +191,30 @@ export function convertChainId(chainId: ChainIdType) {
       return chainId;
   }
 }
+
+/**
+ * amount display as role: preLen...endLen
+ * @param str amount value
+ * @param preLen preLen
+ * @param endLen endLen
+ * @returns amount value string
+ */
+export const getOmittedStr = (
+  str: string,
+  preLen?: number,
+  endLen?: number
+) => {
+  if (!str || typeof str !== 'string') {
+    return str;
+  }
+  if (typeof preLen !== 'number' || typeof endLen !== 'number') {
+    return str;
+  }
+  if (str.length <= preLen + endLen) {
+    return str;
+  }
+  if (preLen === 0 || endLen === 0) {
+    return str;
+  }
+  return `${str.slice(0, preLen)}...${str.slice(-endLen)}`;
+};

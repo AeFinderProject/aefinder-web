@@ -17,3 +17,11 @@ export type ResetPasswordRequest = {
   userName: string;
   newPassword: string;
 };
+
+export type BindWalletRequest = {
+  timestamp: number;
+  signatureVal: string;
+  chainId: string;
+  caHash?: string;
+  address: string;
+};

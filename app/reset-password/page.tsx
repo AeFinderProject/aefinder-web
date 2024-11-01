@@ -1,6 +1,6 @@
 'use client';
 import { Button, Form, Input, message } from 'antd';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { useDebounceCallback } from '@/lib/utils';

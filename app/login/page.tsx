@@ -1,17 +1,20 @@
 'use client';
-import { Button, Form, Input, message } from 'antd';
-import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+// eslint-disable-next-line
 import React, { useCallback, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import Image from 'next/image';
+
+import { Button, Divider, Form, Input, message } from 'antd';
 
 import { useDebounceCallback } from '@/lib/utils';
+import { queryAuthApi, resetLocalJWT } from '@/api/apiUtils';
 
 import { useAppDispatch } from '@/store/hooks';
 import { setUsername } from '@/store/slices/commonSlice';
 
-import { queryAuthApi, resetLocalJWT } from '@/api/apiUtils';
-
 import { CurrentTourStepEnum } from '@/types/appType';
+
+import LogInButton from '@/components/wallet/LoginButton';
 
 export default function LogIn() {
   const [form] = Form.useForm();
@@ -39,13 +42,12 @@ export default function LogIn() {
   }, [pathname, initialTourValues]);
 
   const loginSuccessActive = useCallback(() => {
-    dispatch(setUsername(form.getFieldValue('username')));
     messageApi.open({
       type: 'success',
       content: 'login success',
     });
     router.push('/dashboard');
-  }, [dispatch, form, router, messageApi]);
+  }, [router, messageApi]);
 
   const handleLogin = useDebounceCallback(async () => {
     sessionStorage.setItem('isGuest', 'false');
@@ -53,7 +55,7 @@ export default function LogIn() {
       username: form.getFieldValue('username'),
       password: form.getFieldValue('password'),
     });
-    if (res.access_token) {
+    if (res?.access_token) {
       loginSuccessActive();
     } else {
       messageApi.open({
@@ -119,9 +121,11 @@ export default function LogIn() {
                 Sign In
               </Button>
             </FormItem>
+            <Divider style={{ color: '#808080', fontSize: '12px' }}>OR</Divider>
             <FormItem>
+              <LogInButton className='mx-auto mb-[16px] h-[48px] w-full md:mr-[2%] md:w-[48%]' />
               <Button
-                className='mx-auto h-[48px] w-full'
+                className='mx-auto h-[48px] w-full md:w-[48%]'
                 onClick={handleGuestLogin}
               >
                 Continue as Guest

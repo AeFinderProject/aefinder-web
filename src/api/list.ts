@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { AeFinderHost } from '@/constant';
+import { AeFinderAuthHost, AeFinderHost } from '@/constant';
 
 import { API_REQ_FUNCTION } from './apiType';
 export const DEFAULT_METHOD = 'GET';
@@ -20,11 +20,15 @@ export const DEFAULT_METHOD = 'GET';
 
 export const AuthList = {
   token: {
-    target: '/connect/token',
+    target: `${AeFinderAuthHost}/connect/token`,
     baseConfig: { method: 'POST' },
   },
   resetPassword: {
     target: `${AeFinderHost}/api/users/reset/password`,
+    baseConfig: { method: 'POST' },
+  },
+  bindWallet: {
+    target: `${AeFinderHost}/bind/wallet`,
     baseConfig: { method: 'POST' },
   },
 };
@@ -49,6 +53,10 @@ export const appApiList = {
   },
   fetchQraphiql: {
     target: `${AeFinderHost}/api/app/graphql`,
+    baseConfig: { method: 'GET' },
+  },
+  getUsersInfo: {
+    target: `${AeFinderHost}/api/users/info`,
     baseConfig: { method: 'GET' },
   },
 };
