@@ -8,8 +8,9 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { getOmittedStr } from '@/lib/utils';
+import { openWithBlank } from '@/lib/utils';
 
+import Copy from '@/components/Copy';
 import PrimaryLink from '@/components/links/PrimaryLink';
 import UnstyledLink from '@/components/links/UnstyledLink';
 import { useGetWalletSignParams } from '@/components/wallet/getWalletSignParams';
@@ -21,6 +22,7 @@ import { setUsername } from '@/store/slices/commonSlice';
 
 import { getUsersInfo } from '@/api/requestApp';
 import { bindWallet } from '@/api/requestApp';
+import { CHAIN_ID } from '@/constant';
 
 export default function Header() {
   const router = useRouter();
@@ -28,21 +30,20 @@ export default function Header() {
   const [isShowBox, setIsShowBox] = useState(false);
   const { username } = useAppSelector((state) => state.common);
   const [address, setAddress] = useState('');
-  const { connectWallet, disConnectWallet, isConnected, walletInfo } =
-    useConnectWallet();
+  const { disConnectWallet, isConnected, walletInfo } = useConnectWallet();
   const [messageApi, contextHolder] = message.useMessage();
   const dispatch = useAppDispatch();
   const { getReqParams } = useGetWalletSignParams();
 
   const getUsersInfoTemp = useCallback(async () => {
-    if (pathname !== '/' && pathname !== '/login' && !username) {
+    if (pathname !== '/' && pathname !== '/login') {
       const res = await getUsersInfo();
       if (res?.address) {
         setAddress(res?.address);
       }
       dispatch(setUsername(res?.userName));
     }
-  }, [dispatch, pathname, username]);
+  }, [dispatch, pathname]);
 
   useEffect(() => {
     getUsersInfoTemp();
@@ -80,8 +81,14 @@ export default function Header() {
     }, 100);
   }, [router]);
 
-  const BindSignWallet = useCallback(async () => {
+  const handleBindSignInWallet = useCallback(async () => {
     const reqParams = await getReqParams();
+    if (!reqParams) {
+      messageApi.open({
+        type: 'error',
+        content: 'Login sign wallet error',
+      });
+    }
     if (reqParams?.address) {
       const res = await bindWallet({
         timestamp: reqParams.timestamp,
@@ -98,13 +105,6 @@ export default function Header() {
       }
     }
   }, [getReqParams, messageApi]);
-
-  const handleBindSignInWallet = useCallback(async () => {
-    if (!isConnected) {
-      await connectWallet();
-    }
-    BindSignWallet();
-  }, [isConnected, connectWallet, BindSignWallet]);
 
   return (
     <header className='border-gray-E0 flex h-[72px] w-full items-center justify-between border-b px-[16px] py-[24px] sm:px-[40px]'>
@@ -162,7 +162,7 @@ export default function Header() {
                 !isShowBox && 'hidden'
               )}
             >
-              {/* <UpOutlined className='border-b-none text-gray-E0 absolute hidden bg-white text-xs sm:right-[105px] sm:top-[-12px] sm:block' /> */}
+              {/* <UpOutlined className='border-b-none text-gray-F0 absolute hidden bg-white text-xs sm:right-[105px] sm:top-[-12px] sm:block' /> */}
               <PrimaryLink
                 href='/dashboard'
                 className='hover:bg-gray-F5 w-full border-none px-[16px] sm:hidden'
@@ -195,21 +195,34 @@ export default function Header() {
                 )}
                 {(address || walletInfo?.address) && (
                   <div
-                    className='hover:bg-gray-F5 text-nowrap border-none pl-[10px] pr-[16px] text-left'
-                    // onClick={() => {}}
+                    className='hover:bg-gray-F5 hover:text-blue-link text-nowrap border-none pl-[10px] pr-[16px] text-left'
+                    onClick={() => {
+                      openWithBlank(
+                        `https://testnet.aelfscan.io/${CHAIN_ID}/address/${
+                          address || walletInfo?.address
+                        }`
+                      );
+                    }}
                   >
                     <Image
-                      src='/assets/svg/coin-icon/portkey.svg'
-                      alt='wallet-black'
+                      src='/assets/svg/address.svg'
+                      alt='address'
                       width={24}
                       height={24}
                       className='mr-2 inline-block align-middle'
                     />
-                    {getOmittedStr(address || walletInfo?.address || '', 8, 9)}
+                    <Copy
+                      textClassName='text-[14px] font-normal'
+                      content={`ELF_${
+                        address || walletInfo?.address || ''
+                      }_${CHAIN_ID}`}
+                      isShowCopy={true}
+                      showLittle={true}
+                    />
                   </div>
                 )}
                 <div
-                  className='hover:bg-gray-F5 text-nowrap border-none pl-[10px] pr-[16px] text-left'
+                  className='hover:bg-gray-F5 text-nowrap border-none pl-[10px] pr-[16px] text-left text-[14px]'
                   onClick={() => handleResetPassword()}
                 >
                   <Image
@@ -222,7 +235,7 @@ export default function Header() {
                   Reset password
                 </div>
                 <div
-                  className='hover:bg-gray-F5 border-none pl-[10px] pr-[16px] text-left'
+                  className='hover:bg-gray-F5 border-none pl-[10px] pr-[16px] text-left text-[14px]'
                   onClick={() => handleLogout()}
                 >
                   <Image

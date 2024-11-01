@@ -7,6 +7,7 @@ import { DependencyList, useCallback, useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 import { ChainIdType } from '@/types/appType';
+import { ExploreUrlType } from '@/types/loginType';
 
 /** Merge classes with tailwind-merge with clsx full feature */
 export function cn(...inputs: ClassValue[]) {
@@ -218,3 +219,33 @@ export const getOmittedStr = (
   }
   return `${str.slice(0, preLen)}...${str.slice(-endLen)}`;
 };
+
+export function openWithBlank(url: string): void {
+  const newWindow = window.open(url, '_blank');
+  if (newWindow) {
+    newWindow.opener = null;
+  }
+}
+
+export function getOtherExploreLink(
+  data: string,
+  network: keyof typeof ExploreUrlType,
+  type: 'transaction' | 'address'
+): string {
+  const prefix = ExploreUrlType[network] || 'https://explorer.aelf.io';
+  switch (type) {
+    case 'transaction': {
+      if (network === 'TRX') {
+        return `${prefix}/#/transaction/${data}`;
+      }
+      return `${prefix}/tx/${data}`;
+    }
+    case 'address':
+    default: {
+      if (network === 'TRX') {
+        return `${prefix}/#/address/${data}`;
+      }
+      return `${prefix}/address/${data}`;
+    }
+  }
+}

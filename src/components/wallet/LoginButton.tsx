@@ -1,7 +1,6 @@
 'use client';
 
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
-import { sleep } from '@portkey/utils';
 import { Button, message } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -16,7 +15,7 @@ interface LogInButtonProps {
 }
 
 export default function LogInButton({ className }: LogInButtonProps) {
-  const { connectWallet, disConnectWallet, walletInfo } = useConnectWallet();
+  const { disConnectWallet } = useConnectWallet();
   const [messageApi, contextHolder] = message.useMessage();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -32,12 +31,14 @@ export default function LogInButton({ className }: LogInButtonProps) {
 
   const handleWalletLogin = useCallback(async () => {
     setLoading(true);
-    if (!walletInfo) {
-      await connectWallet();
-      await sleep(1000);
-    }
     try {
       const reqParams = await getReqParams();
+      if (!reqParams) {
+        messageApi.open({
+          type: 'error',
+          content: 'Login sign wallet error',
+        });
+      }
       if (reqParams && reqParams?.address) {
         await queryWalletAuthLogin(reqParams);
         loginSuccessActive();
@@ -45,22 +46,11 @@ export default function LogInButton({ className }: LogInButtonProps) {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log('error', error);
-      messageApi.open({
-        type: 'error',
-        content: 'wallet login with error',
-      });
       await disConnectWallet;
     } finally {
       setLoading(false);
     }
-  }, [
-    walletInfo,
-    messageApi,
-    connectWallet,
-    disConnectWallet,
-    getReqParams,
-    loginSuccessActive,
-  ]);
+  }, [messageApi, disConnectWallet, getReqParams, loginSuccessActive]);
 
   return (
     <Button

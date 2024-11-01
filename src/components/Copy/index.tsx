@@ -1,6 +1,6 @@
-import { CopyOutlined } from '@ant-design/icons';
 import { message } from 'antd';
 import clsx from 'clsx';
+import Image from 'next/image';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import { formatStr2Ellipsis } from '@/lib/utils';
@@ -10,6 +10,7 @@ type CopyProps = {
   readonly content: string | number;
   readonly isShowCopy?: boolean;
   readonly className?: string;
+  readonly textClassName?: string;
   readonly showLittle?: boolean;
 };
 
@@ -24,6 +25,7 @@ export default function Copy({
   content,
   isShowCopy = false,
   className,
+  textClassName,
   showLittle,
 }: CopyProps) {
   const [messageApi, contextHolder] = message.useMessage();
@@ -38,9 +40,14 @@ export default function Copy({
   return (
     <div className={clsx('inline-block', className)}>
       {contextHolder}
-      <div className='text-gray-80 mb-[10px] text-xs'>{label}</div>
+      {label && <div className='text-gray-80 mb-[10px] text-xs'>{label}</div>}
       <div className='text-block text-base font-medium'>
-        <span className='mr-2 max-w-[80%] overflow-hidden whitespace-pre-wrap break-words'>
+        <span
+          className={clsx(
+            'mr-2 max-w-[80%] overflow-hidden whitespace-pre-wrap break-words align-middle',
+            textClassName
+          )}
+        >
           {showLittle ? formatStr2Ellipsis(String(content), [8, 9]) : content}
         </span>
         {isShowCopy && (
@@ -49,7 +56,13 @@ export default function Copy({
             onCopy={() => handleCopy()}
             style={{ color: '#ADADAD' }}
           >
-            <CopyOutlined />
+            <Image
+              src='/assets/svg/copy.svg'
+              alt='copy'
+              width={16}
+              height={16}
+              className='inline-block cursor-pointer align-middle'
+            />
           </CopyToClipboard>
         )}
       </div>

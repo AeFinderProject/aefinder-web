@@ -17,6 +17,7 @@ export const useGetWalletSignParams = () => {
     walletInfo,
     walletType,
     getSignature,
+    connectWallet,
     disConnectWallet,
     isConnected,
   } = useConnectWallet();
@@ -25,9 +26,13 @@ export const useGetWalletSignParams = () => {
   const getReqParams: () => Promise<null | QueryWalletAuthExtra> = async () => {
     console.log('isConnected', isConnected);
     console.log('walletInfo', walletInfo);
-    if (!isConnected || !walletInfo) return null;
+    let wallet = walletInfo;
+    if (!isConnected || !walletInfo) {
+      wallet = await connectWallet();
+    }
+    if (!isConnected || !wallet) return null;
     const timestamp = Date.now();
-    const plainTextOrigin = `${walletInfo?.address}-${timestamp}`;
+    const plainTextOrigin = `${wallet?.address}-${timestamp}`;
     const signInfo = AElf.utils.sha256(plainTextOrigin);
     const discoverSignHex = Buffer.from(
       hexDataCopywriter + plainTextOrigin
@@ -51,10 +56,10 @@ export const useGetWalletSignParams = () => {
     } else {
       const sign = await getSignature({
         appName: 'aefinder-web',
-        address: walletInfo?.address,
+        address: wallet?.address,
         signInfo:
           walletType === WalletTypeEnum.aa
-            ? Buffer.from(`${walletInfo?.address}-${timestamp}`).toString('hex')
+            ? Buffer.from(`${wallet?.address}-${timestamp}`).toString('hex')
             : AElf.utils.sha256(plainTextOrigin),
       });
       if (sign?.errorMessage) {
@@ -74,7 +79,7 @@ export const useGetWalletSignParams = () => {
       timestamp,
       signature,
       chain_id: originChainId,
-      address: walletInfo?.address,
+      address: wallet?.address,
     } as QueryWalletAuthExtra;
 
     if (caHash) {

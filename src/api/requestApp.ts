@@ -140,7 +140,7 @@ export const getUsersInfo = async (): Promise<UserInfoType> => {
     return {
       userName: 'Guest',
       email: '',
-      address: '',
+      address: '2qgHANBSZN6ywSboJ4sWXw2PZfD8uw4xbuTJ5nDs83S23bNh7Y',
     };
   }
 

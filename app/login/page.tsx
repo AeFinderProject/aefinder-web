@@ -25,6 +25,7 @@ export default function LogIn() {
   const [messageApi, contextHolder] = message.useMessage();
   const currentTourStep = localStorage.getItem('currentTourStep');
   const [loading, setLoading] = useState(false);
+  const [guestLoading, setGuestLoading] = useState(false);
 
   const initialTourValues = useCallback(() => {
     // check first isTourDashboard isTourCreateApp isTourHaveCreateApp
@@ -69,7 +70,7 @@ export default function LogIn() {
   }, [setLoading]);
 
   const handleGuestLogin = useDebounceCallback(async () => {
-    setLoading(true);
+    setGuestLoading(true);
     // if Guest Login, set isGuest to true
     sessionStorage.setItem('isGuest', 'true');
     await queryAuthApi({
@@ -77,9 +78,9 @@ export default function LogIn() {
       password: 'Guest',
     });
     dispatch(setUsername('Guest'));
-    setLoading(false);
+    setGuestLoading(false);
     router.push('/dashboard');
-  }, [setLoading]);
+  }, [setGuestLoading]);
 
   return (
     <div className='flex w-full flex-col items-center justify-center pb-10 text-center'>
@@ -122,6 +123,7 @@ export default function LogIn() {
                 className='mx-auto h-[48px] w-full'
                 type='primary'
                 htmlType='submit'
+                loading={loading}
               >
                 Sign In
               </Button>
@@ -132,7 +134,7 @@ export default function LogIn() {
               <Button
                 className='mx-auto h-[48px] w-full md:w-[48%]'
                 onClick={handleGuestLogin}
-                loading={loading}
+                loading={guestLoading}
               >
                 Continue as Guest
               </Button>
