@@ -1,8 +1,10 @@
 'use client';
-import type { TourProps } from 'antd';
-import { message, Tabs, Tour } from 'antd';
+// eslint-disable-next-line
 import { useParams } from 'next/navigation';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+
+import type { TourProps } from 'antd';
+import { message, Tabs, Tour } from 'antd';
 
 import DeployDrawer from '@/components/appDetail/DeployDrawer';
 import DetailBox from '@/components/appDetail/DetailBox';
@@ -23,8 +25,7 @@ import { queryAuthToken } from '@/api/apiUtils';
 import { getAppDetail } from '@/api/requestApp';
 import { getSubscriptions } from '@/api/requestSubscription';
 
-import { CurrentTourStepEnum } from '@/types/appType';
-import { AppStatusType } from '@/types/appType';
+import { CurrentTourStepEnum, AppStatusType } from '@/types/appType';
 
 export default function AppDetail() {
   const dispatch = useAppDispatch();

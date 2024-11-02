@@ -26,6 +26,13 @@ export type BindWalletRequest = {
   address: string;
 };
 
+export type BindWalletResponse = {
+  userName: string;
+  email: string;
+  emailConfirmed: boolean;
+  walletAddress: string;
+};
+
 export enum ExploreUrlType {
   AELF = 'https://explorer.aelf.io',
   SETH = 'https://sepolia.etherscan.io',

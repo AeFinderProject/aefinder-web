@@ -1,7 +1,7 @@
 'use client';
 
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
-import { DownOutlined, UpOutlined } from '@ant-design/icons';
+import { DownOutlined, LoadingOutlined, UpOutlined } from '@ant-design/icons';
 import { message } from 'antd';
 import clsx from 'clsx';
 import Image from 'next/image';
@@ -16,12 +16,10 @@ import UnstyledLink from '@/components/links/UnstyledLink';
 import { useGetWalletSignParams } from '@/components/wallet/getWalletSignParams';
 import LogInButton from '@/components/wallet/LoginButton';
 
-import { useAppDispatch } from '@/store/hooks';
-import { useAppSelector } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setUsername } from '@/store/slices/commonSlice';
 
-import { getUsersInfo } from '@/api/requestApp';
-import { bindWallet } from '@/api/requestApp';
+import { bindWallet, getUsersInfo } from '@/api/requestApp';
 import { CHAIN_ID } from '@/constant';
 
 export default function Header() {
@@ -30,7 +28,9 @@ export default function Header() {
   const [isShowBox, setIsShowBox] = useState(false);
   const { username } = useAppSelector((state) => state.common);
   const [address, setAddress] = useState('');
-  const { disConnectWallet, isConnected, walletInfo } = useConnectWallet();
+  const [isLoading, setIsLoading] = useState(false);
+  const { disConnectWallet, connectWallet, isConnected, walletInfo } =
+    useConnectWallet();
   const [messageApi, contextHolder] = message.useMessage();
   const dispatch = useAppDispatch();
   const { getReqParams } = useGetWalletSignParams();
@@ -82,29 +82,49 @@ export default function Header() {
   }, [router]);
 
   const handleBindSignInWallet = useCallback(async () => {
-    const reqParams = await getReqParams();
-    if (!reqParams) {
-      messageApi.open({
-        type: 'error',
-        content: 'Login sign wallet error',
-      });
-    }
-    if (reqParams?.address) {
-      const res = await bindWallet({
-        timestamp: reqParams.timestamp,
-        signatureVal: reqParams.signature || '',
-        chainId: reqParams.chain_id,
-        caHash: reqParams.ca_hash,
-        address: reqParams.address,
-      });
-      if (res) {
+    setIsLoading(true);
+    try {
+      const reqParams = await getReqParams();
+      if (!reqParams) {
         messageApi.open({
-          type: 'success',
-          content: 'Bind sign wallet success',
+          type: 'error',
+          content: 'Login sign wallet error',
         });
       }
+      if (reqParams?.address) {
+        const res = await bindWallet({
+          timestamp: reqParams.timestamp,
+          signatureVal: reqParams.signature ?? '',
+          chainId: reqParams.chain_id,
+          caHash: reqParams.ca_hash,
+          address: reqParams.address,
+        });
+        if (res?.walletAddress) {
+          setAddress(res?.walletAddress);
+          messageApi.open({
+            type: 'success',
+            content: 'Bind sign wallet success',
+          });
+        }
+      }
+    } catch (error) {
+      console.log('error', error);
+    } finally {
+      setIsLoading(false);
     }
   }, [getReqParams, messageApi]);
+
+  const connectWalletFirst = useCallback(async () => {
+    if (!walletInfo || !isConnected) {
+      await connectWallet();
+    }
+  }, [walletInfo, isConnected, connectWallet]);
+
+  useEffect(() => {
+    if (pathname === '/dashboard' && walletInfo && isConnected) {
+      handleBindSignInWallet();
+    }
+  }, [pathname, walletInfo, isConnected, handleBindSignInWallet]);
 
   return (
     <header className='border-gray-E0 flex h-[72px] w-full items-center justify-between border-b px-[16px] py-[24px] sm:px-[40px]'>
@@ -150,6 +170,7 @@ export default function Header() {
               className='mr-2 inline-block'
             />
             {username}
+            {isLoading && <LoadingOutlined className='ml-[10px] text-lg' />}
             {isShowBox ? (
               <UpOutlined className='text-gray-80 absolute right-[6px] top-[13px]' />
             ) : (
@@ -181,7 +202,7 @@ export default function Header() {
                 {!address && (
                   <div
                     className='hover:bg-gray-F5 text-nowrap border-none pl-[10px] pr-[16px] text-left'
-                    onClick={handleBindSignInWallet}
+                    onClick={connectWalletFirst}
                   >
                     <Image
                       src='/assets/svg/wallet-black.svg'

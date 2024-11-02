@@ -8,7 +8,7 @@ import { config } from '@/components/wallet/Config';
 export default function WalletLoginProvider({
   children,
 }: {
-  children: ReactNode;
+  readonly children: ReactNode;
 }) {
   const bridgeAPI = init(config);
 

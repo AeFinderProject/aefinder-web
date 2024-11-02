@@ -3,22 +3,23 @@
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { Button, message } from 'antd';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useGetWalletSignParams } from '@/components/wallet/getWalletSignParams';
 
 import { queryWalletAuthLogin } from '@/api/apiUtils';
 
 interface LogInButtonProps {
-  className?: string;
+  readonly className?: string;
 }
 
 export default function LogInButton({ className }: LogInButtonProps) {
-  const { disConnectWallet } = useConnectWallet();
+  const { connectWallet, walletInfo, isConnected } = useConnectWallet();
   const [messageApi, contextHolder] = message.useMessage();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const { getReqParams } = useGetWalletSignParams();
 
   const loginSuccessActive = useCallback(() => {
@@ -30,6 +31,7 @@ export default function LogInButton({ className }: LogInButtonProps) {
   }, [router, messageApi]);
 
   const handleWalletLogin = useCallback(async () => {
+    console.log('handleWalletLogin start');
     setLoading(true);
     try {
       const reqParams = await getReqParams();
@@ -39,23 +41,34 @@ export default function LogInButton({ className }: LogInButtonProps) {
           content: 'Login sign wallet error',
         });
       }
-      if (reqParams && reqParams?.address) {
+      if (reqParams?.address) {
         await queryWalletAuthLogin(reqParams);
         loginSuccessActive();
       }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log('error', error);
-      await disConnectWallet;
     } finally {
       setLoading(false);
     }
-  }, [messageApi, disConnectWallet, getReqParams, loginSuccessActive]);
+  }, [messageApi, getReqParams, loginSuccessActive]);
+
+  const connectWalletFirst = useCallback(async () => {
+    if (!walletInfo || !isConnected) {
+      await connectWallet();
+    }
+  }, [walletInfo, isConnected, connectWallet]);
+
+  useEffect(() => {
+    if (pathname === '/login' && walletInfo && isConnected) {
+      handleWalletLogin();
+    }
+  }, [pathname, walletInfo, isConnected, handleWalletLogin]);
 
   return (
     <Button
       className={className}
-      onClick={handleWalletLogin}
+      onClick={connectWalletFirst}
       type='primary'
       icon={
         <Image

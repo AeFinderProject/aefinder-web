@@ -21,7 +21,11 @@ import {
   ModifyAppRequest,
   UserInfoType,
 } from '@/types/appType';
-import { BindWalletRequest, ResetPasswordRequest } from '@/types/loginType';
+import {
+  BindWalletRequest,
+  BindWalletResponse,
+  ResetPasswordRequest,
+} from '@/types/loginType';
 
 export const createApp = async (
   params: CreateAppRequest
@@ -120,10 +124,15 @@ export const resetPassword = async (
 
 export const bindWallet = async (
   params: BindWalletRequest
-): Promise<boolean> => {
+): Promise<BindWalletResponse> => {
   const isGuest = sessionStorage.getItem('isGuest');
   if (isGuest === 'true') {
-    return true;
+    return {
+      userName: 'Guest',
+      email: '',
+      emailConfirmed: false,
+      walletAddress: '2qgHANBSZN6ywSboJ4sWXw2PZfD8uw4xbuTJ5nDs83S23bNh7Y',
+    };
   }
 
   try {

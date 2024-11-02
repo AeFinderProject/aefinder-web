@@ -149,7 +149,13 @@ export const readAndCompressFile = async (file: File): Promise<Blob> => {
         reject(new Error('Is not a string'));
       }
     };
-    reader.onerror = (error) => reject(error);
+    reader.onerror = () => {
+      reject(
+        new Error(
+          reader.error?.message ?? 'An error occurred while reading the file.'
+        )
+      );
+    };
     reader.readAsText(file);
   });
 

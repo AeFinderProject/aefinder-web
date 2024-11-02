@@ -3,6 +3,10 @@ import { IPortkeyProvider, MethodsWallet } from '@portkey/provider-types';
 
 import { zeroFill } from '@/lib/utils';
 
+interface ProviderWithMethodCheck extends IPortkeyProvider {
+  methodCheck: (method: string) => unknown;
+}
+
 export default function useDiscoverProvider() {
   const { walletInfo } = useConnectWallet();
   const discoverProvider = async () => {
@@ -22,10 +26,12 @@ export default function useDiscoverProvider() {
     signInfo: string
   ) => {
     const provider = await discoverProvider();
-    if (!provider || !provider?.request)
+    if (!provider?.request) {
       throw new Error('Discover not connected');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const isSupportManagerSignature = (provider as any).methodCheck(
+    }
+
+    const providerWithMethodCheck = provider as ProviderWithMethodCheck;
+    const isSupportManagerSignature = providerWithMethodCheck.methodCheck(
       'wallet_getManagerSignature'
     );
     const signature = await provider.request({
@@ -35,7 +41,7 @@ export default function useDiscoverProvider() {
         : MethodsWallet.GET_WALLET_SIGNATURE,
       payload: isSupportManagerSignature ? { hexData } : { data: signInfo },
     });
-    if (!signature || signature.recoveryParam == null) return {};
+    if (signature?.recoveryParam == null) return {};
     const signatureR = zeroFill(signature.r);
     const signatureS = zeroFill(signature.s);
     const signatureRE = `0${signature.recoveryParam.toString()}`;

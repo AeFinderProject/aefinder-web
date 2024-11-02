@@ -28,7 +28,7 @@ export const AuthList = {
     baseConfig: { method: 'POST' },
   },
   bindWallet: {
-    target: `${AeFinderHost}/bind/wallet`,
+    target: `${AeFinderHost}/api/users/bind/wallet`,
     baseConfig: { method: 'POST' },
   },
 };

@@ -8,7 +8,11 @@ import { setUsername } from '@/store/slices/commonSlice';
 
 import { queryAuthToken } from '@/api/apiUtils';
 
-export default function LoginProvider({ children }: { children: ReactNode }) {
+export default function LoginProvider({
+  children,
+}: {
+  readonly children: ReactNode;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useAppDispatch();
@@ -22,10 +26,8 @@ export default function LoginProvider({ children }: { children: ReactNode }) {
     const res = await queryAuthToken();
     if (res.auth === 'NoAuthToken') {
       router.push(`/login`);
-    } else {
-      if (res.username) {
-        dispatch(setUsername(res.username));
-      }
+    } else if (res.username) {
+      dispatch(setUsername(res.username));
     }
   }, [router, pathname, dispatch]);
 

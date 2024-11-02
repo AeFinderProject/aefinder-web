@@ -17,24 +17,16 @@ export const useGetWalletSignParams = () => {
     walletInfo,
     walletType,
     getSignature,
-    connectWallet,
     disConnectWallet,
     isConnected,
   } = useConnectWallet();
   const { getSignatureAndPublicKey } = useDiscoverProvider();
 
   const getReqParams: () => Promise<null | QueryWalletAuthExtra> = async () => {
-    console.log('isConnected', isConnected);
-    console.log('walletInfo', walletInfo);
-    let wallet = walletInfo;
-    let isConnect = isConnected;
-    if (!isConnected || !walletInfo) {
-      wallet = await connectWallet();
-      isConnect = true;
-    }
-    if (!isConnect || !wallet) return null;
+    if (!walletInfo) return null;
+
     const timestamp = Date.now();
-    const plainTextOrigin = `${wallet?.address}-${timestamp}`;
+    const plainTextOrigin = `${walletInfo?.address}-${timestamp}`;
     const signInfo = AElf.utils.sha256(plainTextOrigin);
     const discoverSignHex = Buffer.from(
       hexDataCopywriter + plainTextOrigin
@@ -49,30 +41,35 @@ export const useGetWalletSignParams = () => {
           discoverSignHex,
           signInfo
         );
-        signature = signatureStr || '';
+        signature = signatureStr ?? '';
       } catch (error) {
         console.log(error);
-        isConnect && disConnectWallet();
+        isConnected && disConnectWallet();
         return null;
       }
     } else {
       const sign = await getSignature({
         appName: 'aefinder-web',
-        address: wallet?.address,
+        address: walletInfo?.address,
         signInfo:
           walletType === WalletTypeEnum.aa
-            ? Buffer.from(`${wallet?.address}-${timestamp}`).toString('hex')
+            ? Buffer.from(`${walletInfo?.address}-${timestamp}`).toString('hex')
             : AElf.utils.sha256(plainTextOrigin),
       });
       if (sign?.errorMessage) {
         message.error(sign?.errorMessage);
-        isConnect && disConnectWallet();
+        isConnected && disConnectWallet();
         return null;
       }
       signature = sign?.signature ?? '';
     }
 
     // ------------ request api ---------
+    console.log(
+      'getCaHashAndOriginChainIdByWallet start ---->',
+      walletInfo,
+      walletType
+    );
     const { caHash, originChainId } = await getCaHashAndOriginChainIdByWallet(
       walletInfo,
       walletType
@@ -81,7 +78,7 @@ export const useGetWalletSignParams = () => {
       timestamp,
       signature,
       chain_id: originChainId,
-      address: wallet?.address,
+      address: walletInfo?.address,
     } as QueryWalletAuthExtra;
 
     if (caHash) {
