@@ -1,4 +1,4 @@
-import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
+import { TWalletInfo } from '@aelf-web-login/wallet-adapter-base';
 import { IPortkeyProvider, MethodsWallet } from '@portkey/provider-types';
 
 import { zeroFill } from '@/lib/utils';
@@ -8,9 +8,13 @@ interface ProviderWithMethodCheck extends IPortkeyProvider {
 }
 
 export default function useDiscoverProvider() {
-  const { walletInfo } = useConnectWallet();
-  const discoverProvider = async () => {
-    const provider: IPortkeyProvider | null = walletInfo?.extraInfo?.provider;
+  const discoverProvider = async ({
+    walletInfoRef,
+  }: {
+    walletInfoRef: TWalletInfo;
+  }) => {
+    const provider: IPortkeyProvider | null =
+      walletInfoRef?.extraInfo?.provider;
     if (provider) {
       if (!provider.isPortkey) {
         throw new Error('Discover provider found, but check isPortkey failed');
@@ -23,9 +27,10 @@ export default function useDiscoverProvider() {
 
   const getSignatureAndPublicKey = async (
     hexData: string,
-    signInfo: string
+    signInfo: string,
+    walletInfoRef: TWalletInfo
   ) => {
-    const provider = await discoverProvider();
+    const provider = await discoverProvider({ walletInfoRef });
     if (!provider?.request) {
       throw new Error('Discover not connected');
     }

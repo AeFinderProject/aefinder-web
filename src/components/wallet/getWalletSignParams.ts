@@ -1,4 +1,7 @@
-import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
+import {
+  TWalletInfo,
+  WalletTypeEnum,
+} from '@aelf-web-login/wallet-adapter-base';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import AElf from 'aelf-sdk';
 import { message } from 'antd';
@@ -12,21 +15,25 @@ const hexDataCopywriter = `Welcome to AeFinder! Click to sign in to the AeFinder
 
 signature: `;
 
+interface getReqParamsProps {
+  walletInfoRef: TWalletInfo;
+  walletTypeRef: WalletTypeEnum;
+  isConnectedRef: boolean;
+}
+
 export const useGetWalletSignParams = () => {
-  const {
-    walletInfo,
-    walletType,
-    getSignature,
-    disConnectWallet,
-    isConnected,
-  } = useConnectWallet();
+  const { getSignature, disConnectWallet } = useConnectWallet();
   const { getSignatureAndPublicKey } = useDiscoverProvider();
 
-  const getReqParams: () => Promise<null | QueryWalletAuthExtra> = async () => {
-    if (!walletInfo) return null;
+  const getReqParams = async ({
+    walletInfoRef,
+    walletTypeRef,
+    isConnectedRef,
+  }: getReqParamsProps): Promise<null | QueryWalletAuthExtra> => {
+    if (!walletInfoRef || !walletTypeRef) return null;
 
     const timestamp = Date.now();
-    const plainTextOrigin = `${walletInfo?.address}-${timestamp}`;
+    const plainTextOrigin = `${walletInfoRef?.address}-${timestamp}`;
     const signInfo = AElf.utils.sha256(plainTextOrigin);
     const discoverSignHex = Buffer.from(
       hexDataCopywriter + plainTextOrigin
@@ -35,50 +42,48 @@ export const useGetWalletSignParams = () => {
     let signature = '';
 
     // -------------- get signature --------------
-    if (walletType === WalletTypeEnum.discover) {
+    if (walletTypeRef === WalletTypeEnum.discover) {
       try {
         const { signatureStr } = await getSignatureAndPublicKey(
           discoverSignHex,
-          signInfo
+          signInfo,
+          walletInfoRef
         );
         signature = signatureStr ?? '';
       } catch (error) {
         console.log(error);
-        isConnected && disConnectWallet();
+        isConnectedRef && disConnectWallet();
         return null;
       }
     } else {
       const sign = await getSignature({
         appName: 'aefinder-web',
-        address: walletInfo?.address,
+        address: walletInfoRef?.address,
         signInfo:
-          walletType === WalletTypeEnum.aa
-            ? Buffer.from(`${walletInfo?.address}-${timestamp}`).toString('hex')
+          walletTypeRef === WalletTypeEnum.aa
+            ? Buffer.from(`${walletInfoRef?.address}-${timestamp}`).toString(
+                'hex'
+              )
             : AElf.utils.sha256(plainTextOrigin),
       });
       if (sign?.errorMessage) {
         message.error(sign?.errorMessage);
-        isConnected && disConnectWallet();
+        isConnectedRef && disConnectWallet();
         return null;
       }
       signature = sign?.signature ?? '';
     }
 
     // ------------ request api ---------
-    console.log(
-      'getCaHashAndOriginChainIdByWallet start ---->',
-      walletInfo,
-      walletType
-    );
     const { caHash, originChainId } = await getCaHashAndOriginChainIdByWallet(
-      walletInfo,
-      walletType
+      walletInfoRef,
+      walletTypeRef
     );
     const reqParams = {
       timestamp,
       signature,
       chain_id: originChainId,
-      address: walletInfo?.address,
+      address: walletInfoRef?.address,
     } as QueryWalletAuthExtra;
 
     if (caHash) {

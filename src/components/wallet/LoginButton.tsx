@@ -1,10 +1,16 @@
 'use client';
 
+import {
+  TWalletInfo,
+  WalletTypeEnum,
+} from '@aelf-web-login/wallet-adapter-base';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { Button, message } from 'antd';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useRef, useState } from 'react';
+
+import { useThrottleCallback } from '@/lib/utils';
 
 import { useGetWalletSignParams } from '@/components/wallet/getWalletSignParams';
 
@@ -15,12 +21,19 @@ interface LogInButtonProps {
 }
 
 export default function LogInButton({ className }: LogInButtonProps) {
-  const { connectWallet, walletInfo, isConnected } = useConnectWallet();
+  const { getReqParams } = useGetWalletSignParams();
+  const { connectWallet, walletInfo, walletType, isConnected } =
+    useConnectWallet();
   const [messageApi, contextHolder] = message.useMessage();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
-  const { getReqParams } = useGetWalletSignParams();
+
+  const walletInfoRef = useRef<TWalletInfo>();
+  walletInfoRef.current = walletInfo;
+  const walletTypeRef = useRef<WalletTypeEnum>();
+  walletTypeRef.current = walletType;
+  const isConnectedRef = useRef<boolean>();
+  isConnectedRef.current = isConnected;
 
   const loginSuccessActive = useCallback(() => {
     messageApi.open({
@@ -30,40 +43,59 @@ export default function LogInButton({ className }: LogInButtonProps) {
     router.push('/dashboard');
   }, [router, messageApi]);
 
-  const handleWalletLogin = useCallback(async () => {
-    console.log('handleWalletLogin start');
-    setLoading(true);
-    try {
-      const reqParams = await getReqParams();
-      if (!reqParams) {
-        messageApi.open({
-          type: 'error',
-          content: 'Login sign wallet error',
+  const handleWalletLogin = useThrottleCallback(
+    async () => {
+      // wait for wallet connect complete and can get walletInfo data
+      if (
+        !walletInfoRef.current ||
+        !walletTypeRef.current ||
+        !isConnectedRef.current
+      ) {
+        setTimeout(() => {
+          handleWalletLogin();
+        }, 500);
+        return;
+      }
+      setLoading(true);
+      try {
+        const reqParams = await getReqParams({
+          walletInfoRef: walletInfoRef.current,
+          walletTypeRef: walletTypeRef.current,
+          isConnectedRef: isConnectedRef.current,
         });
+
+        if (!reqParams) {
+          messageApi.open({
+            type: 'error',
+            content: 'Login sign wallet error',
+          });
+        }
+        if (reqParams?.address) {
+          await queryWalletAuthLogin(reqParams);
+          loginSuccessActive();
+        }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.log('error', error);
+      } finally {
+        setLoading(false);
       }
-      if (reqParams?.address) {
-        await queryWalletAuthLogin(reqParams);
-        loginSuccessActive();
-      }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log('error', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [messageApi, getReqParams, loginSuccessActive]);
+    },
+    [messageApi, getReqParams, loginSuccessActive],
+    300
+  );
 
   const connectWalletFirst = useCallback(async () => {
-    if (!walletInfo || !isConnected) {
+    if (
+      !walletInfoRef.current ||
+      !walletTypeRef.current ||
+      !isConnectedRef.current
+    ) {
       await connectWallet();
     }
-  }, [walletInfo, isConnected, connectWallet]);
 
-  useEffect(() => {
-    if (pathname === '/login' && walletInfo && isConnected) {
-      handleWalletLogin();
-    }
-  }, [pathname, walletInfo, isConnected, handleWalletLogin]);
+    handleWalletLogin();
+  }, [connectWallet, handleWalletLogin]);
 
   return (
     <Button

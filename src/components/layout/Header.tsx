@@ -1,14 +1,18 @@
 'use client';
 
+import {
+  TWalletInfo,
+  WalletTypeEnum,
+} from '@aelf-web-login/wallet-adapter-base';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { DownOutlined, LoadingOutlined, UpOutlined } from '@ant-design/icons';
 import { message } from 'antd';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { openWithBlank } from '@/lib/utils';
+import { openWithBlank, useDebounceCallback } from '@/lib/utils';
 
 import Copy from '@/components/Copy';
 import PrimaryLink from '@/components/links/PrimaryLink';
@@ -29,11 +33,23 @@ export default function Header() {
   const { username } = useAppSelector((state) => state.common);
   const [address, setAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { disConnectWallet, connectWallet, isConnected, walletInfo } =
-    useConnectWallet();
+  const {
+    disConnectWallet,
+    connectWallet,
+    walletInfo,
+    walletType,
+    isConnected,
+  } = useConnectWallet();
   const [messageApi, contextHolder] = message.useMessage();
   const dispatch = useAppDispatch();
   const { getReqParams } = useGetWalletSignParams();
+
+  const walletInfoRef = useRef<TWalletInfo>();
+  walletInfoRef.current = walletInfo;
+  const walletTypeRef = useRef<WalletTypeEnum>();
+  walletTypeRef.current = walletType;
+  const isConnectedRef = useRef<boolean>();
+  isConnectedRef.current = isConnected;
 
   const getUsersInfoTemp = useCallback(async () => {
     if (pathname !== '/' && pathname !== '/login') {
@@ -81,50 +97,66 @@ export default function Header() {
     }, 100);
   }, [router]);
 
-  const handleBindSignInWallet = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const reqParams = await getReqParams();
-      if (!reqParams) {
-        messageApi.open({
-          type: 'error',
-          content: 'Login sign wallet error',
-        });
+  const handleBindSignInWallet = useDebounceCallback(
+    async () => {
+      // wait for wallet connect complete and can get walletInfo data
+      if (
+        !walletInfoRef.current ||
+        !walletTypeRef.current ||
+        !isConnectedRef.current
+      ) {
+        setTimeout(() => {
+          handleBindSignInWallet();
+        }, 500);
+        return;
       }
-      if (reqParams?.address) {
-        const res = await bindWallet({
-          timestamp: reqParams.timestamp,
-          signatureVal: reqParams.signature ?? '',
-          chainId: reqParams.chain_id,
-          caHash: reqParams.ca_hash,
-          address: reqParams.address,
+
+      setIsLoading(true);
+      try {
+        const reqParams = await getReqParams({
+          walletInfoRef: walletInfoRef.current,
+          walletTypeRef: walletTypeRef.current,
+          isConnectedRef: isConnectedRef.current,
         });
-        if (res?.walletAddress) {
-          setAddress(res?.walletAddress);
+
+        if (!reqParams) {
           messageApi.open({
-            type: 'success',
-            content: 'Bind sign wallet success',
+            type: 'error',
+            content: 'Login sign wallet error',
           });
         }
+        if (reqParams?.address) {
+          const res = await bindWallet({
+            timestamp: reqParams.timestamp,
+            signatureVal: reqParams.signature ?? '',
+            chainId: reqParams.chain_id,
+            caHash: reqParams.ca_hash,
+            address: reqParams.address,
+          });
+          if (res?.walletAddress) {
+            setAddress(res?.walletAddress);
+            messageApi.open({
+              type: 'success',
+              content: 'Bind sign wallet success',
+            });
+          }
+        }
+      } catch (error) {
+        console.log('error', error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.log('error', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [getReqParams, messageApi]);
+    },
+    [getReqParams, messageApi],
+    300
+  );
 
   const connectWalletFirst = useCallback(async () => {
-    if (!walletInfo || !isConnected) {
+    if (!walletInfoRef.current || !walletTypeRef.current) {
       await connectWallet();
     }
-  }, [walletInfo, isConnected, connectWallet]);
-
-  useEffect(() => {
-    if (pathname === '/dashboard' && walletInfo && isConnected) {
-      handleBindSignInWallet();
-    }
-  }, [pathname, walletInfo, isConnected, handleBindSignInWallet]);
+    handleBindSignInWallet();
+  }, [connectWallet, handleBindSignInWallet]);
 
   return (
     <header className='border-gray-E0 flex h-[72px] w-full items-center justify-between border-b px-[16px] py-[24px] sm:px-[40px]'>
