@@ -56,8 +56,8 @@ const networkHostMap = {
     NETWORK_TYPE: NetworkEnum.MAINNET,
     CHAIN_ID: 'tDVV',
     RPC_SERVER_AELF: 'https://aelf-public-node.aelf.io',
-    RPC_SERVER_TDVV: 'https://tdvv-public-node.aelf.io/',
-    RPC_SERVER_TDVW: 'https://tdvv-public-node.aelf.io/',
+    RPC_SERVER_TDVV: 'https://tdvv-public-node.aelf.io',
+    RPC_SERVER_TDVW: 'https://tdvv-public-node.aelf.io',
   },
 };
 
