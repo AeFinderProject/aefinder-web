@@ -12,7 +12,7 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { openWithBlank, useDebounceCallback } from '@/lib/utils';
+import { openWithBlank } from '@/lib/utils';
 
 import Copy from '@/components/Copy';
 import PrimaryLink from '@/components/links/PrimaryLink';
@@ -97,59 +97,55 @@ export default function Header() {
     }, 100);
   }, [router]);
 
-  const handleBindSignInWallet = useDebounceCallback(
-    async () => {
-      // wait for wallet connect complete and can get walletInfo data
-      if (
-        !walletInfoRef.current ||
-        !walletTypeRef.current ||
-        !isConnectedRef.current
-      ) {
-        setTimeout(() => {
-          handleBindSignInWallet();
-        }, 500);
-        return;
-      }
+  const handleBindSignInWallet = useCallback(async () => {
+    // wait for wallet connect complete and can get walletInfo data
+    if (
+      !walletInfoRef.current ||
+      !walletTypeRef.current ||
+      !isConnectedRef.current
+    ) {
+      setTimeout(() => {
+        handleBindSignInWallet();
+      }, 100);
+      return;
+    }
 
-      setIsLoading(true);
-      try {
-        const reqParams = await getReqParams({
-          walletInfoRef: walletInfoRef.current,
-          walletTypeRef: walletTypeRef.current,
-          isConnectedRef: isConnectedRef.current,
+    setIsLoading(true);
+    try {
+      const reqParams = await getReqParams({
+        walletInfoRef: walletInfoRef.current,
+        walletTypeRef: walletTypeRef.current,
+        isConnectedRef: isConnectedRef.current,
+      });
+
+      if (!reqParams) {
+        messageApi.open({
+          type: 'error',
+          content: 'Login sign wallet error',
         });
-
-        if (!reqParams) {
-          messageApi.open({
-            type: 'error',
-            content: 'Login sign wallet error',
-          });
-        }
-        if (reqParams?.address) {
-          const res = await bindWallet({
-            timestamp: reqParams.timestamp,
-            signatureVal: reqParams.signature ?? '',
-            chainId: reqParams.chain_id,
-            caHash: reqParams.ca_hash,
-            address: reqParams.address,
-          });
-          if (res?.walletAddress) {
-            setAddress(res?.walletAddress);
-            messageApi.open({
-              type: 'success',
-              content: 'Bind sign wallet success',
-            });
-          }
-        }
-      } catch (error) {
-        console.log('error', error);
-      } finally {
-        setIsLoading(false);
       }
-    },
-    [getReqParams, messageApi],
-    300
-  );
+      if (reqParams?.address) {
+        const res = await bindWallet({
+          timestamp: reqParams.timestamp,
+          signatureVal: reqParams.signature ?? '',
+          chainId: reqParams.chain_id,
+          caHash: reqParams.ca_hash,
+          address: reqParams.address,
+        });
+        if (res?.walletAddress) {
+          setAddress(res?.walletAddress);
+          messageApi.open({
+            type: 'success',
+            content: 'Bind sign wallet success',
+          });
+        }
+      }
+    } catch (error) {
+      console.log('error', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [getReqParams, messageApi]);
 
   const connectWalletFirst = useCallback(async () => {
     if (!walletInfoRef.current || !walletTypeRef.current) {

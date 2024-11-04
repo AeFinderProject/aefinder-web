@@ -10,8 +10,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useRef, useState } from 'react';
 
-import { useThrottleCallback } from '@/lib/utils';
-
 import { useGetWalletSignParams } from '@/components/wallet/getWalletSignParams';
 
 import { queryWalletAuthLogin } from '@/api/apiUtils';
@@ -43,47 +41,43 @@ export default function LogInButton({ className }: LogInButtonProps) {
     router.push('/dashboard');
   }, [router, messageApi]);
 
-  const handleWalletLogin = useThrottleCallback(
-    async () => {
-      // wait for wallet connect complete and can get walletInfo data
-      if (
-        !walletInfoRef.current ||
-        !walletTypeRef.current ||
-        !isConnectedRef.current
-      ) {
-        setTimeout(() => {
-          handleWalletLogin();
-        }, 500);
-        return;
-      }
-      setLoading(true);
-      try {
-        const reqParams = await getReqParams({
-          walletInfoRef: walletInfoRef.current,
-          walletTypeRef: walletTypeRef.current,
-          isConnectedRef: isConnectedRef.current,
-        });
+  const handleWalletLogin = useCallback(async () => {
+    // wait for wallet connect complete and can get walletInfo data
+    if (
+      !walletInfoRef.current ||
+      !walletTypeRef.current ||
+      !isConnectedRef.current
+    ) {
+      setTimeout(() => {
+        handleWalletLogin();
+      }, 100);
+      return;
+    }
+    setLoading(true);
+    try {
+      const reqParams = await getReqParams({
+        walletInfoRef: walletInfoRef.current,
+        walletTypeRef: walletTypeRef.current,
+        isConnectedRef: isConnectedRef.current,
+      });
 
-        if (!reqParams) {
-          messageApi.open({
-            type: 'error',
-            content: 'Login sign wallet error',
-          });
-        }
-        if (reqParams?.address) {
-          await queryWalletAuthLogin(reqParams);
-          loginSuccessActive();
-        }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.log('error', error);
-      } finally {
-        setLoading(false);
+      if (!reqParams) {
+        messageApi.open({
+          type: 'error',
+          content: 'Login sign wallet error',
+        });
       }
-    },
-    [messageApi, getReqParams, loginSuccessActive],
-    300
-  );
+      if (reqParams?.address) {
+        await queryWalletAuthLogin(reqParams);
+        loginSuccessActive();
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log('error', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [messageApi, getReqParams, loginSuccessActive]);
 
   const connectWalletFirst = useCallback(async () => {
     if (

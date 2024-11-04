@@ -15,7 +15,7 @@ const hexDataCopywriter = `Welcome to AeFinder! Click to sign in to the AeFinder
 
 signature: `;
 
-interface getReqParamsProps {
+interface GetReqParamsProps {
   walletInfoRef: TWalletInfo;
   walletTypeRef: WalletTypeEnum;
   isConnectedRef: boolean;
@@ -29,7 +29,7 @@ export const useGetWalletSignParams = () => {
     walletInfoRef,
     walletTypeRef,
     isConnectedRef,
-  }: getReqParamsProps): Promise<null | QueryWalletAuthExtra> => {
+  }: GetReqParamsProps): Promise<null | QueryWalletAuthExtra> => {
     if (!walletInfoRef || !walletTypeRef) return null;
 
     const timestamp = Date.now();
