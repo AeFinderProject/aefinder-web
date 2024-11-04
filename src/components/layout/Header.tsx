@@ -165,7 +165,8 @@ export default function Header() {
         });
       }
     }
-    res?.address && handleBindSignInWallet();
+    if (res?.address || walletInfoRef.current?.address)
+      handleBindSignInWallet();
   }, [connectWallet, handleBindSignInWallet, messageApi]);
 
   return (
