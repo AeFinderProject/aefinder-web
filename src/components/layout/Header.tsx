@@ -82,12 +82,12 @@ export default function Header() {
   }, []);
 
   const handleLogout = useCallback(async () => {
-    if (isConnected) {
+    if (isConnectedRef.current) {
       await disConnectWallet();
     }
     setAddress('');
     router.push('/login');
-  }, [router, isConnected, disConnectWallet]);
+  }, [router, disConnectWallet]);
 
   const handleResetPassword = useCallback(() => {
     router.push('/reset-password');
@@ -148,10 +148,13 @@ export default function Header() {
       }
     } catch (error) {
       console.log('error', error);
+      if (isConnectedRef.current) {
+        await disConnectWallet();
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [getReqParams, messageApi]);
+  }, [getReqParams, messageApi, disConnectWallet]);
 
   const connectWalletFirst = useCallback(async () => {
     let res;
