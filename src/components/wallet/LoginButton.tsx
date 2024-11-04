@@ -56,11 +56,6 @@ export default function LogInButton({ className }: LogInButtonProps) {
     }
     setLoading(true);
     try {
-      console.log('getReqParams start');
-      console.log('walletInfoRef.current', walletInfoRef.current);
-      console.log('walletTypeRef.current', walletTypeRef.current);
-      console.log('isConnectedRef.current', isConnectedRef.current);
-
       const reqParams = await getReqParams({
         walletInfoRef: walletInfoRef.current,
         walletTypeRef: walletTypeRef.current,

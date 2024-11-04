@@ -39,19 +39,18 @@ export const useGetWalletSignParams = () => {
       hexDataCopywriter + plainTextOrigin
     ).toString('hex');
 
+    let publicKey = '';
     let signature = '';
 
     // -------------- get signature --------------
-    console.log('get signature start');
-    console.log('walletInfoRef --->', walletInfoRef);
-    console.log('walletTypeRef --->', walletTypeRef);
     if (walletTypeRef === WalletTypeEnum.discover) {
       try {
-        const { signatureStr } = await getSignatureAndPublicKey(
+        const { pubKey, signatureStr } = await getSignatureAndPublicKey(
           discoverSignHex,
           signInfo,
           walletInfoRef
         );
+        publicKey = pubKey || '';
         signature = signatureStr ?? '';
       } catch (error) {
         console.log(error);
@@ -72,6 +71,7 @@ export const useGetWalletSignParams = () => {
         isConnectedRef && disConnectWallet();
         return null;
       }
+      publicKey = walletInfoRef?.extraInfo?.publicKey || '';
       signature = sign?.signature ?? '';
     }
 
@@ -83,6 +83,7 @@ export const useGetWalletSignParams = () => {
     const reqParams = {
       timestamp,
       signature,
+      publickey: publicKey,
       chain_id: originChainId,
       address: walletInfoRef?.address,
     } as QueryWalletAuthExtra;

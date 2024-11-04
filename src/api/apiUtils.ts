@@ -148,6 +148,7 @@ export type QueryWalletAuthExtra = {
   signature?: string;
   chain_id: string;
   ca_hash?: string;
+  publickey: string;
   address: string;
   // use to set setLocalJWT
   username?: string;

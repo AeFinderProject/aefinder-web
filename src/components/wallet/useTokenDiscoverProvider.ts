@@ -1,7 +1,11 @@
 import { TWalletInfo } from '@aelf-web-login/wallet-adapter-base';
 import { IPortkeyProvider, MethodsWallet } from '@portkey/provider-types';
+import AElf from 'aelf-sdk';
+import elliptic from 'elliptic';
 
 import { zeroFill } from '@/lib/utils';
+
+const ec = new elliptic.ec('secp256k1');
 
 interface ProviderWithMethodCheck extends IPortkeyProvider {
   methodCheck: (method: string) => unknown;
@@ -52,7 +56,24 @@ export default function useDiscoverProvider() {
     const signatureRE = `0${signature.recoveryParam.toString()}`;
     const signatureStr = `${signatureR}${signatureS}${signatureRE}`;
 
-    return { signatureStr };
+    // recover pubkey by signature
+    let publicKey;
+    if (isSupportManagerSignature) {
+      publicKey = ec.recoverPubKey(
+        Buffer.from(AElf.utils.sha256(hexData), 'hex'),
+        signature,
+        signature.recoveryParam
+      );
+    } else {
+      publicKey = ec.recoverPubKey(
+        Buffer.from(signInfo.slice(0, 64), 'hex'),
+        signature,
+        signature.recoveryParam
+      );
+    }
+    const pubKey = ec.keyFromPublic(publicKey).getPublic('hex');
+
+    return { pubKey, signatureStr };
   };
 
   return { discoverProvider, getSignatureAndPublicKey };
