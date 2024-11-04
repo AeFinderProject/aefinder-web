@@ -26,6 +26,8 @@ import { setUsername } from '@/store/slices/commonSlice';
 import { bindWallet, getUsersInfo } from '@/api/requestApp';
 import { CHAIN_ID } from '@/constant';
 
+let retry = 50;
+
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
@@ -105,6 +107,8 @@ export default function Header() {
       !isConnectedRef.current
     ) {
       setTimeout(() => {
+        if (retry <= 0) return;
+        retry--;
         handleBindSignInWallet();
       }, 100);
       return;
@@ -149,20 +153,19 @@ export default function Header() {
   }, [getReqParams, messageApi]);
 
   const connectWalletFirst = useCallback(async () => {
-    let defaultConnected = true;
+    let res;
     if (!walletInfoRef.current || !walletTypeRef.current) {
       try {
-        await connectWallet();
+        res = await connectWallet();
         // eslint-disable-next-line
       } catch (error: any) {
-        defaultConnected = false;
         messageApi.open({
           type: 'error',
           content: `${error?.message}` || 'connectWallet error',
         });
       }
     }
-    defaultConnected && handleBindSignInWallet();
+    res?.address && handleBindSignInWallet();
   }, [connectWallet, handleBindSignInWallet, messageApi]);
 
   return (

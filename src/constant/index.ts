@@ -32,8 +32,8 @@ const networkHostMap = {
     RPC_SERVER_TDVW: 'https://tdvw-test-node.aelf.io',
   },
   testnet: {
-    AeFinderHost: 'https://gcptest-indexer-api.aefinder.io',
-    AeFinderAuthHost: 'https://gcptest-indexer-auth.aefinder.io',
+    AeFinderHost: 'https://test-indexer-api.aefinder.io',
+    AeFinderAuthHost: 'https://test-indexer-auth.aefinder.io',
     CollectorEndpoint: 'https://otel.aelf.com/v1/traces',
     GRAPHQL_SERVER:
       'https://dapp-aa-portkey-test.portkey.finance/aefinder-v2/api/app/graphql/portkey',
@@ -55,9 +55,9 @@ const networkHostMap = {
     SERVICE_SERVER: 'https://aa-portkey.portkey.finance',
     NETWORK_TYPE: NetworkEnum.MAINNET,
     CHAIN_ID: 'tDVV',
-    RPC_SERVER_AELF: 'https://explorer.aelf.io/chain',
-    RPC_SERVER_TDVV: 'https://tdvv-explorer.aelf.io/chain',
-    RPC_SERVER_TDVW: 'https://tdvv-explorer.aelf.io/chain',
+    RPC_SERVER_AELF: 'https://aelf-public-node.aelf.io',
+    RPC_SERVER_TDVV: 'https://tdvv-public-node.aelf.io/',
+    RPC_SERVER_TDVW: 'https://tdvv-public-node.aelf.io/',
   },
 };
 

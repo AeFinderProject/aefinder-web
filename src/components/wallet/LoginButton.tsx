@@ -18,6 +18,8 @@ interface LogInButtonProps {
   readonly className?: string;
 }
 
+let retry = 50;
+
 export default function LogInButton({ className }: LogInButtonProps) {
   const { getReqParams } = useGetWalletSignParams();
   const { connectWallet, walletInfo, walletType, isConnected } =
@@ -50,6 +52,8 @@ export default function LogInButton({ className }: LogInButtonProps) {
       !isConnectedRef.current
     ) {
       setTimeout(() => {
+        if (retry <= 0) return;
+        retry--;
         handleWalletLogin();
       }, 100);
       return;
@@ -81,24 +85,23 @@ export default function LogInButton({ className }: LogInButtonProps) {
   }, [messageApi, getReqParams, loginSuccessActive]);
 
   const connectWalletFirst = useCallback(async () => {
-    let defaultConnected = true;
+    let res;
     if (
       !walletInfoRef.current ||
       !walletTypeRef.current ||
       !isConnectedRef.current
     ) {
       try {
-        await connectWallet();
+        res = await connectWallet();
         // eslint-disable-next-line
       } catch (error: any) {
-        defaultConnected = false;
         messageApi.open({
           type: 'error',
           content: `${error?.message}` || 'connectWallet error',
         });
       }
     }
-    defaultConnected && handleWalletLogin();
+    res?.address && handleWalletLogin();
   }, [connectWallet, handleWalletLogin, messageApi]);
 
   return (
