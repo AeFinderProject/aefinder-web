@@ -1,8 +1,10 @@
 'use client';
+// eslint-disable-next-line
+import { useParams } from 'next/navigation';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+
 import type { TourProps } from 'antd';
 import { message, Tabs, Tour } from 'antd';
-import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import DeployDrawer from '@/components/appDetail/DeployDrawer';
 import DetailBox from '@/components/appDetail/DetailBox';
@@ -23,12 +25,11 @@ import { queryAuthToken } from '@/api/apiUtils';
 import { getAppDetail } from '@/api/requestApp';
 import { getSubscriptions } from '@/api/requestSubscription';
 
-import { CurrentTourStepEnum } from '@/types/appType';
-import { AppStatusType } from '@/types/appType';
+import { CurrentTourStepEnum, AppStatusType } from '@/types/appType';
 
 export default function AppDetail() {
   const dispatch = useAppDispatch();
-  const router = useRouter();
+  const params = useParams();
   const PlaygroundRef = useRef<HTMLDivElement>(null);
   const LogRef = useRef<HTMLDivElement>(null);
   const [openPlaygroundTour, setOpenPlaygroundTour] = useState(false);
@@ -42,7 +43,7 @@ export default function AppDetail() {
     (state) => state.app
   );
   const [messageApi, contextHolder] = message.useMessage();
-  const { appId } = router.query;
+  const appId = params ? params.appId : '';
   const currentTourStep = localStorage.getItem('currentTourStep');
 
   const PlaygroundSteps: TourProps['steps'] = [

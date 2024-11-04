@@ -210,7 +210,7 @@ export default function DeployDrawer({
   );
 
   const handleUpdateCode = useCallback(async () => {
-    const Code = form.getFieldValue('code') && form.getFieldValue('code')[0];
+    const Code = form.getFieldValue('code')?.[0];
     const isGuest = sessionStorage.getItem('isGuest');
     const tempAdditionalJSONFileList = additionalJSONFileList?.filter(
       (file) => {
@@ -468,7 +468,7 @@ export default function DeployDrawer({
             if (Array.isArray(e)) {
               return e;
             }
-            return e && e.fileList;
+            return e?.fileList || [];
           }}
           extra='Format supported: DLL. Max size 12MB.'
           rules={[{ required: type === 0, message: 'Please upload code DLL!' }]}
@@ -492,7 +492,7 @@ export default function DeployDrawer({
                 if (Array.isArray(e)) {
                   return e;
                 }
-                return e && e.fileList;
+                return e?.fileList || [];
               }}
               extra='Format supported: JSON. Max size 120MB.'
             >

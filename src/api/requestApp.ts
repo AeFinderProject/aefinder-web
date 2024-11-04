@@ -19,8 +19,13 @@ import {
   GetLogRequest,
   GetLogResponse,
   ModifyAppRequest,
+  UserInfoType,
 } from '@/types/appType';
-import { ResetPasswordRequest } from '@/types/loginType';
+import {
+  BindWalletRequest,
+  BindWalletResponse,
+  ResetPasswordRequest,
+} from '@/types/loginType';
 
 export const createApp = async (
   params: CreateAppRequest
@@ -114,5 +119,44 @@ export const resetPassword = async (
     return res;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'resetPassword error'));
+  }
+};
+
+export const bindWallet = async (
+  params: BindWalletRequest
+): Promise<BindWalletResponse> => {
+  const isGuest = sessionStorage.getItem('isGuest');
+  if (isGuest === 'true') {
+    return {
+      userName: 'Guest',
+      email: '',
+      emailConfirmed: false,
+      walletAddress: '2qgHANBSZN6ywSboJ4sWXw2PZfD8uw4xbuTJ5nDs83S23bNh7Y',
+    };
+  }
+
+  try {
+    const res = await request.auth.bindWallet({ data: params });
+    return res;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'bindWallet error'));
+  }
+};
+
+export const getUsersInfo = async (): Promise<UserInfoType> => {
+  const isGuest = sessionStorage.getItem('isGuest');
+  if (isGuest === 'true') {
+    return {
+      userName: 'Guest',
+      email: '',
+      walletAddress: '',
+    };
+  }
+
+  try {
+    const res = await request.app.getUsersInfo();
+    return res;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'getUsersInfo error'));
   }
 };
