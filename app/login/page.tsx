@@ -54,19 +54,22 @@ export default function LogIn() {
   const handleLogin = useDebounceCallback(async () => {
     setLoading(true);
     sessionStorage.setItem('isGuest', 'false');
-    const res = await queryAuthApi({
-      username: form.getFieldValue('username'),
-      password: form.getFieldValue('password'),
-    });
-    if (res?.access_token) {
-      loginSuccessActive();
-    } else {
-      messageApi.open({
-        type: 'error',
-        content: 'Wrong user name or password, please retry',
+    try {
+      const res = await queryAuthApi({
+        username: form.getFieldValue('username'),
+        password: form.getFieldValue('password'),
       });
+      if (res?.access_token) {
+        loginSuccessActive();
+      } else {
+        messageApi.open({
+          type: 'error',
+          content: 'Wrong user name or password, please retry',
+        });
+      }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [setLoading]);
 
   const handleGuestLogin = useDebounceCallback(async () => {
