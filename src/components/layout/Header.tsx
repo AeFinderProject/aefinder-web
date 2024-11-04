@@ -85,6 +85,7 @@ export default function Header() {
     if (isConnected) {
       await disConnectWallet();
     }
+    setAddress('');
     router.push('/login');
   }, [router, isConnected, disConnectWallet]);
 
