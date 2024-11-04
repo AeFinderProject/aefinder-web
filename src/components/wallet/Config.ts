@@ -9,15 +9,14 @@ import {
   CONNECT_SERVER,
   GRAPHQL_SERVER,
   NETWORK_TYPE,
+  RPC_SERVER_AELF,
+  RPC_SERVER_TDVV,
+  RPC_SERVER_TDVW,
   SERVICE_SERVER,
 } from '@/constant';
 
 const APP_NAME = 'aefinder-web';
 const WEBSITE_ICON = 'https://explorer.aelf.io/favicon.main.ico';
-
-const RPC_SERVER_AELF = 'https://aelf-test-node.aelf.io';
-const RPC_SERVER_TDVV = 'https://tdvv-public-node.aelf.io';
-const RPC_SERVER_TDVW = 'https://tdvw-test-node.aelf.io';
 
 // const TELEGRAM_BOT_ID = 'xx';
 

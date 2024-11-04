@@ -13,6 +13,9 @@ const networkHostMap = {
     SERVICE_SERVER: 'https://aa-portkey-test.portkey.finance',
     NETWORK_TYPE: NetworkEnum.TESTNET,
     CHAIN_ID: 'tDVW',
+    RPC_SERVER_AELF: 'https://aelf-test-node.aelf.io',
+    RPC_SERVER_TDVV: 'https://tdvw-test-node.aelf.io',
+    RPC_SERVER_TDVW: 'https://tdvw-test-node.aelf.io',
   },
   devnet: {
     AeFinderHost: 'http://192.168.71.128:8081',
@@ -24,6 +27,9 @@ const networkHostMap = {
     SERVICE_SERVER: 'https://aa-portkey-test.portkey.finance',
     NETWORK_TYPE: NetworkEnum.TESTNET,
     CHAIN_ID: 'tDVW',
+    RPC_SERVER_AELF: 'https://aelf-test-node.aelf.io',
+    RPC_SERVER_TDVV: 'https://tdvw-test-node.aelf.io',
+    RPC_SERVER_TDVW: 'https://tdvw-test-node.aelf.io',
   },
   testnet: {
     AeFinderHost: 'https://gcptest-indexer-api.aefinder.io',
@@ -35,6 +41,9 @@ const networkHostMap = {
     SERVICE_SERVER: 'https://aa-portkey-test.portkey.finance',
     NETWORK_TYPE: NetworkEnum.TESTNET,
     CHAIN_ID: 'tDVW',
+    RPC_SERVER_AELF: 'https://aelf-test-node.aelf.io',
+    RPC_SERVER_TDVV: 'https://tdvw-test-node.aelf.io',
+    RPC_SERVER_TDVW: 'https://tdvw-test-node.aelf.io',
   },
   mainnet: {
     AeFinderHost: 'https://indexer-api.aefinder.io',
@@ -46,6 +55,9 @@ const networkHostMap = {
     SERVICE_SERVER: 'https://aa-portkey.portkey.finance',
     NETWORK_TYPE: NetworkEnum.MAINNET,
     CHAIN_ID: 'tDVV',
+    RPC_SERVER_AELF: 'https://explorer.aelf.io/chain',
+    RPC_SERVER_TDVV: 'https://tdvv-explorer.aelf.io/chain',
+    RPC_SERVER_TDVW: 'https://tdvv-explorer.aelf.io/chain',
   },
 };
 
@@ -73,6 +85,15 @@ export const NETWORK_TYPE =
 
 export const CHAIN_ID = networkHostMap[network as networkType]
   ?.CHAIN_ID as TChainId;
+
+export const RPC_SERVER_AELF =
+  networkHostMap[network as networkType]?.RPC_SERVER_AELF;
+
+export const RPC_SERVER_TDVV =
+  networkHostMap[network as networkType]?.RPC_SERVER_TDVV;
+
+export const RPC_SERVER_TDVW =
+  networkHostMap[network as networkType]?.RPC_SERVER_TDVW;
 
 export const LogsColor = {
   Debug: '#1890ff',

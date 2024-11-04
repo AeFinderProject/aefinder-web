@@ -86,11 +86,19 @@ export default function LogInButton({ className }: LogInButtonProps) {
       !walletTypeRef.current ||
       !isConnectedRef.current
     ) {
-      await connectWallet();
+      try {
+        await connectWallet();
+        // eslint-disable-next-line
+      } catch (error: any) {
+        messageApi.open({
+          type: 'error',
+          content: `${error?.message}` || 'connectWallet error',
+        });
+      }
     }
 
     handleWalletLogin();
-  }, [connectWallet, handleWalletLogin]);
+  }, [connectWallet, handleWalletLogin, messageApi]);
 
   return (
     <Button

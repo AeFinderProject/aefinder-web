@@ -130,6 +130,7 @@ export default function Header() {
           signatureVal: reqParams.signature ?? '',
           chainId: reqParams.chain_id,
           caHash: reqParams.ca_hash,
+          publicKey: reqParams.publickey,
           address: reqParams.address,
         });
         if (res?.walletAddress) {
@@ -149,10 +150,18 @@ export default function Header() {
 
   const connectWalletFirst = useCallback(async () => {
     if (!walletInfoRef.current || !walletTypeRef.current) {
-      await connectWallet();
+      try {
+        await connectWallet();
+        // eslint-disable-next-line
+      } catch (error: any) {
+        messageApi.open({
+          type: 'error',
+          content: `${error?.message}` || 'connectWallet error',
+        });
+      }
     }
     handleBindSignInWallet();
-  }, [connectWallet, handleBindSignInWallet]);
+  }, [connectWallet, handleBindSignInWallet, messageApi]);
 
   return (
     <header className='border-gray-E0 flex h-[72px] w-full items-center justify-between border-b px-[16px] py-[24px] sm:px-[40px]'>

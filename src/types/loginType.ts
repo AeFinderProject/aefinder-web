@@ -23,6 +23,7 @@ export type BindWalletRequest = {
   signatureVal: string;
   chainId: string;
   caHash?: string;
+  publicKey: string;
   address: string;
 };
 
