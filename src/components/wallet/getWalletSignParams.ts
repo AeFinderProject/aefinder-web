@@ -42,6 +42,9 @@ export const useGetWalletSignParams = () => {
     let signature = '';
 
     // -------------- get signature --------------
+    console.log('get signature start');
+    console.log('walletInfoRef --->', walletInfoRef);
+    console.log('walletTypeRef --->', walletTypeRef);
     if (walletTypeRef === WalletTypeEnum.discover) {
       try {
         const { signatureStr } = await getSignatureAndPublicKey(
