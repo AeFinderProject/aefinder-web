@@ -35,7 +35,7 @@ export type BindWalletResponse = {
 };
 
 export enum ExploreUrlType {
-  AELF = 'https://explorer.aelf.io',
+  AELF = 'https://aelfscan.io',
   SETH = 'https://sepolia.etherscan.io',
   ETH = 'https://etherscan.io',
   MATIC = 'https://polygonscan.com',

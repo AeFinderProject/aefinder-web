@@ -149,18 +149,20 @@ export default function Header() {
   }, [getReqParams, messageApi]);
 
   const connectWalletFirst = useCallback(async () => {
+    let defaultConnected = true;
     if (!walletInfoRef.current || !walletTypeRef.current) {
       try {
         await connectWallet();
         // eslint-disable-next-line
       } catch (error: any) {
+        defaultConnected = false;
         messageApi.open({
           type: 'error',
           content: `${error?.message}` || 'connectWallet error',
         });
       }
     }
-    handleBindSignInWallet();
+    defaultConnected && handleBindSignInWallet();
   }, [connectWallet, handleBindSignInWallet, messageApi]);
 
   return (

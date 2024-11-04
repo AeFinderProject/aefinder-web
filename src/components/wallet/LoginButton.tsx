@@ -81,6 +81,7 @@ export default function LogInButton({ className }: LogInButtonProps) {
   }, [messageApi, getReqParams, loginSuccessActive]);
 
   const connectWalletFirst = useCallback(async () => {
+    let defaultConnected = true;
     if (
       !walletInfoRef.current ||
       !walletTypeRef.current ||
@@ -90,14 +91,14 @@ export default function LogInButton({ className }: LogInButtonProps) {
         await connectWallet();
         // eslint-disable-next-line
       } catch (error: any) {
+        defaultConnected = false;
         messageApi.open({
           type: 'error',
           content: `${error?.message}` || 'connectWallet error',
         });
       }
     }
-
-    handleWalletLogin();
+    defaultConnected && handleWalletLogin();
   }, [connectWallet, handleWalletLogin, messageApi]);
 
   return (
