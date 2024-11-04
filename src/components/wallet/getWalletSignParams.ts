@@ -64,9 +64,7 @@ export const useGetWalletSignParams = () => {
         address: walletInfoRef?.address,
         signInfo:
           walletTypeRef === WalletTypeEnum.aa
-            ? Buffer.from(`${walletInfoRef?.address}-${timestamp}`).toString(
-                'hex'
-              )
+            ? Buffer.from(plainTextOrigin).toString('hex')
             : AElf.utils.sha256(plainTextOrigin),
       });
       if (sign?.errorMessage) {
