@@ -42,6 +42,7 @@ export default function LogInButton({ className }: LogInButtonProps) {
   }, [router, messageApi]);
 
   const handleWalletLogin = useCallback(async () => {
+    console.log('handleWalletLogin start');
     // wait for wallet connect complete and can get walletInfo data
     if (
       !walletInfoRef.current ||
@@ -55,6 +56,11 @@ export default function LogInButton({ className }: LogInButtonProps) {
     }
     setLoading(true);
     try {
+      console.log('getReqParams start');
+      console.log('walletInfoRef.current', walletInfoRef.current);
+      console.log('walletTypeRef.current', walletTypeRef.current);
+      console.log('isConnectedRef.current', isConnectedRef.current);
+
       const reqParams = await getReqParams({
         walletInfoRef: walletInfoRef.current,
         walletTypeRef: walletTypeRef.current,
