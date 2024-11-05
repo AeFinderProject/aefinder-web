@@ -1,8 +1,6 @@
 import { GraphiQL } from 'graphiql';
 import { useCallback, useEffect } from 'react';
 
-import 'graphiql/graphiql.css';
-
 import { generateDataArray } from '@/lib/utils';
 
 import db from '@/api/guestDB';
