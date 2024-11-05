@@ -1,6 +1,5 @@
 'use client';
 // eslint-disable-next-line
-import { useParams } from 'next/navigation';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { TourProps } from 'antd';
@@ -29,7 +28,6 @@ import { CurrentTourStepEnum, AppStatusType } from '@/types/appType';
 
 export default function AppDetail() {
   const dispatch = useAppDispatch();
-  const params = useParams();
   const PlaygroundRef = useRef<HTMLDivElement>(null);
   const LogRef = useRef<HTMLDivElement>(null);
   const [openPlaygroundTour, setOpenPlaygroundTour] = useState(false);
@@ -43,7 +41,10 @@ export default function AppDetail() {
     (state) => state.app
   );
   const [messageApi, contextHolder] = message.useMessage();
-  const appId = params ? params.appId : '';
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const [appId, setAppId] = useState(searchParams.get('appId'));
+
   const currentTourStep = localStorage.getItem('currentTourStep');
 
   const PlaygroundSteps: TourProps['steps'] = [
@@ -81,6 +82,19 @@ export default function AppDetail() {
       placement: 'top',
     },
   ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!appId) {
+        const searchParams = new URLSearchParams(window.location.search);
+        setAppId(searchParams.get('appId'));
+      } else {
+        clearInterval(interval);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, [appId]);
+
   useEffect(() => {
     const getAppDetailTemp = async () => {
       await queryAuthToken();
