@@ -37,7 +37,7 @@ export default function ResetPassword() {
     }
     // step 2 check password is valid
     const passwordRegExp =
-      /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[~!@#$%^&*()_+])[A-Za-z\d~!@#$%^&*()_+]+$/;
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[~!@#$%^&*()_+.])[A-Za-z\d~!@#$%^&*()_+.]+$/;
     if (!passwordRegExp.test(password)) {
       messageApi.open({
         type: 'warning',
