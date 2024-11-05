@@ -3,8 +3,6 @@ import { createGraphiQLFetcher } from '@graphiql/toolkit';
 import { GraphiQL } from 'graphiql';
 import React, { useCallback } from 'react';
 
-import 'graphiql/graphiql.css';
-
 import { useAppSelector } from '@/store/hooks';
 
 import { appApiList } from '@/api/list';

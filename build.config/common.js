@@ -4,6 +4,7 @@ const rewritesConfig = require('./rewrites/index');
 const path = require('path');
 
 module.exports = {
+  output: 'standalone',
   reactStrictMode: true,
   async rewrites() {
     return rewritesConfig;

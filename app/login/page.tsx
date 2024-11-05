@@ -1,17 +1,20 @@
 'use client';
-import { Button, Form, Input, message } from 'antd';
-import Image from 'next/image';
+// eslint-disable-next-line
+import React, { useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { useCallback, useEffect } from 'react';
+import Image from 'next/image';
+
+import { Button, Divider, Form, Input, message } from 'antd';
 
 import { useDebounceCallback } from '@/lib/utils';
+import { queryAuthApi, resetLocalJWT } from '@/api/apiUtils';
 
 import { useAppDispatch } from '@/store/hooks';
 import { setUsername } from '@/store/slices/commonSlice';
 
-import { queryAuthApi, resetLocalJWT } from '@/api/apiUtils';
-
 import { CurrentTourStepEnum } from '@/types/appType';
+
+import LogInButton from '@/components/wallet/LoginButton';
 
 export default function LogIn() {
   const [form] = Form.useForm();
@@ -21,6 +24,8 @@ export default function LogIn() {
   const pathname = usePathname();
   const [messageApi, contextHolder] = message.useMessage();
   const currentTourStep = localStorage.getItem('currentTourStep');
+  const [loading, setLoading] = useState(false);
+  const [guestLoading, setGuestLoading] = useState(false);
 
   const initialTourValues = useCallback(() => {
     // check first isTourDashboard isTourCreateApp isTourHaveCreateApp
@@ -39,31 +44,36 @@ export default function LogIn() {
   }, [pathname, initialTourValues]);
 
   const loginSuccessActive = useCallback(() => {
-    dispatch(setUsername(form.getFieldValue('username')));
     messageApi.open({
       type: 'success',
       content: 'login success',
     });
     router.push('/dashboard');
-  }, [dispatch, form, router, messageApi]);
+  }, [router, messageApi]);
 
   const handleLogin = useDebounceCallback(async () => {
+    setLoading(true);
     sessionStorage.setItem('isGuest', 'false');
-    const res = await queryAuthApi({
-      username: form.getFieldValue('username'),
-      password: form.getFieldValue('password'),
-    });
-    if (res.access_token) {
-      loginSuccessActive();
-    } else {
-      messageApi.open({
-        type: 'error',
-        content: 'Wrong user name or password, please retry',
+    try {
+      const res = await queryAuthApi({
+        username: form.getFieldValue('username'),
+        password: form.getFieldValue('password'),
       });
+      if (res?.access_token) {
+        loginSuccessActive();
+      } else {
+        messageApi.open({
+          type: 'error',
+          content: 'Wrong user name or password, please retry',
+        });
+      }
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  }, [setLoading]);
 
   const handleGuestLogin = useDebounceCallback(async () => {
+    setGuestLoading(true);
     // if Guest Login, set isGuest to true
     sessionStorage.setItem('isGuest', 'true');
     await queryAuthApi({
@@ -71,8 +81,9 @@ export default function LogIn() {
       password: 'Guest',
     });
     dispatch(setUsername('Guest'));
+    setGuestLoading(false);
     router.push('/dashboard');
-  }, []);
+  }, [setGuestLoading]);
 
   return (
     <div className='flex w-full flex-col items-center justify-center pb-10 text-center'>
@@ -115,14 +126,18 @@ export default function LogIn() {
                 className='mx-auto h-[48px] w-full'
                 type='primary'
                 htmlType='submit'
+                loading={loading}
               >
                 Sign In
               </Button>
             </FormItem>
+            <Divider style={{ color: '#808080', fontSize: '12px' }}>OR</Divider>
             <FormItem>
+              <LogInButton className='mx-auto mb-[16px] h-[48px] w-full md:mr-[2%] md:w-[48%]' />
               <Button
-                className='mx-auto h-[48px] w-full'
+                className='mx-auto h-[48px] w-full md:w-[48%]'
                 onClick={handleGuestLogin}
+                loading={guestLoading}
               >
                 Continue as Guest
               </Button>

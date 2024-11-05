@@ -1,8 +1,6 @@
 import { GraphiQL } from 'graphiql';
 import { useCallback, useEffect } from 'react';
 
-import 'graphiql/graphiql.css';
-
 import { generateDataArray } from '@/lib/utils';
 
 import db from '@/api/guestDB';
@@ -37,7 +35,7 @@ export default function GuestPlayground() {
     try {
       // step 1 get id from graphQLParams
       const regex = /id:\s*"(.*?)"/;
-      const match = graphQLParams?.query?.match(regex);
+      const match = regex.exec(graphQLParams?.query);
       // step 2 check if id is valid
       const idValue = match ? match[1] : '-1';
       if (idValue <= '20' && idValue > '0') {

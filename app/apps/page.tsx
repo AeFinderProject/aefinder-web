@@ -1,8 +1,9 @@
 'use client';
+// eslint-disable-next-line
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+
 import type { TourProps } from 'antd';
 import { message, Tabs, Tour } from 'antd';
-import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import DeployDrawer from '@/components/appDetail/DeployDrawer';
 import DetailBox from '@/components/appDetail/DetailBox';
@@ -23,12 +24,10 @@ import { queryAuthToken } from '@/api/apiUtils';
 import { getAppDetail } from '@/api/requestApp';
 import { getSubscriptions } from '@/api/requestSubscription';
 
-import { CurrentTourStepEnum } from '@/types/appType';
-import { AppStatusType } from '@/types/appType';
+import { CurrentTourStepEnum, AppStatusType } from '@/types/appType';
 
 export default function AppDetail() {
   const dispatch = useAppDispatch();
-  const router = useRouter();
   const PlaygroundRef = useRef<HTMLDivElement>(null);
   const LogRef = useRef<HTMLDivElement>(null);
   const [openPlaygroundTour, setOpenPlaygroundTour] = useState(false);
@@ -42,7 +41,10 @@ export default function AppDetail() {
     (state) => state.app
   );
   const [messageApi, contextHolder] = message.useMessage();
-  const { appId } = router.query;
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const [appId, setAppId] = useState(searchParams.get('appId'));
+
   const currentTourStep = localStorage.getItem('currentTourStep');
 
   const PlaygroundSteps: TourProps['steps'] = [
@@ -80,6 +82,19 @@ export default function AppDetail() {
       placement: 'top',
     },
   ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!appId) {
+        const searchParams = new URLSearchParams(window.location.search);
+        setAppId(searchParams.get('appId'));
+      } else {
+        clearInterval(interval);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, [appId]);
+
   useEffect(() => {
     const getAppDetailTemp = async () => {
       await queryAuthToken();

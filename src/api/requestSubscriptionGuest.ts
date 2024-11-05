@@ -15,6 +15,108 @@ import {
   UpdateSubscriptionRequest,
 } from '@/types/subscriptionType';
 
+const addAttachments = async (
+  appId: string,
+  version: string,
+  fileList: UploadFile[]
+) => {
+  const attachments = fileList.map((file) => ({
+    appId,
+    version,
+    fileKey: file.uid,
+    fileName: file.name,
+    fileSize: file.size ?? 0,
+  }));
+
+  await db.attachmentTable.bulkAdd(attachments);
+};
+
+const handleNewSubscription = async (
+  appId: string,
+  tempVersion: string,
+  Manifest: string,
+  additionalJSONFileList?: UploadFile[]
+) => {
+  await db.transaction('rw', db.subscriptionTable, async () => {
+    await db.subscriptionTable.add({
+      appId,
+      version: tempVersion,
+      status: 1,
+      subscriptionManifest: JSON.parse(Manifest),
+    });
+  });
+
+  if (additionalJSONFileList) {
+    await addAttachments(appId, tempVersion, additionalJSONFileList);
+  }
+
+  await db.appTable.update(appId, { status: 1 });
+  await db.deployTable.update(appId, {
+    currentVersion: tempVersion,
+    status: 1,
+  });
+};
+
+const handlePendingVersion = async (
+  appId: string,
+  tempVersion: string,
+  Manifest: string,
+  additionalJSONFileList?: UploadFile[]
+) => {
+  await db.subscriptionTable.add({
+    appId,
+    version: tempVersion,
+    status: 1,
+    subscriptionManifest: JSON.parse(Manifest),
+  });
+
+  if (additionalJSONFileList) {
+    await addAttachments(appId, tempVersion, additionalJSONFileList);
+  }
+
+  await db.appTable.update(appId, { status: 1 });
+  await db.deployTable.update(appId, {
+    pendingVersion: tempVersion,
+    status: 1,
+  });
+};
+
+const replacePendingVersion = async (
+  appId: string,
+  tempVersion: string,
+  Manifest: string,
+  additionalJSONFileList?: UploadFile[],
+  currentVersion?: string,
+  oldPendingVersion?: string
+) => {
+  await db.deployTable.update(appId, {
+    pendingVersion: tempVersion,
+    status: 1,
+  });
+
+  oldPendingVersion &&
+    (await db.subscriptionTable
+      .where('version')
+      .equals(oldPendingVersion)
+      .delete());
+
+  await db.subscriptionTable.add({
+    appId,
+    version: tempVersion,
+    status: 1,
+    subscriptionManifest: JSON.parse(Manifest),
+  });
+
+  currentVersion &&
+    (await db.attachmentTable.where('version').equals(currentVersion).delete());
+
+  if (additionalJSONFileList) {
+    await addAttachments(appId, tempVersion, additionalJSONFileList);
+  }
+
+  await db.appTable.update(appId, { status: 1 });
+};
+
 export const addSubscriptionGuest = async (
   params: CreateSubscriptionRequest
 ): Promise<boolean> => {
@@ -33,107 +135,33 @@ export const addSubscriptionGuest = async (
     }
 
     const tempVersion = generateUid();
+
     if (!deployItem.currentVersion) {
-      await db.transaction('rw', db.subscriptionTable, async () => {
-        await db.subscriptionTable.add({
-          appId,
-          version: tempVersion,
-          status: 1,
-          subscriptionManifest: JSON.parse(Manifest),
-        });
-      });
-
-      const tempFile = [];
-      if (additionalJSONFileList) {
-        for (const file of additionalJSONFileList) {
-          tempFile.push({
-            appId: appId,
-            version: tempVersion,
-            fileKey: file.uid,
-            fileName: file.name,
-            fileSize: file.size ?? 0,
-          });
-        }
-      }
-      await db.attachmentTable.bulkAdd(tempFile);
-
-      await db.appTable.update(appId, { status: 1 });
-      await db.deployTable.update(appId, {
-        currentVersion: tempVersion,
-        status: 1,
-      });
-    }
-    // step 1.2 if has current version, create a pending version
-    if (deployItem.currentVersion && !deployItem.pendingVersion) {
-      await db.subscriptionTable.add({
+      // 1 have no currentVersion
+      await handleNewSubscription(
         appId,
-        version: tempVersion,
-        status: 1,
-        subscriptionManifest: JSON.parse(Manifest),
-      });
-
-      const addAttachmentsWithTransaction = async (
-        JSONFileList: UploadFile[]
-      ) => {
-        await db.transaction('rw', db.attachmentTable, async () => {
-          for (const file of JSONFileList) {
-            await db.attachmentTable.add({
-              appId,
-              version: tempVersion,
-              fileKey: file.uid,
-              fileName: file.name,
-              fileSize: file.size || 0,
-            });
-          }
-        });
-      };
-      if (additionalJSONFileList?.length) {
-        // add attachments
-        addAttachmentsWithTransaction(additionalJSONFileList);
-      }
-
-      await db.appTable.update(appId, { status: 1 });
-      await db.deployTable.update(appId, {
-        pendingVersion: tempVersion,
-        status: 1,
-      });
-    }
-    // step 1.3 if has pending version, delete pending version, create a new pending version
-    if (deployItem.currentVersion && deployItem.pendingVersion) {
-      await db.deployTable.update(appId, {
-        pendingVersion: tempVersion,
-        status: 1,
-      });
-      await db.subscriptionTable
-        .where('version')
-        .equals(deployItem.pendingVersion)
-        .delete();
-
-      await db.subscriptionTable.add({
+        tempVersion,
+        Manifest,
+        additionalJSONFileList
+      );
+    } else if (!deployItem.pendingVersion) {
+      // 2 have currentVersion, have no  pendingVersion
+      await handlePendingVersion(
         appId,
-        version: tempVersion,
-        status: 1,
-        subscriptionManifest: JSON.parse(Manifest),
-      });
-
-      await db.attachmentTable
-        .where('version')
-        .equals(deployItem.currentVersion)
-        .delete();
-
-      if (additionalJSONFileList) {
-        for (const file of additionalJSONFileList) {
-          await db.attachmentTable.add({
-            appId,
-            version: tempVersion,
-            fileKey: file.uid,
-            fileName: file.name,
-            fileSize: file.size || 0,
-          });
-        }
-      }
-
-      await db.appTable.update(appId, { status: 1 });
+        tempVersion,
+        Manifest,
+        additionalJSONFileList
+      );
+    } else {
+      // 3 both: currentVersion, pendingVersion
+      await replacePendingVersion(
+        appId,
+        tempVersion,
+        Manifest,
+        additionalJSONFileList,
+        deployItem.currentVersion,
+        deployItem.pendingVersion
+      );
     }
 
     return true;
@@ -180,7 +208,6 @@ export const updateCodeGuest = async (
       .filter((id): id is number => id !== undefined);
 
     if (delAttachment.length > 0) {
-      console.log('delAttachment', '====>');
       await db.attachmentTable.bulkDelete(delAttachment);
     }
 

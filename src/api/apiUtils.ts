@@ -125,7 +125,6 @@ export const queryAuthApi = async (config: QueryAuthApiExtraRequest) => {
     );
     token_type = res.data.token_type;
     access_token = res.data.access_token;
-
     service.defaults.headers.common[
       'Authorization'
     ] = `${token_type} ${access_token}`;
@@ -136,6 +135,72 @@ export const queryAuthApi = async (config: QueryAuthApiExtraRequest) => {
     }
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'queryAuthApi error'));
+  }
+
+  return {
+    token_type,
+    access_token,
+  };
+};
+
+export type QueryWalletAuthExtra = {
+  timestamp: number;
+  signature?: string;
+  chain_id: string;
+  ca_hash?: string;
+  publickey: string;
+  address: string;
+  // use to set setLocalJWT
+  username?: string;
+};
+
+const queryWalletBaseConfig = {
+  grant_type: 'signature',
+  scope: 'AeFinder',
+  client_id: 'AeFinder_App',
+};
+export const queryWalletAuthLogin = async (config: QueryWalletAuthExtra) => {
+  const data = { ...queryWalletBaseConfig, ...config };
+  let token_type = '';
+  let access_token = '';
+  try {
+    const isGuest = sessionStorage.getItem('isGuest');
+    if (isGuest === 'true') {
+      token_type = 'Bearer';
+      access_token = 'Guest';
+      if (localStorage) {
+        setLocalJWT('LocalJWTData', {
+          token_type,
+          access_token,
+          expires_in: 3600,
+          username: 'Guest',
+        });
+      }
+      return {
+        token_type,
+        access_token,
+      };
+    }
+    const res = await axios.post<JWTData>(
+      `${AeFinderAuthHost}/connect/token`,
+      queryString.stringify(data),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      }
+    );
+    token_type = res.data?.token_type;
+    access_token = res.data?.access_token;
+
+    service.defaults.headers.common[
+      'Authorization'
+    ] = `${token_type} ${access_token}`;
+    myEvents.AuthTokenSuccess.emit();
+
+    if (localStorage) {
+      setLocalJWT('LocalJWTData', { ...res.data, username: config?.username });
+    }
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'queryWalletAuthLogin error'));
   }
 
   return {

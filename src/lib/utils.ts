@@ -1,8 +1,14 @@
+'use client';
+
 import { message } from 'antd';
+import BN, { isBN } from 'bn.js';
 import clsx, { ClassValue } from 'clsx';
 import pako from 'pako';
 import { DependencyList, useCallback, useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
+
+import { ChainIdType } from '@/types/appType';
+import { ExploreUrlType } from '@/types/loginType';
 
 /** Merge classes with tailwind-merge with clsx full feature */
 export function cn(...inputs: ClassValue[]) {
@@ -143,7 +149,13 @@ export const readAndCompressFile = async (file: File): Promise<Blob> => {
         reject(new Error('Is not a string'));
       }
     };
-    reader.onerror = (error) => reject(error);
+    reader.onerror = () => {
+      reject(
+        new Error(
+          reader.error?.message ?? 'An error occurred while reading the file.'
+        )
+      );
+    };
     reader.readAsText(file);
   });
 
@@ -175,3 +187,76 @@ export const generateDataArray = () => {
 
   return dataArray;
 };
+
+export function convertChainId(chainId: ChainIdType) {
+  switch (chainId) {
+    case 'AELF':
+      return 'aelf MainChain';
+    case 'tDVV':
+    case 'tDVW':
+      return 'aelf dAppChain';
+    default:
+      return chainId;
+  }
+}
+
+/**
+ * amount display as role: preLen...endLen
+ * @param str amount value
+ * @param preLen preLen
+ * @param endLen endLen
+ * @returns amount value string
+ */
+export const getOmittedStr = (
+  str: string,
+  preLen?: number,
+  endLen?: number
+) => {
+  if (!str || typeof str !== 'string') {
+    return str;
+  }
+  if (typeof preLen !== 'number' || typeof endLen !== 'number') {
+    return str;
+  }
+  if (str.length <= preLen + endLen) {
+    return str;
+  }
+  if (preLen === 0 || endLen === 0) {
+    return str;
+  }
+  return `${str.slice(0, preLen)}...${str.slice(-endLen)}`;
+};
+
+export function openWithBlank(url: string): void {
+  const newWindow = window.open(url, '_blank');
+  if (newWindow) {
+    newWindow.opener = null;
+  }
+}
+
+export function getOtherExploreLink(
+  data: string,
+  network: keyof typeof ExploreUrlType,
+  type: 'transaction' | 'address'
+): string {
+  const prefix = ExploreUrlType[network] || 'https://explorer.aelf.io';
+  switch (type) {
+    case 'transaction': {
+      if (network === 'TRX') {
+        return `${prefix}/#/transaction/${data}`;
+      }
+      return `${prefix}/tx/${data}`;
+    }
+    case 'address':
+    default: {
+      if (network === 'TRX') {
+        return `${prefix}/#/address/${data}`;
+      }
+      return `${prefix}/address/${data}`;
+    }
+  }
+}
+
+export function zeroFill(str: string | BN) {
+  return isBN(str) ? str.toString(16, 64) : str.padStart(64, '0');
+}

@@ -13,3 +13,5 @@ declare module 'query-string';
 declare module 'react-copy-to-clipboard';
 declare module 'qs';
 declare module 'pako';
+declare module 'opentelemetry-launcher';
+declare module 'aelf-sdk';
