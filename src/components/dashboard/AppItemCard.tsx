@@ -61,7 +61,7 @@ export default function AppItemCard({ appList }: AppItemProps) {
     (appId: string) => {
       // currentTourStep change to DeployAeIndexer
       handleListCloseTour();
-      router.push(`/apps/${appId}`);
+      router.push(`/apps?appId=${appId}`);
     },
     [handleListCloseTour, router]
   );
