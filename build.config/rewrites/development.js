@@ -1,4 +1,4 @@
-const { NEXT_PUBLIC_NETWORK_KEY } = process.env;
+const NEXT_PUBLIC_NETWORK_KEY = process.env.NEXT_PUBLIC_NETWORK_KEY;
 
 // devnet | localnet
 let AeFinderHost = 'http://192.168.71.128:8081';
@@ -6,8 +6,8 @@ let AeFinderAuthHost = 'http://192.168.71.128:8082';
 
 // testnet
 if (NEXT_PUBLIC_NETWORK_KEY === 'testnet') {
-  AeFinderHost = 'https://gcptest-indexer-api.aefinder.io';
-  AeFinderAuthHost = 'https://gcptest-indexer-auth.aefinder.io';
+  AeFinderHost = 'https://test-indexer-api.aefinder.io';
+  AeFinderAuthHost = 'https://test-indexer-auth.aefinder.io';
 }
 
 module.exports = [
