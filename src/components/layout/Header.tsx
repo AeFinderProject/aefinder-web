@@ -9,6 +9,7 @@ import { DownOutlined, LoadingOutlined, UpOutlined } from '@ant-design/icons';
 import { message } from 'antd';
 import clsx from 'clsx';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -195,6 +196,18 @@ export default function Header() {
           <PrimaryLink href='/dashboard' className='hidden sm:inline-block'>
             My Dashboard
           </PrimaryLink>
+          <Link
+            href='/dashboard/billing'
+            className='text-dark-primaryText ml-[40px] hidden sm:inline-block'
+          >
+            Billing
+          </Link>
+          <Link
+            href='/dashboard/apikey'
+            className='text-dark-primaryText ml-[40px] hidden sm:inline-block'
+          >
+            APIKeys
+          </Link>
           <UnstyledLink
             href='https://docs.aefinder.io'
             className='mx-[40px] hidden sm:inline-block'
