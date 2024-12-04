@@ -11,10 +11,10 @@ export default function Footer() {
           Copyright © 2024 AeFinder
         </div>
         <div className='flex justify-between'>
-          <UnstyledLink href='https://t.me/aefinder_assistant'>
+          <UnstyledLink href='https://form.aefinder.io/contact'>
             <Image
-              src='/assets/svg/telegram.svg'
-              alt='telegram'
+              src='/assets/svg/contact.svg'
+              alt='contact'
               width={24}
               height={24}
               className='mr-[22px]'

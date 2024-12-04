@@ -203,7 +203,7 @@ export default function HeaderHandle({
         <Button
           type='text'
           size='small'
-          className='bg-gray-D6 relative top-1 h-[32px]'
+          className='bg-gray-D6 relative top-[-2px] h-[32px]'
         >
           UnDeployed
         </Button>
