@@ -14,9 +14,8 @@ export const OpentelemetryContext = createContext<Tracer | undefined>(
 );
 
 export const OpentelemetryProvider = ({ children }: Props) => {
-  const { NEXT_PUBLIC_NETWORK_KEY } = process.env;
-  const isMainNet = NEXT_PUBLIC_NETWORK_KEY === 'mainnet';
-  const prefix = isMainNet ? 'mainnet' : 'testnet';
+  const network = process.env.NEXT_PUBLIC_NETWORK_KEY ?? 'testnet';
+  const prefix = network === 'mainnet' ? 'mainnet' : 'testnet';
   const [webTracerWithZone, setWebTracerWithZone] = useState<Tracer>();
   const APP_SETTINGS = useMemo(() => {
     return {
