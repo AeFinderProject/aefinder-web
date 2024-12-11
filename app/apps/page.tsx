@@ -12,6 +12,7 @@ import HeaderHandle from '@/components/appDetail/HeaderHandle';
 import Logs from '@/components/appDetail/Logs';
 import Manifest from '@/components/appDetail/Manifest';
 import Playground from '@/components/appDetail/Playground';
+import Capacity from '@/components/appDetail/Capacity';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
@@ -187,6 +188,11 @@ export default function AppDetail() {
               key: 'manifest',
               label: 'Manifest',
               children: <Manifest />,
+            },
+            {
+              key: 'capacity',
+              label: 'Capacity',
+              children: <Capacity />,
             },
           ]}
         />

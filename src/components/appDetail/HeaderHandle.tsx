@@ -1,6 +1,6 @@
-import { EditOutlined, SyncOutlined } from '@ant-design/icons';
-import type { GetRef, TourProps } from 'antd';
-import { Button, Select, Tour } from 'antd';
+import { EditOutlined, MoreOutlined, SyncOutlined } from '@ant-design/icons';
+import type { GetRef, MenuProps, TourProps } from 'antd';
+import { Button, Dropdown, Select, Tour } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
 import Image from 'next/image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -56,6 +56,13 @@ export default function HeaderHandle({
       style: {
         width: '320px',
       },
+    },
+  ];
+
+  const dropdownItems: MenuProps['items'] = [
+    {
+      key: '1',
+      label: <Button className='text-danger-normal'>Delete AeIndexer</Button>,
     },
   ];
 
@@ -123,6 +130,28 @@ export default function HeaderHandle({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTourStep]);
 
+  const handleDeleteAeIndexer = useCallback(() => {
+    // todo: delete AeIndexer
+    // delete -> Modal confirm -> route.replace('/dashboard')
+    messageApi.open({
+      type: 'warning',
+      content: 'Are you sure you want to delete this AeIndexer?',
+      duration: 3,
+      onClose: () => {
+        messageApi.open({
+          type: 'error',
+          content: 'This AeIndexer has been deleted.',
+          duration: 3,
+        });
+      },
+    });
+  }, [messageApi]);
+
+  const handleDeletePendingPod = useCallback(() => {
+    // todo: delete PendingPod
+    console.log('delete PendingPod');
+  }, []);
+
   return (
     <div className='border-gray-F0 flex h-[130px] items-center justify-between border-b pt-[14px]'>
       <div>
@@ -166,6 +195,18 @@ export default function HeaderHandle({
           >
             Deploy...
           </Button>
+          <Dropdown
+            menu={{ items: dropdownItems }}
+            trigger={['click']}
+            className='ml-3'
+          >
+            <Button
+              className='text-blue-link border-blue-link'
+              onClick={handleDeleteAeIndexer}
+            >
+              <MoreOutlined className='relative top-[-2px]' />
+            </Button>
+          </Dropdown>
         </div>
       </div>
       {currentAppDetail.status === AppStatusType.Deployed && (
@@ -180,7 +221,18 @@ export default function HeaderHandle({
             </Select.Option>
             {currentAppDetail?.versions?.pendingVersion && (
               <Select.Option value={currentAppDetail?.versions?.pendingVersion}>
-                {currentAppDetail?.versions?.pendingVersion}
+                <div className='relative w-full truncate pr-[22px]'>
+                  {currentAppDetail?.versions?.pendingVersion}
+                  <span className='absolute right-[-4px] top-[-2px] cursor-pointer p-[2px] hover:bg-gray-100'>
+                    <Image
+                      src='/assets/svg/delete.svg'
+                      alt='delete'
+                      width={22}
+                      height={22}
+                      onClick={handleDeletePendingPod}
+                    />
+                  </span>
+                </div>
               </Select.Option>
             )}
           </Select>

@@ -101,7 +101,7 @@ export default function LogIn() {
           <Form form={form} layout='vertical' onFinish={() => handleLogin()}>
             <FormItem
               name='username'
-              label='Username'
+              label='User name or email'
               rules={[
                 { required: true, message: 'Please input your username!' },
               ]}
@@ -133,7 +133,7 @@ export default function LogIn() {
             </FormItem>
             <Divider style={{ color: '#808080', fontSize: '12px' }}>OR</Divider>
             <FormItem>
-              <LogInButton className='mx-auto mb-[16px] h-[48px] w-full md:mr-[2%] md:w-[48%]' />
+              <LogInButton className='mx-auto h-[48px] w-full md:mr-[2%] md:w-[48%]' />
               <Button
                 className='mx-auto h-[48px] w-full md:w-[48%]'
                 onClick={handleGuestLogin}
@@ -142,6 +142,16 @@ export default function LogIn() {
                 Continue as Guest
               </Button>
             </FormItem>
+            <div className='mb-[16px]'>
+              Don’t have an account yet?
+              <span
+                className='text-blue-link cursor-pointer font-medium'
+                onClick={() => router.push('/login/signup')}
+              >
+                {' '}
+                Sign up
+              </span>
+            </div>
           </Form>
         </div>
       </div>
