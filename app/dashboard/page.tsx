@@ -1,7 +1,8 @@
 'use client';
-import { PlusOutlined } from '@ant-design/icons';
+
+import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import type { GetRef, TourProps } from 'antd';
-import { Button, message, Tour } from 'antd';
+import { Button, message, Tag, Tooltip, Tour } from 'antd';
 import Image from 'next/image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -121,26 +122,93 @@ export default function Dashboard() {
       {contextHolder}
       <Seo templateTitle='Dashboard' />
       <div className='px-[16px] sm:px-[40px]'>
-        <div className='border-gray-F0 flex h-[140px] items-center justify-between border-b'>
+        <div className='flex h-[120px] items-center justify-between'>
           <div>
             <div className='text-3xl text-black'>My Dashboard</div>
-            <div className='text-gray-80 relative top-6'>
-              ALL ({appList.length})
+          </div>
+          <div>
+            <Button
+              type='primary'
+              icon={<PlusOutlined className='relative top-[-3px]' />}
+              onClick={() => {
+                handleCreateCloseTour();
+                setCreateAppDrawerVisible(true);
+              }}
+              className='h-[40px] w-[160px] text-sm'
+              ref={createRef}
+            >
+              Create AeIndexer
+            </Button>
+            <Button
+              type='primary'
+              onClick={() => {
+                console.log('Upgrade Plan click');
+              }}
+              className='ml-[40px] h-[40px] w-[148px] text-sm'
+            >
+              <Image
+                src='/assets/svg/shopping-cart.svg'
+                alt='shopping'
+                width={14}
+                height={14}
+                className='mr-2 inline-block'
+              />
+              Upgrade Plan
+            </Button>
+          </div>
+        </div>
+        <div className='border-gray-E0 mb-[31px] flex h-[98px] items-center justify-between rounded-lg border p-[24px]'>
+          <Tag color='#9DCBFF'>Free Trial</Tag>
+          <div className='flex flex-col items-start'>
+            <div className='text-gray-80 text-base'>
+              Queries made
+              <Tooltip
+                title='prompt text todo'
+                className='relative top-[-3px] ml-[4px]'
+              >
+                <InfoCircleOutlined />
+              </Tooltip>
+            </div>
+            <div className='text-dark-normal mt-[2px] text-base font-medium'>
+              0/100,000
             </div>
           </div>
-          <Button
-            type='primary'
-            icon={<PlusOutlined />}
-            onClick={() => {
-              handleCreateCloseTour();
-              setCreateAppDrawerVisible(true);
-            }}
-            className='h-[40px] w-[160px] text-sm'
-            ref={createRef}
-          >
-            Create AeIndexer
-          </Button>
+          <div className='flex flex-col items-start'>
+            <div className='text-gray-80 text-base'>
+              Renews in
+              <Tooltip
+                title='prompt text todo'
+                className='relative top-[-3px] ml-[4px]'
+              >
+                <InfoCircleOutlined />
+              </Tooltip>
+            </div>
+            <div className='text-dark-normal mt-[2px] text-base font-medium'>
+              24 Days
+            </div>
+          </div>
+          <div className='flex flex-col items-start'>
+            <div className='text-gray-80 text-base'>
+              API Keys
+              <Tooltip
+                title='prompt text todo'
+                className='relative top-[-3px] ml-[4px]'
+              >
+                <InfoCircleOutlined />
+              </Tooltip>
+            </div>
+            <div className='text-dark-normal mt-[2px] text-base font-medium'>
+              0
+            </div>
+          </div>
+          <div></div>
         </div>
+      </div>
+      <div className='px-[40px]'>
+        <div className='border-gray-70 border-b'></div>
+      </div>
+      <div className='text-gray-80 ml-[40px] mt-[31px]'>
+        My AeIndexer ({appList.length})
       </div>
       {appList.length === 0 && (
         <div className='flex min-h-[450px] w-full flex-col items-center justify-center'>

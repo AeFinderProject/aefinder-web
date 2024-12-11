@@ -28,6 +28,11 @@ export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
               label='Created'
               content={dayjs(currentAppDetail?.createTime).format('YYYY-MM-DD')}
             />
+            <Copy
+              className='ml-[32px]'
+              label='AeIndexer capacity'
+              content='Large'
+            />
           </div>
           {currentAppDetail?.description && (
             <Copy

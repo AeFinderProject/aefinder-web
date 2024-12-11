@@ -260,3 +260,15 @@ export function getOtherExploreLink(
 export function zeroFill(str: string | BN) {
   return isBN(str) ? str.toString(16, 64) : str.padStart(64, '0');
 }
+
+export function objectToQueryString(params: object) {
+  return Object.entries(params)
+    .filter(
+      ([, value]) => value !== undefined && value !== null && value !== ''
+    )
+    .map(
+      ([key, value]) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+    )
+    .join('&');
+}

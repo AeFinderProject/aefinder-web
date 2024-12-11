@@ -9,6 +9,7 @@ import { DownOutlined, LoadingOutlined, UpOutlined } from '@ant-design/icons';
 import { message } from 'antd';
 import clsx from 'clsx';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -35,6 +36,8 @@ export default function Header() {
   const { username } = useAppSelector((state) => state.common);
   const [address, setAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const isLoginPathname = pathname === '/login' || pathname === '/login/signup';
+
   const {
     disConnectWallet,
     connectWallet,
@@ -54,14 +57,14 @@ export default function Header() {
   isConnectedRef.current = isConnected;
 
   const getUsersInfoTemp = useCallback(async () => {
-    if (pathname !== '/' && pathname !== '/login') {
+    if (pathname !== '/' && !isLoginPathname) {
       const res = await getUsersInfo();
       if (res?.walletAddress) {
         setAddress(res?.walletAddress);
       }
       dispatch(setUsername(res?.userName));
     }
-  }, [dispatch, pathname]);
+  }, [dispatch, pathname, isLoginPathname]);
 
   useEffect(() => {
     getUsersInfoTemp();
@@ -185,22 +188,52 @@ export default function Header() {
         className='cursor-pointer'
         style={{ width: '150px', height: '24px' }}
       />
-      {pathname === '/login' && (
+      {isLoginPathname && (
         <div>
           <LogInButton className='mx-auto h-[40px] w-[160px] md:w-[170px]' />
         </div>
       )}
-      {pathname !== '/login' && pathname !== '/' && (
+      {!isLoginPathname && pathname !== '/' && (
         <div>
-          <PrimaryLink href='/dashboard' className='hidden sm:inline-block'>
+          <Link
+            href='/dashboard'
+            className={clsx(
+              'hidden sm:inline-block',
+              pathname === '/dashboard'
+                ? 'text-blue-link'
+                : 'text-dark-primaryText'
+            )}
+          >
             My Dashboard
-          </PrimaryLink>
-          <UnstyledLink
+          </Link>
+          <Link
+            href='/dashboard/billing'
+            className={clsx(
+              'ml-[40px] hidden sm:inline-block',
+              pathname?.startsWith('/dashboard/billing')
+                ? 'text-blue-link'
+                : 'text-dark-primaryText'
+            )}
+          >
+            Billing
+          </Link>
+          <Link
+            href='/dashboard/apikey'
+            className={clsx(
+              'ml-[40px] hidden sm:inline-block',
+              pathname?.startsWith('/dashboard/apikey')
+                ? 'text-blue-link'
+                : 'text-dark-primaryText'
+            )}
+          >
+            APIKeys
+          </Link>
+          <Link
             href='https://docs.aefinder.io'
-            className='mx-[40px] hidden sm:inline-block'
+            className='text-dark-primaryText mx-[40px] hidden sm:inline-block'
           >
             Docs
-          </UnstyledLink>
+          </Link>
           <div
             className='border-gray-E0 relative inline-block min-h-10 min-w-[240px] cursor-pointer rounded border pl-[20px] pr-[30px] text-center leading-[40px]'
             onClick={() => {

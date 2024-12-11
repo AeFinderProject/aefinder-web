@@ -86,6 +86,59 @@ export const SubscriptionsApiList = {
   getSubscriptionsAttachments: `${AeFinderHost}/api/apps/subscriptions/attachments`,
 };
 
+export const apiKeyList = {
+  getSummary: `${AeFinderHost}/api/api-keys/summary`,
+  getSnapshots: `${AeFinderHost}/api/api-keys/summary-snapshots`,
+  addApiKey: {
+    target: `${AeFinderHost}/api/api-keys`,
+    baseConfig: { method: 'POST' },
+  },
+  getApiKeysList: `${AeFinderHost}/api/api-keys`,
+  getApiKeyDetail: `${AeFinderHost}/api/api-keys`,
+  getApiKeySnapshot: `${AeFinderHost}/api/api-keys`,
+  getAeIndexers: `${AeFinderHost}/api/api-keys`,
+  getAeIndexerSnapshots: `${AeFinderHost}/api/api-keys`,
+  getAPI: `${AeFinderHost}/api/api-keys`,
+  getAPISnapshots: `${AeFinderHost}/api/api-keys`,
+  renameApiKey: {
+    target: `${AeFinderHost}/api/api-keys`,
+    baseConfig: { method: 'PUT' },
+  },
+  regenerateApiKey: {
+    target: `${AeFinderHost}/api/api-keys`,
+    baseConfig: { method: 'POST' },
+  },
+  deleteApiKey: {
+    target: `${AeFinderHost}/api/api-keys`,
+    baseConfig: { method: 'DELETE' },
+  },
+  setSpendingLimit: {
+    target: `${AeFinderHost}/api/api-keys`,
+    baseConfig: { method: 'PUT' },
+  },
+  addAuthorisedAeIndexer: {
+    target: `${AeFinderHost}/api/api-keys`,
+    baseConfig: { method: 'PUT' },
+  },
+  deleteAuthorisedAeIndexer: {
+    target: `${AeFinderHost}/api/api-keys`,
+    baseConfig: { method: 'DELETE' },
+  },
+  addAuthorisedDomain: {
+    target: `${AeFinderHost}/api/api-keys`,
+    baseConfig: { method: 'PUT' },
+  },
+  deleteAuthorisedDomain: {
+    target: `${AeFinderHost}/api/api-keys`,
+    baseConfig: { method: 'DELETE' },
+  },
+  setAuthorisedApis: {
+    target: `${AeFinderHost}/api/api-keys`,
+    baseConfig: { method: 'PUT' },
+  },
+  getAeIndexerMyList: `${AeFinderHost}/api/apps/search?keyword=aaaa`,
+};
+
 /**
  * api request extension configuration directory
  * @description object.key // The type of this object key comes from from @type {UrlObj}
@@ -94,6 +147,7 @@ export const EXPAND_APIS = {
   auth: AuthList,
   app: appApiList,
   subscription: SubscriptionsApiList,
+  apikey: apiKeyList,
 };
 
 export type EXPAND_REQ_TYPES = {

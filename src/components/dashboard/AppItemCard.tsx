@@ -67,7 +67,7 @@ export default function AppItemCard({ appList }: AppItemProps) {
   );
 
   return (
-    <div className='px-[16px] pb-[30px] sm:px-[40px] sm:py-[24px]'>
+    <div className='px-[16px] pb-[30px] sm:px-[40px] sm:pb-[24px] sm:pt-[14px]'>
       <Row gutter={24}>
         {appList.map((item, index) => (
           <Col
