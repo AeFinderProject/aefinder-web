@@ -29,7 +29,7 @@ import {
   setAuthorisedApis,
 } from '@/api/requestAPIKeys';
 
-import { ApiItem, ApiType, AuthorisedAeIndexers } from '@/types/apikeyType';
+import { ApiType, AuthorisedAeIndexers } from '@/types/apikeyType';
 
 const Option = Select.Option;
 
@@ -51,9 +51,7 @@ export default function Security() {
   >([]);
 
   const apikeyDetail = useAppSelector((state) => state.app.apikeyDetail);
-
-  const defaultAPIList = useAppSelector((state) => state.app.defaultAPIList);
-  console.log(apikeyDetail);
+  console.log('apikeyDetail', apikeyDetail);
 
   const getApiKeyDetailTemp = useCallback(async () => {
     if (!id) {
@@ -129,12 +127,12 @@ export default function Security() {
         tempAipArray.splice(index, 1);
       }
       console.log('tempAipArray', tempAipArray);
-      console.log('defaultAPIList', defaultAPIList);
-      defaultAPIList.forEach((item) => {
+      const tempList = [0, 1, 2];
+      tempList.forEach((item) => {
         if (
-          tempAipArray.findIndex((currentItem) => currentItem === item.api) > -1
+          tempAipArray.findIndex((currentItem) => currentItem === item) > -1
         ) {
-          apis[item.api] = true;
+          apis[item] = true;
         }
       });
       console.log('apis', apis);
@@ -155,7 +153,6 @@ export default function Security() {
       getApiKeyDetailTemp,
       apikeyDetail?.id,
       apikeyDetail?.authorisedApis,
-      defaultAPIList,
     ]
   );
 
@@ -242,11 +239,10 @@ export default function Security() {
       1: false,
       2: false,
     };
-    defaultAPIList.forEach((item) => {
-      if (
-        currentApi.findIndex((currentItem) => currentItem === item.api) > -1
-      ) {
-        apis[item.api] = true;
+    const tempList = [0, 1, 2];
+    tempList.forEach((item) => {
+      if (currentApi.findIndex((currentItem) => currentItem === item) > -1) {
+        apis[item] = true;
       }
     });
     console.log('apis', apis);
@@ -257,17 +253,12 @@ export default function Security() {
     if (res) {
       messageApi.success('Authorise API successfully');
       setTimeout(() => {
+        setCurrentApi([]);
         setIsShowEditAPIModal(false);
         getApiKeyDetailTemp();
       }, 1000);
     }
-  }, [
-    messageApi,
-    getApiKeyDetailTemp,
-    apikeyDetail?.id,
-    currentApi,
-    defaultAPIList,
-  ]);
+  }, [messageApi, getApiKeyDetailTemp, apikeyDetail?.id, currentApi]);
 
   const onCheckBoxChange: GetProp<typeof Checkbox.Group, 'onChange'> = (
     checkedValues
@@ -571,13 +562,15 @@ export default function Security() {
             onChange={onCheckBoxChange}
           >
             <Row>
-              {defaultAPIList?.map((item: ApiItem) => {
-                return (
-                  <Col span={24} key={item.api}>
-                    <Checkbox value={item.api}>{ApiType[item.api]}</Checkbox>
-                  </Col>
-                );
-              })}
+              <Col span={24} key={0}>
+                <Checkbox value={0}>{ApiType[0]}</Checkbox>
+              </Col>
+              <Col span={24} key={1}>
+                <Checkbox value={1}>{ApiType[1]}</Checkbox>
+              </Col>
+              <Col span={24} key={2}>
+                <Checkbox value={2}>{ApiType[2]}</Checkbox>
+              </Col>
             </Row>
           </Checkbox.Group>
         </div>
@@ -590,7 +583,6 @@ export default function Security() {
             size='large'
             type='primary'
             onClick={handleAuthAPI}
-            disabled={defaultAPIList.length === 0}
           >
             Confirm
           </Button>
