@@ -136,7 +136,7 @@ export const apiKeyList = {
     target: `${AeFinderHost}/api/api-keys`,
     baseConfig: { method: 'PUT' },
   },
-  getAeIndexerMyList: `${AeFinderHost}/api/apps/search?keyword=aaaa`,
+  getAeIndexerMyList: `${AeFinderHost}/api/apps/search`,
 };
 
 /**

@@ -12,7 +12,9 @@ import {
 } from 'antd';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
+import { useDebounceCallback } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setApikeyDetail } from '@/store/slices/appSlice';
@@ -22,16 +24,12 @@ import {
   addAuthorisedDomain,
   deleteAuthorisedAeIndexer,
   deleteAuthorisedDomain,
+  getAeIndexerMyList,
   getApiKeyDetail,
   setAuthorisedApis,
 } from '@/api/requestAPIKeys';
 
-import {
-  AeIndexersItem,
-  ApiItem,
-  ApiType,
-  AuthorisedAeIndexers,
-} from '@/types/apikeyType';
+import { ApiItem, ApiType, AuthorisedAeIndexers } from '@/types/apikeyType';
 
 const Option = Select.Option;
 
@@ -48,14 +46,14 @@ export default function Security() {
   const [currentAppId, setCurrentAppId] = useState(null);
   const [currentDomain, setCurrentDomain] = useState<string>('');
   const [currentApi, setCurrentApi] = useState<(0 | 1 | 2)[]>([]);
+  const [currentMyAeindexersList, setCurrentMyAeindexersList] = useState<
+    AuthorisedAeIndexers[]
+  >([]);
 
   const apikeyDetail = useAppSelector((state) => state.app.apikeyDetail);
-  const defaultAeindexersList = useAppSelector(
-    (state) => state.app.defaultAeindexersList
-  );
+
   const defaultAPIList = useAppSelector((state) => state.app.defaultAPIList);
   console.log(apikeyDetail);
-  console.log('defaultAeindexersList', defaultAeindexersList);
 
   const getApiKeyDetailTemp = useCallback(async () => {
     if (!id) {
@@ -65,6 +63,25 @@ export default function Security() {
     console.log('res', res);
     dispatch(setApikeyDetail(res));
   }, [dispatch, id]);
+
+  const getCurrentMyAeindexersListTemp = useCallback(
+    async (keyword: string) => {
+      const { items } = await getAeIndexerMyList({ keyword });
+      setCurrentMyAeindexersList(items);
+    },
+    []
+  );
+
+  useEffect(() => {
+    getCurrentMyAeindexersListTemp('');
+  }, [getCurrentMyAeindexersListTemp, isShowAddAeIndexerModal]);
+
+  const handleAeIndexerSearch = useDebounceCallback(
+    (keyword: string) => {
+      getCurrentMyAeindexersListTemp(keyword);
+    },
+    [getCurrentMyAeindexersListTemp]
+  );
 
   const handleDeleteAeIndexer = useCallback(
     async (appId: string) => {
@@ -76,7 +93,7 @@ export default function Security() {
         messageApi.success('Delete Authorise AeIndexers successfully');
         setTimeout(() => {
           getApiKeyDetailTemp();
-        }, 500);
+        }, 1000);
       }
     },
     [messageApi, getApiKeyDetailTemp, apikeyDetail?.id]
@@ -92,7 +109,7 @@ export default function Security() {
         messageApi.success('Delete Authorise Domain successfully');
         setTimeout(() => {
           getApiKeyDetailTemp();
-        }, 500);
+        }, 1000);
       }
     },
     [messageApi, getApiKeyDetailTemp, apikeyDetail?.id]
@@ -472,8 +489,10 @@ export default function Security() {
           value={currentAppId}
           onChange={(value) => setCurrentAppId(value)}
           placeholder='Select Authorised AeIndexers'
+          showSearch
+          onSearch={(value) => handleAeIndexerSearch(value)}
         >
-          {defaultAeindexersList?.map((item: AeIndexersItem) => {
+          {currentMyAeindexersList?.map((item: AuthorisedAeIndexers) => {
             return (
               <Option key={item.appId} value={item.appId}>
                 {item.appName}

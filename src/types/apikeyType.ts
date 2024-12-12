@@ -154,3 +154,7 @@ export type SetAuthorisedApisRequest = {
 export type GetAeIndexerMyListRequest = {
   keyword: string;
 };
+
+export type GetAeIndexerMyListResponse = {
+  items: AuthorisedAeIndexers[];
+};
