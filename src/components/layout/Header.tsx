@@ -36,7 +36,10 @@ export default function Header() {
   const { username } = useAppSelector((state) => state.common);
   const [address, setAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const isLoginPathname = pathname === '/login' || pathname === '/login/signup';
+  const isLoginPathname =
+    pathname === '/login' ||
+    pathname === '/login/signup' ||
+    pathname === '/login/emailcheck';
 
   const {
     disConnectWallet,

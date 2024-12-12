@@ -470,7 +470,9 @@ export default function Security() {
         destroyOnClose
         footer={false}
       >
-        <div className='text-gray-80 mb-[4px] mt-[24px] text-xs'>Test</div>
+        <div className='text-gray-80 mb-[4px] mt-[24px] text-xs'>
+          {apikeyDetail?.name}
+        </div>
         <div className='text-dark-normal mb-[24px] font-medium'>
           Authorise AeIndexers
         </div>
@@ -513,7 +515,9 @@ export default function Security() {
         destroyOnClose
         footer={false}
       >
-        <div className='text-gray-80 mb-[4px] mt-[24px] text-xs'>Test</div>
+        <div className='text-gray-80 mb-[4px] mt-[24px] text-xs'>
+          {apikeyDetail?.name}
+        </div>
         <div className='text-dark-normal mb-[24px] font-medium'>
           Authorise Domain
         </div>
