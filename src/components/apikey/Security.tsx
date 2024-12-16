@@ -39,6 +39,7 @@ export default function Security() {
   const id = searchParams.get('id');
   const [messageApi, contextHolder] = message.useMessage();
 
+  const [loading, setLoading] = useState(false);
   const [isShowAddAeIndexerModal, setIsShowAddAeIndexerModal] = useState(false);
   const [isShowAddDomainModal, setIsShowAddDomainModal] = useState(false);
   const [isShowEditAPIModal, setIsShowEditAPIModal] = useState(false);
@@ -159,12 +160,13 @@ export default function Security() {
   const handleCancel = useCallback(() => {
     setCurrentAppId(null);
     setCurrentDomain('');
+    setLoading(false);
     setIsShowAddAeIndexerModal(false);
     setIsShowAddDomainModal(false);
     setIsShowEditAPIModal(false);
   }, []);
 
-  const handleAuthAeIndexers = useCallback(async () => {
+  const handleAuthAeIndexers = useDebounceCallback(async () => {
     // step 1 check value, step2 check if copy, step3 addAuthorisedAeIndexer
     if (!currentAppId) {
       messageApi.info('Please select AeIndexers!');
@@ -178,17 +180,22 @@ export default function Security() {
       messageApi.warning('This AeIndexers had been added');
       return;
     }
-    const res = await addAuthorisedAeIndexer({
-      id: apikeyDetail?.id,
-      appIds: [currentAppId],
-    });
-    if (res) {
-      messageApi.success('Authorise AeIndexers successfully');
-      setTimeout(() => {
-        setIsShowAddAeIndexerModal(false);
-        setCurrentAppId(null);
-        getApiKeyDetailTemp();
-      }, 1000);
+    try {
+      setLoading(true);
+      const res = await addAuthorisedAeIndexer({
+        id: apikeyDetail?.id,
+        appIds: [currentAppId],
+      });
+      if (res) {
+        messageApi.success('Authorise AeIndexers successfully');
+        setTimeout(() => {
+          setIsShowAddAeIndexerModal(false);
+          setCurrentAppId(null);
+          getApiKeyDetailTemp();
+        }, 1000);
+      }
+    } finally {
+      setLoading(false);
     }
   }, [
     messageApi,
@@ -198,7 +205,7 @@ export default function Security() {
     apikeyDetail?.authorisedAeIndexers,
   ]);
 
-  const handleAuthDomain = useCallback(async () => {
+  const handleAuthDomain = useDebounceCallback(async () => {
     const urlPattern =
       /^((https?:\/\/)?(\*\.|[\w.-]+\.)+)([a-z]{2,6})(\/[\w.-]*)*\/?$/i;
     const isValidUrl = urlPattern.test(currentDomain);
@@ -212,17 +219,22 @@ export default function Security() {
       messageApi.warning('This domain had been added');
       return;
     }
-    const res = await addAuthorisedDomain({
-      id: apikeyDetail?.id,
-      domains: [currentDomain],
-    });
-    if (res) {
-      messageApi.success('Authorise Domain successfully');
-      setTimeout(() => {
-        setIsShowAddDomainModal(false);
-        setCurrentDomain('');
-        getApiKeyDetailTemp();
-      }, 1000);
+    try {
+      setLoading(true);
+      const res = await addAuthorisedDomain({
+        id: apikeyDetail?.id,
+        domains: [currentDomain],
+      });
+      if (res) {
+        messageApi.success('Authorise Domain successfully');
+        setTimeout(() => {
+          setIsShowAddDomainModal(false);
+          setCurrentDomain('');
+          getApiKeyDetailTemp();
+        }, 1000);
+      }
+    } finally {
+      setLoading(false);
     }
   }, [
     messageApi,
@@ -232,12 +244,12 @@ export default function Security() {
     apikeyDetail?.authorisedDomains,
   ]);
 
-  const handleAuthAPI = useCallback(async () => {
+  const handleAuthAPI = useDebounceCallback(async () => {
     // pre apis obj
     const apis: { [key: number]: boolean } = {
-      0: false,
-      1: false,
-      2: false,
+      0: apikeyDetail?.authorisedApis.findIndex((item) => item === 0) > -1,
+      1: apikeyDetail?.authorisedApis.findIndex((item) => item === 1) > -1,
+      2: apikeyDetail?.authorisedApis.findIndex((item) => item === 2) > -1,
     };
     const tempList = [0, 1, 2];
     tempList.forEach((item) => {
@@ -246,17 +258,22 @@ export default function Security() {
       }
     });
     console.log('apis', apis);
-    const res = await setAuthorisedApis({
-      id: apikeyDetail?.id,
-      apis: apis,
-    });
-    if (res) {
-      messageApi.success('Authorise API successfully');
-      setTimeout(() => {
-        setCurrentApi([]);
-        setIsShowEditAPIModal(false);
-        getApiKeyDetailTemp();
-      }, 1000);
+    try {
+      setLoading(true);
+      const res = await setAuthorisedApis({
+        id: apikeyDetail?.id,
+        apis: apis,
+      });
+      if (res) {
+        messageApi.success('Authorise API successfully');
+        setTimeout(() => {
+          setCurrentApi([]);
+          setIsShowEditAPIModal(false);
+          getApiKeyDetailTemp();
+        }, 1000);
+      }
+    } finally {
+      setLoading(false);
     }
   }, [messageApi, getApiKeyDetailTemp, apikeyDetail?.id, currentApi]);
 
@@ -494,14 +511,15 @@ export default function Security() {
           })}
         </Select>
         <div className='mt-[24px] flex items-center  justify-between'>
-          <Button className='w-[40%]' size='large' onClick={handleCancel}>
+          <Button className='w-[35%]' size='large' onClick={handleCancel}>
             Cancel
           </Button>
           <Button
-            className='w-[56%]'
+            className='w-[60%]'
             size='large'
             type='primary'
             onClick={handleAuthAeIndexers}
+            loading={loading}
           >
             Authorise AeIndexers
           </Button>
@@ -532,14 +550,15 @@ export default function Security() {
           Note: You can authorise all subdomains using a wildcard *.example.com
         </div>
         <div className='mt-[24px] flex items-center  justify-between'>
-          <Button className='w-[40%]' size='large' onClick={handleCancel}>
+          <Button className='w-[35%]' size='large' onClick={handleCancel}>
             Cancel
           </Button>
           <Button
-            className='w-[56%]'
+            className='w-[60%]'
             size='large'
             type='primary'
             onClick={handleAuthDomain}
+            loading={loading}
           >
             Authorise Domains
           </Button>
@@ -587,6 +606,7 @@ export default function Security() {
             size='large'
             type='primary'
             onClick={handleAuthAPI}
+            loading={loading}
           >
             Confirm
           </Button>

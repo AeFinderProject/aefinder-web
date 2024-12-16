@@ -46,3 +46,18 @@ export enum ExploreUrlType {
   BSC = 'https://bscscan.com',
   AVAXC = 'https://subnets.avax.network/c-chain',
 }
+
+export type RegisterRequest = {
+  userName: string;
+  password: string;
+  email: string;
+  organizationName: string;
+};
+
+export type ResendRequest = {
+  email: string;
+};
+
+export type EmailVerificationRequest = {
+  code: string;
+};

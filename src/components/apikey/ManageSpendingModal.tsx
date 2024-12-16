@@ -2,6 +2,8 @@ import { Button, InputNumber, Modal, Switch } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
 import { useCallback, useState } from 'react';
 
+import { getQueryFee, getRemainingDays } from '@/lib/utils';
+
 import { useAppSelector } from '@/store/hooks';
 
 import { setSpendingLimit } from '@/api/requestAPIKeys';
@@ -20,6 +22,7 @@ export default function ManageSpendingModal({
   setIsShowManageSpendingModal,
 }: ManageSpendingProps) {
   const apikeyDetail = useAppSelector((state) => state.app.apikeyDetail);
+  const regularData = useAppSelector((state) => state.app.regularData);
 
   const [currentIsEnableSpendingLimit, setCurrentIsEnableSpendingLimit] =
     useState(apikeyDetail.isEnableSpendingLimit);
@@ -64,7 +67,7 @@ export default function ManageSpendingModal({
       footer={false}
       className='p-[50px]'
     >
-      <div className='text-gray-80 mt-[24px] text-xs'>test</div>
+      <div className='text-gray-80 mt-[24px] text-xs'>{apikeyDetail.name}</div>
       <div className='text-dark-normal my-[4px] font-medium'>
         Manage Spending Limit
       </div>
@@ -75,11 +78,20 @@ export default function ManageSpendingModal({
       <div className='border-gray-E0 mb-[24px] flex items-center justify-between rounded-md border p-[12px]'>
         <div>
           <div className='text-gray-80 text-xs'>Period Cost</div>
-          <div className='text-dark-normal text-sm'>- USD</div>
+          <div className='text-dark-normal text-sm'>
+            $
+            {getQueryFee(
+              apikeyDetail?.totalQuery,
+              regularData?.monthlyUnitPrice
+            )}{' '}
+            USD
+          </div>
         </div>
         <div className='border-gray-D6 border-l pl-[30px]'>
           <div className='text-gray-80 text-xs'>Renews in</div>
-          <div className='text-dark-normal text-sm'>23 Days</div>
+          <div className='text-dark-normal text-sm'>
+            {getRemainingDays()} Days
+          </div>
         </div>
         <div></div>
       </div>

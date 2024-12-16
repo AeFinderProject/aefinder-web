@@ -24,6 +24,9 @@ import {
 import {
   BindWalletRequest,
   BindWalletResponse,
+  EmailVerificationRequest,
+  RegisterRequest,
+  ResendRequest,
   ResetPasswordRequest,
 } from '@/types/loginType';
 
@@ -158,5 +161,34 @@ export const getUsersInfo = async (): Promise<UserInfoType> => {
     return res;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'getUsersInfo error'));
+  }
+};
+
+export const register = async (params: RegisterRequest): Promise<boolean> => {
+  try {
+    await request.auth.register({ data: params });
+    return true;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'register error'));
+  }
+};
+
+export const resend = async (params: ResendRequest): Promise<boolean> => {
+  try {
+    await request.auth.resend({ data: params });
+    return true;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'resend error'));
+  }
+};
+
+export const emailVerification = async (
+  params: EmailVerificationRequest
+): Promise<boolean> => {
+  try {
+    await request.auth.emailVerification({ query: params?.code });
+    return true;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'emailVerification error'));
   }
 };

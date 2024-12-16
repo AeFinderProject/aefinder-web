@@ -6,13 +6,20 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 
+import { getQueryFee } from '@/lib/utils';
+
 import CreateApiKeyModal from '@/components/apikey/CreateApiKeyModal';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setApikeyList, setApikeySummary } from '@/store/slices/appSlice';
+import {
+  setApikeyList,
+  setApikeySummary,
+  setRegularData,
+} from '@/store/slices/appSlice';
 
 import { queryAuthToken } from '@/api/apiUtils';
 import { getApiKeysList, getSummary } from '@/api/requestAPIKeys';
+import { getMarketRegular } from '@/api/requestMarket';
 
 import { ApikeyItemType } from '@/types/apikeyType';
 
@@ -21,6 +28,8 @@ export default function Apikey() {
   const router = useRouter();
   const apikeyList = useAppSelector((state) => state.app.apikeyList);
   const apikeySummary = useAppSelector((state) => state.app.apikeySummary);
+  const regularData = useAppSelector((state) => state.app.regularData);
+
   const [loading, setLoading] = useState(false);
   const [isShowCreateModal, setIsShowCreateModal] = useState(false);
 
@@ -58,15 +67,34 @@ export default function Apikey() {
           <Tag color='#f50'>unActive</Tag>
         ),
     },
-    { title: 'Period Cost', dataIndex: 'periodQuery', key: 'periodQuery' },
+    {
+      title: 'Period Cost',
+      dataIndex: '',
+      key: 'periodQuery',
+      render: (record) => (
+        <span>
+          ${getQueryFee(record?.periodQuery, regularData?.monthlyUnitPrice)}
+          <span className='text-gray-80 ml-[4px]'>USDT</span>
+        </span>
+      ),
+    },
     {
       title: 'Spending Limit',
       dataIndex: 'spendingLimitUsdt',
       key: 'spendingLimitUsdt',
     },
     { title: 'Total Queries', dataIndex: 'totalQuery', key: 'totalQuery' },
-    // todo totalQuery Fees not have
-    { title: 'Total Query Fees', dataIndex: 'totalQuery', key: 'totalQuery' },
+    {
+      title: 'Total Query Fees',
+      dataIndex: '',
+      key: 'totalQuery',
+      render: (record) => (
+        <span>
+          ${getQueryFee(record?.totalQuery, regularData?.monthlyUnitPrice)}
+          <span className='text-gray-80 ml-[4px]'>USDT</span>
+        </span>
+      ),
+    },
   ];
 
   const getSummaryTemp = useCallback(async () => {
@@ -79,6 +107,15 @@ export default function Apikey() {
   useEffect(() => {
     getSummaryTemp();
   }, [isShowCreateModal, getSummaryTemp]);
+
+  const getMarketRegularTemp = useCallback(async () => {
+    const res = await getMarketRegular();
+    dispatch(setRegularData(res));
+  }, [dispatch]);
+
+  useEffect(() => {
+    getMarketRegularTemp();
+  }, [getMarketRegularTemp]);
 
   const getApikeyListTemp = useCallback(async () => {
     const param = {
@@ -141,7 +178,11 @@ export default function Apikey() {
             </Tooltip>
           </div>
           <div className='text-dark-normal font-medium'>
-            $0.00
+            $
+            {getQueryFee(
+              apikeySummary?.totalQuery,
+              regularData?.monthlyUnitPrice
+            )}
             <span className='text-gray-80 ml-[4px] font-medium'>USDT</span>
           </div>
         </div>
@@ -168,7 +209,10 @@ export default function Apikey() {
             <span className='text-gray-80 ml-[4px] mr-[12px] font-medium'>
               USDT
             </span>
-            <span className='text-blue-link cursor-pointer text-sm'>
+            <span
+              className='text-blue-link cursor-pointer text-sm'
+              onClick={() => router.push('/dashboard/billing')}
+            >
               Add
               <Image
                 src='/assets/svg/right-arrow.svg'

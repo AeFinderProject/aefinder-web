@@ -2,27 +2,62 @@
 
 import { Line } from '@ant-design/charts';
 import { Col, Row, Slider, Statistic } from 'antd';
+import dayjs from 'dayjs';
+import React, { useCallback, useEffect, useState } from 'react';
+
+import { useDebounceCallback } from '@/lib/utils';
+
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { setApikeySummary } from '@/store/slices/appSlice';
+
+import { getSnapshots, getSummary } from '@/api/requestAPIKeys';
+
+import { SnapshotsItemType } from '@/types/apikeyType';
+
 export default function Overview() {
-  const data = [
-    { year: '1991', value: 3 },
-    { year: '1992', value: 4 },
-    { year: '1993', value: 3.5 },
-    { year: '1994', value: 5 },
-    { year: '1995', value: 4.9 },
-    { year: '1996', value: 6 },
-    { year: '1997', value: 7 },
-    { year: '1998', value: 9 },
-    { year: '1999', value: 13 },
-  ];
+  const dispatch = useAppDispatch();
+
+  const [snapshotsData, setSnapshotsData] = useState<SnapshotsItemType[]>([]);
+
+  const apikeyDetail = useAppSelector((state) => state.app.apikeyDetail);
+  const apikeySummary = useAppSelector((state) => state.app.apikeySummary);
+
   const config = {
-    data,
-    title: {
-      visible: true,
-      text: 'wahaha',
-    },
-    xField: 'year',
-    yField: 'value',
+    data: snapshotsData,
+    xField: 'time',
+    yField: 'query',
+    padding: 'auto',
+    forceFit: true,
+    smooth: true,
   };
+
+  const getSummaryTemp = useCallback(async () => {
+    const res = await getSummary();
+    console.log('res', res);
+    dispatch(setApikeySummary(res));
+  }, [dispatch]);
+
+  useEffect(() => {
+    getSummaryTemp();
+  }, [getSummaryTemp]);
+
+  const getSnapshotsData = useDebounceCallback(async () => {
+    const currentDate = dayjs();
+    const currentDateISO = currentDate.toISOString();
+    const oneMonthAgoISO = currentDate.subtract(1, 'month').toISOString();
+
+    const params = {
+      beginTime: oneMonthAgoISO,
+      endTime: currentDateISO,
+      type: 0,
+    };
+    const { items } = await getSnapshots(params);
+    setSnapshotsData(items);
+  }, [apikeyDetail?.id]);
+
+  useEffect(() => {
+    getSnapshotsData();
+  }, [getSnapshotsData, apikeyDetail?.id]);
 
   return (
     <div>
@@ -65,7 +100,7 @@ export default function Overview() {
           <div className='items-top flex justify-between'>
             <Statistic
               title='Queries made'
-              value='0/200,000'
+              value={`${apikeySummary.query}/${apikeySummary.queryLimit}`}
               valueStyle={{ fontSize: '16px', fontWeight: 500 }}
             />
             <div className='text-gray-80 relative top-[4px] text-xs'>
@@ -73,17 +108,16 @@ export default function Overview() {
             </div>
           </div>
           <Slider
-            defaultValue={5000}
+            value={apikeySummary.query}
             min={0}
-            max={200000}
-            step={100}
+            max={apikeySummary.queryLimit}
             disabled
           />
         </Col>
         <Col span={8} className='border-gray-E0 rounded-lg border p-[24px]'>
           <Statistic
             title='API Keys'
-            value='0'
+            value={`${apikeySummary.apiKeyCount}/${apikeySummary.maxApiKeyCount}`}
             valueStyle={{ fontSize: '16px', fontWeight: 500 }}
           />
           <div></div>
@@ -91,7 +125,12 @@ export default function Overview() {
       </Row>
       <div>
         <div className='text-dark-normal mt-[32px]'>Current period queries</div>
-        <Line {...config} />
+        {snapshotsData.length === 0 && (
+          <div className='text-gray-80 border-gray-E0 mt-[6px] h-[120px] rounded-lg border bg-gradient-to-b from-[#F5F7FF] to-[#E6EBF5] p-[24px] text-center text-sm leading-[85px]'>
+            Chart will be visible when we have enough data
+          </div>
+        )}
+        {snapshotsData.length > 0 && <Line {...config} />}
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ import Image from 'next/image';
 import React, { useCallback, useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { useDebounceCallback } from '@/lib/utils';
+import { getQueryFee, useDebounceCallback } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
@@ -59,6 +59,7 @@ export default function ApikeyOverview() {
     (state) => state.app.defaultAeindexersList
   );
   const defaultAPIList = useAppSelector((state) => state.app.defaultAPIList);
+  const regularData = useAppSelector((state) => state.app.regularData);
 
   const tabsItems: TabsProps['items'] = [
     {
@@ -75,18 +76,13 @@ export default function ApikeyOverview() {
     },
   ];
 
-  // const data = [
-  //   { time: '1991', query: 3 },
-  //   { time: '1992', query: 4 },
-  //   { time: '1993', query: 3.5 },
-  //   { time: '1994', query: 5 },
-  //   { time: '1995', query: 4.9 },
-  //   { time: '1996', query: 6 },
-  // ];
   const config = {
     data: snapshotsData,
     xField: 'time',
     yField: 'query',
+    padding: 'auto',
+    forceFit: true,
+    smooth: true,
   };
 
   const getAeindexersListTemp = useCallback(async () => {
@@ -226,9 +222,9 @@ export default function ApikeyOverview() {
           <div className='text-gray-80 my-[22px] text-center'>
             Your API has not been used yet. Your API key can be used to query
             Subgraphs.
-            <div className='text-blue-link mt-[4px] cursor-pointer'>
+            {/* <div className='text-blue-link mt-[4px] cursor-pointer'>
               Learn more
-            </div>
+            </div> */}
           </div>
           <div className='border-gray-E0 flex h-[70px] w-[356px] items-center justify-between rounded-md border p-[12px]'>
             <div>
@@ -341,7 +337,11 @@ export default function ApikeyOverview() {
                 </Tooltip>
               </div>
               <div className='text-dark-normal font-medium'>
-                $230.00
+                $
+                {getQueryFee(
+                  apikeyDetail?.totalQuery,
+                  regularData?.monthlyUnitPrice
+                )}
                 <span className='text-gray-80 ml-[4px] font-medium'>USDT</span>
               </div>
             </div>
@@ -364,7 +364,7 @@ export default function ApikeyOverview() {
                 </Tooltip>
               </div>
               <div className='text-dark-normal font-medium'>
-                0.000191
+                ${regularData?.monthlyUnitPrice / 10000}
                 <span className='text-gray-80 ml-[4px] mr-[12px] font-medium'>
                   USDT
                 </span>
@@ -423,7 +423,16 @@ export default function ApikeyOverview() {
                       {item.totalQuery}
                     </Col>
                     <Col span={5} className='text-gray-80'>
-                      0.000574
+                      <div className='font-medium'>
+                        $
+                        {getQueryFee(
+                          item?.totalQuery,
+                          regularData?.monthlyUnitPrice
+                        )}
+                        <span className='text-gray-80 ml-[4px] font-medium'>
+                          USDT
+                        </span>
+                      </div>
                     </Col>
                     <Col span={5} className='text-gray-80'>
                       {dayjs(item.lastQueryTime).format('YYYY/MM/DD HH:mm:ss')}
@@ -470,7 +479,16 @@ export default function ApikeyOverview() {
                       {item.totalQuery}
                     </Col>
                     <Col span={5} className='text-gray-80'>
-                      0.000574
+                      <div className='font-medium'>
+                        $
+                        {getQueryFee(
+                          item?.totalQuery,
+                          regularData?.monthlyUnitPrice
+                        )}
+                        <span className='text-gray-80 ml-[4px] font-medium'>
+                          USDT
+                        </span>
+                      </div>
                     </Col>
                     <Col span={5} className='text-gray-80'>
                       {dayjs(item.lastQueryTime).format('YYYY/MM/DD HH:mm:ss')}

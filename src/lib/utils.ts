@@ -1,8 +1,10 @@
 'use client';
 
 import { message } from 'antd';
+import BigNumber from 'bignumber.js';
 import BN, { isBN } from 'bn.js';
 import clsx, { ClassValue } from 'clsx';
+import dayjs from 'dayjs';
 import pako from 'pako';
 import { DependencyList, useCallback, useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
@@ -272,3 +274,22 @@ export function objectToQueryString(params: object) {
     )
     .join('&');
 }
+
+export const getRemainingDays = () => {
+  const now = dayjs();
+  const endOfMonth = now.endOf('month');
+  const remainingDays = endOfMonth.diff(now, 'day');
+  return remainingDays;
+};
+
+export const getQueryFee = (queryCount: number, monthlyUnitPrice: number) => {
+  if (!queryCount || !monthlyUnitPrice) {
+    return 0;
+  }
+  const queryCountBignumber = BigNumber(queryCount);
+  const monthlyUnitPriceBignumber = BigNumber(monthlyUnitPrice);
+  return queryCountBignumber
+    .times(monthlyUnitPriceBignumber)
+    .div(10000)
+    .toNumber();
+};

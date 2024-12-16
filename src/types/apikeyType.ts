@@ -36,7 +36,7 @@ export type GetSummaryResponse = {
 };
 
 export type GetSnapshotsRequest = {
-  id: string;
+  id?: string;
   beginTime: string;
   endTime: string;
   type: number | string;

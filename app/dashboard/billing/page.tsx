@@ -1,29 +1,34 @@
 'use client';
-
-import { Button, Tag } from 'antd';
+import { Button } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
+
+import { useAppDispatch } from '@/store/hooks';
+import { setRegularData } from '@/store/slices/appSlice';
+
+import { getMarketRegular } from '@/api/requestMarket';
+
 export default function Billing() {
   // const [haveUpgrade, setHaveUpgrade] = useState(true);
   const haveUpgrade = true;
+  const dispatch = useAppDispatch();
   const router = useRouter();
+
+  const getMarketRegularTemp = useCallback(async () => {
+    const res = await getMarketRegular();
+    dispatch(setRegularData(res));
+  }, [dispatch]);
+
+  useEffect(() => {
+    getMarketRegularTemp();
+  }, [getMarketRegularTemp]);
 
   return (
     <div className='px-[16px] pb-[40px] sm:px-[40px]'>
       <div className='border-gray-F0 flex h-[120px] items-center justify-between border-b'>
         <div className='flex items-center'>
           <div className='text-3xl text-black'>Billing</div>
-          {!haveUpgrade && (
-            <Tag color='#9DCBFF' className='ml-[16px]'>
-              Free Trial
-            </Tag>
-          )}
-          {haveUpgrade && (
-            <Tag color='#9DCBFF' className='ml-[16px]'>
-              Paid Plan
-            </Tag>
-          )}
         </div>
         <div>
           <Button
@@ -103,7 +108,7 @@ export default function Billing() {
         >
           Create API Key
         </Button>
-        <div
+        {/* <div
           className='text-blue-link cursor-pointer'
           onClick={() =>
             window.open('https://docs.aefinder.io/docs/quick-start', '_blank')
@@ -117,7 +122,7 @@ export default function Billing() {
             height={24}
             className='relative top-[-1px] ml-[8px] inline-block'
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );

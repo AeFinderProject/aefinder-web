@@ -12,8 +12,9 @@ import Overview from '@/components/billing/Overview';
 import TransactionHistory from '@/components/billing/TransactionHistory';
 
 export default function BillingManage() {
-  const [activeTabKey, setActiveTabKey] = useState('overview');
   const router = useRouter();
+
+  const [activeTabKey, setActiveTabKey] = useState('overview');
 
   const onTabChange = (key: string) => {
     setActiveTabKey(key);

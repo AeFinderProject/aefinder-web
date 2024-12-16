@@ -6,6 +6,7 @@ import Image from 'next/image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import DeployDrawer from '@/components/appDetail/DeployDrawer';
+import UpdateCapacityDrawer from '@/components/appDetail/UpdateCapacityDrawer';
 import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -35,6 +36,8 @@ export default function HeaderHandle({
   const [editAppDrawerVisible, setEditAppDrawerVisible] = useState(false);
   const [updateDeployDrawerVisible, setUpdateDeployDrawerVisible] =
     useState(false);
+  const [isShowUpdateCapacityModal, setIsShowUpdateCapacityModal] =
+    useState(false);
   const { currentAppDetail, currentVersion } = useAppSelector(
     (state) => state.app
   );
@@ -56,13 +59,6 @@ export default function HeaderHandle({
       style: {
         width: '320px',
       },
-    },
-  ];
-
-  const dropdownItems: MenuProps['items'] = [
-    {
-      key: '1',
-      label: <Button className='text-danger-normal'>Delete AeIndexer</Button>,
     },
   ];
 
@@ -152,6 +148,28 @@ export default function HeaderHandle({
     console.log('delete PendingPod');
   }, []);
 
+  const dropdownItems: MenuProps['items'] = [
+    {
+      key: '1',
+      label: (
+        <Button
+          className='text-blue-link w-full'
+          onClick={() => setIsShowUpdateCapacityModal(true)}
+        >
+          Update capacity
+        </Button>
+      ),
+    },
+    {
+      key: '2',
+      label: (
+        <Button className='text-danger-normal' onClick={handleDeleteAeIndexer}>
+          Delete AeIndexer
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <div className='border-gray-F0 flex h-[130px] items-center justify-between border-b pt-[14px]'>
       <div>
@@ -200,10 +218,7 @@ export default function HeaderHandle({
             trigger={['click']}
             className='ml-3'
           >
-            <Button
-              className='text-blue-link border-blue-link'
-              onClick={handleDeleteAeIndexer}
-            >
+            <Button className='text-blue-link border-blue-link'>
               <MoreOutlined className='relative top-[-2px]' />
             </Button>
           </Dropdown>
@@ -276,6 +291,13 @@ export default function HeaderHandle({
           version={currentVersion}
           deployDrawerVisible={updateDeployDrawerVisible}
           setDeployDrawerVisible={setUpdateDeployDrawerVisible}
+          messageApi={messageApi}
+        />
+      )}
+      {isShowUpdateCapacityModal && (
+        <UpdateCapacityDrawer
+          isShowUpdateCapacityModal={isShowUpdateCapacityModal}
+          setIsShowUpdateCapacityModal={setIsShowUpdateCapacityModal}
           messageApi={messageApi}
         />
       )}

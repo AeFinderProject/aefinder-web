@@ -31,6 +31,18 @@ export const AuthList = {
     target: `${AeFinderHost}/api/users/bind/wallet`,
     baseConfig: { method: 'POST' },
   },
+  register: {
+    target: `${AeFinderHost}/api/users/register`,
+    baseConfig: { method: 'POST' },
+  },
+  resend: {
+    target: `${AeFinderHost}/api/users/register/resend`,
+    baseConfig: { method: 'POST' },
+  },
+  emailVerification: {
+    target: `${AeFinderHost}/api/users/register/confirm`,
+    baseConfig: { method: 'POST' },
+  },
 };
 
 export const appApiList = {
@@ -139,6 +151,47 @@ export const apiKeyList = {
   getAeIndexerMyList: `${AeFinderHost}/api/apps/search`,
 };
 
+export const marketList = {
+  getOrgUserAll: `${AeFinderHost}/api/organizations/user/all`,
+  getOrgBalance: `${AeFinderHost}/api/organizations/balance`,
+  getResourcesLevel: `${AeFinderHost}/api/market/pod-resources/level`,
+  getResourcesFull: `${AeFinderHost}/api/market/pod-resource/full`,
+  getApiQueryCountFree: `${AeFinderHost}/api/market/api-query-count/free`,
+  getApiQueryCountMonthly: `${AeFinderHost}/api/market/api-query-count/monthly`,
+  getRegular: `${AeFinderHost}/api/market/api-query-count/regular`,
+  resourceBillPlan: {
+    target: `${AeFinderHost}/api/market/calculate/resource-bill-plan`,
+    baseConfig: { method: 'POST' },
+  },
+  createOrder: {
+    target: `${AeFinderHost}/api/market/create/order`,
+    baseConfig: { method: 'POST' },
+  },
+  getFullPodUsage: `${AeFinderHost}/api/apps/resources/full-pod/usage`,
+  bindOrganization: {
+    target: `${AeFinderHost}/api/users/bind/organization`,
+    baseConfig: { method: 'POST' },
+  },
+  emailSendCode: {
+    target: `${AeFinderHost}/api/email/send-code`,
+    baseConfig: { method: 'POST' },
+  },
+  setNotification: {
+    target: `${AeFinderHost}/api/email/set-notification`,
+    baseConfig: { method: 'POST' },
+  },
+  appDeployObliterate: {
+    target: `${AeFinderHost}/api/app-deploy/obliterate`,
+    baseConfig: { method: 'POST' },
+  },
+  destroyPending: {
+    target: `${AeFinderHost}/api/app-deploy/destroy-pending`,
+    baseConfig: { method: 'POST' },
+  },
+  getTransactionHistory: `${AeFinderHost}/api/market/transaction-history`,
+  getInvoices: `${AeFinderHost}/api/market/invoices`,
+};
+
 /**
  * api request extension configuration directory
  * @description object.key // The type of this object key comes from from @type {UrlObj}
@@ -148,6 +201,7 @@ export const EXPAND_APIS = {
   app: appApiList,
   subscription: SubscriptionsApiList,
   apikey: apiKeyList,
+  market: marketList,
 };
 
 export type EXPAND_REQ_TYPES = {

@@ -19,7 +19,7 @@ export default function LoginProvider({
 
   const queryAuth = useCallback(async () => {
     // if home page, do not queryAuth
-    if (pathname === '/') {
+    if (pathname === '/' || pathname?.startsWith('/login')) {
       return;
     }
 
