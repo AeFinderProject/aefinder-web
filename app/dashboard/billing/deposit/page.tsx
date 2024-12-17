@@ -1,15 +1,145 @@
 'use client';
 
+import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { LeftOutlined } from '@ant-design/icons';
-import { Button, Col, Divider, InputNumber, Row } from 'antd';
+import { Button, Col, Divider, InputNumber, message, Row } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+import {
+  divDecimals,
+  divDecimalsStr,
+  getOmittedStr,
+  handleErrorMessage,
+  timesDecimals,
+  useDebounceCallback,
+  useThrottleCallback,
+} from '@/lib/utils';
+
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { setElfBalance, setUsdtBalance } from '@/store/slices/commonSlice';
+
+import {
+  AeFinderContractAddress,
+  CHAIN_ID,
+  tokenContractAddress,
+} from '@/constant';
+
+import { ApproveResponseType, GetBalanceResponseType } from '@/types/appType';
 
 export default function Deposit() {
+  const dispatch = useAppDispatch();
   const router = useRouter();
+  const [messageApi, contextHolder] = message.useMessage();
+  const { callSendMethod, callViewMethod, getAccountByChainId } =
+    useConnectWallet();
+  const [loading, setLoading] = useState(false);
+  const [currentAmount, setCurrentAmount] = useState<number | null>(null);
+
+  const userInfo = useAppSelector((state) => state.common.userInfo);
+  const usdtBalance = useAppSelector((state) => state.common.usdtBalance);
+  const elfBalance = useAppSelector((state) => state.common.elfBalance);
+
+  const getBalance = useThrottleCallback(async () => {
+    try {
+      const getELFBalance: GetBalanceResponseType = await callViewMethod({
+        chainId: CHAIN_ID,
+        contractAddress: tokenContractAddress,
+        methodName: 'GetBalance',
+        args: {
+          symbol: 'ELF',
+          owner: await getAccountByChainId(CHAIN_ID),
+        },
+      });
+      console.log('getELFBalance', getELFBalance);
+      dispatch(setElfBalance(getELFBalance?.data));
+      const getUSDTBalance: GetBalanceResponseType = await callViewMethod({
+        chainId: CHAIN_ID,
+        contractAddress: tokenContractAddress,
+        methodName: 'GetBalance',
+        args: {
+          symbol: 'USDT',
+          owner: await getAccountByChainId(CHAIN_ID),
+        },
+      });
+      console.log('getUSDTBalance', getUSDTBalance);
+      dispatch(setUsdtBalance(getUSDTBalance?.data));
+    } catch (error) {
+      messageApi.error(handleErrorMessage(error));
+    }
+  }, [callViewMethod, dispatch, setElfBalance, setUsdtBalance, messageApi]);
+
+  useEffect(() => {
+    getBalance();
+  }, [getBalance]);
+
+  const handleApprove = useDebounceCallback(async () => {
+    if (
+      !currentAmount ||
+      currentAmount > Number(divDecimals(usdtBalance?.balance || 0, 6)) ||
+      currentAmount <= 0
+    ) {
+      messageApi.warning('Insufficient USDT balance');
+      return;
+    }
+    try {
+      setLoading(true);
+      const approveResult: ApproveResponseType = await callSendMethod({
+        contractAddress: tokenContractAddress,
+        methodName: 'Approve',
+        args: {
+          spender: AeFinderContractAddress,
+          symbol: 'USDT',
+          amount: timesDecimals(currentAmount, 6),
+        },
+        chainId: CHAIN_ID,
+      });
+      console.log('approveResult', approveResult);
+      if (approveResult?.data?.Status === 'MINED') {
+        messageApi.open({
+          type: 'success',
+          content: 'Approve successfully, please continue to deposit',
+        });
+        const depositResult: ApproveResponseType = await callSendMethod({
+          contractAddress: AeFinderContractAddress,
+          methodName: 'Deposit',
+          args: {
+            symbol: 'USDT',
+            amount: timesDecimals(currentAmount, 6),
+          },
+          chainId: 'tDVV',
+        });
+        if (depositResult?.data?.Status === 'MINED') {
+          messageApi.open({
+            type: 'success',
+            content: 'Deposit successfully',
+          });
+          setCurrentAmount(null);
+          await getBalance();
+        } else {
+          messageApi.open({
+            type: 'error',
+            content: 'Deposit failed',
+          });
+        }
+        console.log('depositResult', depositResult);
+      } else {
+        messageApi.open({
+          type: 'error',
+          content: 'Approve failed',
+        });
+      }
+    } catch (error) {
+      handleErrorMessage(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [callSendMethod, currentAmount, setCurrentAmount]);
 
   return (
     <div className='px-[16px] pb-[40px] sm:px-[40px]'>
+      {contextHolder}
       <div className='border-gray-F0 flex h-[120px] flex-col items-start justify-center border-b'>
         <div>
           <LeftOutlined
@@ -44,8 +174,25 @@ export default function Deposit() {
                 />
               }
             >
-              <span>e055....7286</span>
+              <span>{getOmittedStr(userInfo.walletAddress, 8, 9)}</span>
             </Button>
+            <div className='mt-[20px] flex items-start justify-start'>
+              <span className='text-gray-80 mr-[20px]'>Balance</span>
+              <div>
+                <div className='text-dark-normal font-medium'>
+                  <span className='mr-[8px]'>
+                    {divDecimalsStr(usdtBalance?.balance || 0, 6)}
+                  </span>
+                  <span>USDT</span>
+                </div>
+                <div className='text-dark-normal mt-[10px] font-medium'>
+                  <span className='mr-[8px]'>
+                    {divDecimalsStr(elfBalance?.balance || 0, 8)}
+                  </span>
+                  <span>ELF</span>
+                </div>
+              </div>
+            </div>
           </div>
           <Divider className='my-[35px]' />
           <div className='mb-[20px] text-xl font-medium text-black'>
@@ -101,6 +248,10 @@ export default function Deposit() {
               addonAfter='USDT'
               size='large'
               className='my-[18px] w-full'
+              min={0}
+              value={currentAmount}
+              placeholder='Please input deposit amount'
+              onChange={(value) => setCurrentAmount(value as number)}
             />
             <div className='mb-[18px]'>
               <span className='text-gray-80 text-sm'>Estimated Gas Fee: </span>
@@ -123,21 +274,17 @@ export default function Deposit() {
           </div>
           <div className='flex items-center justify-between'>
             <div className='w-[48%]'>
-              <div className='text-gray-80 mb-[8px] text-sm'>
-                1. Approve USDT to be transferred
-              </div>
-              <Button type='primary' className='w-full' size='large'>
-                Approve
+              <Button
+                type='primary'
+                className='w-full'
+                size='large'
+                onClick={handleApprove}
+                loading={loading}
+              >
+                Approve & Top up
               </Button>
             </div>
-            <div className='w-[48%]'>
-              <div className='text-gray-80 mb-[8px] text-sm'>
-                2. Transfer USDT
-              </div>
-              <Button className='w-full' size='large'>
-                Top up billing balance
-              </Button>
-            </div>
+            <div className='w-[48%]'></div>
           </div>
         </Col>
       </Row>

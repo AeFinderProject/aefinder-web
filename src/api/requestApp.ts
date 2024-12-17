@@ -152,6 +152,8 @@ export const getUsersInfo = async (): Promise<UserInfoType> => {
     return {
       userName: 'Guest',
       email: '',
+      emailConfirmed: false,
+      notification: false,
       walletAddress: '',
     };
   }

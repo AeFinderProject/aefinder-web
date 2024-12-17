@@ -29,7 +29,7 @@ import {
   SetNotificationRequest,
 } from '@/types/marketType';
 
-export const getOrgUserAll = async (): Promise<GetUserAllResponse> => {
+export const getOrgUserAll = async (): Promise<GetUserAllResponse[]> => {
   try {
     const res = await request.market.getOrgUserAll();
     return res;

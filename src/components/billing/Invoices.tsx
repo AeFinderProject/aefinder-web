@@ -1,9 +1,22 @@
 import Image from 'next/image';
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 export default function Invoices() {
-  // const [invoiceList, setInvoiceList] = useState([]);
+  // const { currentAppDetail, currentVersion } = useAppSelector(
+  //   (state) => state.app
+  // );
+  // const [invoiceList, setInvoiceList] = useState<InvoicesItem[]>([]);
   const invoiceList = [];
+  const getInvoicesList = useCallback(async () => {
+    // const res = await getInvoices({
+    //   organizationId: '',
+    // });
+    // setInvoiceList(res.data.data);
+  }, []);
+
+  useEffect(() => {
+    getInvoicesList();
+  }, [getInvoicesList]);
 
   return (
     <div>

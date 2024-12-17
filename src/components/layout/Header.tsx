@@ -17,7 +17,7 @@ import Bindwallet from '@/components/wallet/BindWallet';
 import LogInButton from '@/components/wallet/LoginButton';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setUsername } from '@/store/slices/commonSlice';
+import { setUserInfo, setUsername } from '@/store/slices/commonSlice';
 
 import { getUsersInfo } from '@/api/requestApp';
 import { CHAIN_ID } from '@/constant';
@@ -41,9 +41,10 @@ export default function Header() {
       if (res?.walletAddress) {
         setAddress(res?.walletAddress);
       } else {
-        router.push('/login');
+        router.push('/login/bindwallet');
       }
       dispatch(setUsername(res?.userName));
+      dispatch(setUserInfo(res));
     }
   }, [dispatch, pathname, isLoginPathname, router]);
 

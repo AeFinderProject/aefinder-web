@@ -44,7 +44,9 @@ export type GetAppListResponse = {
 export type UserInfoType = {
   userName: string;
   email: string;
+  emailConfirmed: boolean;
   walletAddress: string;
+  notification: boolean;
 };
 
 export type LevelType = 'Debug' | 'Error' | 'Warning' | 'Information';
@@ -86,3 +88,42 @@ export enum CurrentTourStepEnum {
   PlaygroundAeIndexer = 'PlaygroundAeIndexer',
   LogAeIndexer = 'LogAeIndexer',
 }
+
+export type BalanceType = {
+  balance: string;
+  owner: string;
+  symbol: string;
+};
+
+export type GetBalanceResponseType = {
+  data: BalanceType;
+};
+
+export type ApproveResponseType = {
+  data: {
+    transactionId: string;
+    Status: string;
+    Logs: {
+      Address: string;
+      Name: string;
+      Indexed: string[];
+      NonIndexed: string;
+    }[];
+    Bloom: string;
+    BlockNumber: number;
+    BlockHash: string;
+    Transaction: {
+      From: string;
+      To: string;
+      RefBlockNumber: string;
+      RefBlockPrefix: string;
+      MethodName: string;
+      Params: object;
+      Signature: string;
+    };
+    ReturnValue: string;
+    Error: string;
+    TransactionSize: number;
+  };
+  transactionId: string;
+};

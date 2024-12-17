@@ -12,10 +12,13 @@ const networkHostMap = {
     CONNECT_SERVER: 'https://auth-aa-portkey-test.portkey.finance',
     SERVICE_SERVER: 'https://aa-portkey-test.portkey.finance',
     NETWORK_TYPE: NetworkEnum.TESTNET,
-    CHAIN_ID: 'tDVW',
-    RPC_SERVER_AELF: 'https://aelf-test-node.aelf.io',
-    RPC_SERVER_TDVV: 'https://tdvw-test-node.aelf.io',
-    RPC_SERVER_TDVW: 'https://tdvw-test-node.aelf.io',
+    CHAIN_ID: 'tDVV',
+    RPC_SERVER_AELF: 'http://192.168.71.115:8000',
+    RPC_SERVER_TDVV: 'http://192.168.71.115:8000',
+    RPC_SERVER_TDVW: 'http://192.168.71.115:8000',
+    AeFinderContractAddress:
+      'RXcxgSXuagn8RrvhQAV81Z652EEYSwR6JLnqHYJ5UVpEptW8Y',
+    tokenContractAddress: '7RzVGiuVWkvL4VfVHdZfQF2Tri3sgLe9U991bohHFfSRZXuGX',
   },
   devnet: {
     AeFinderHost: 'http://192.168.71.128:8081',
@@ -26,10 +29,13 @@ const networkHostMap = {
     CONNECT_SERVER: 'https://auth-aa-portkey-test.portkey.finance',
     SERVICE_SERVER: 'https://aa-portkey-test.portkey.finance',
     NETWORK_TYPE: NetworkEnum.TESTNET,
-    CHAIN_ID: 'tDVW',
-    RPC_SERVER_AELF: 'https://aelf-test-node.aelf.io',
-    RPC_SERVER_TDVV: 'https://tdvw-test-node.aelf.io',
-    RPC_SERVER_TDVW: 'https://tdvw-test-node.aelf.io',
+    CHAIN_ID: 'tDVV',
+    RPC_SERVER_AELF: 'http://192.168.71.115:8000',
+    RPC_SERVER_TDVV: 'http://192.168.71.115:8000',
+    RPC_SERVER_TDVW: 'http://192.168.71.115:8000',
+    AeFinderContractAddress:
+      'RXcxgSXuagn8RrvhQAV81Z652EEYSwR6JLnqHYJ5UVpEptW8Y',
+    tokenContractAddress: '7RzVGiuVWkvL4VfVHdZfQF2Tri3sgLe9U991bohHFfSRZXuGX',
   },
   testnet: {
     AeFinderHost: 'https://test-indexer-api.aefinder.io',
@@ -44,6 +50,9 @@ const networkHostMap = {
     RPC_SERVER_AELF: 'https://aelf-test-node.aelf.io',
     RPC_SERVER_TDVV: 'https://tdvw-test-node.aelf.io',
     RPC_SERVER_TDVW: 'https://tdvw-test-node.aelf.io',
+    // todo: testnet address
+    AeFinderContractAddress: '',
+    tokenContractAddress: 'ASh2Wt7nSEmYqnGxPPzp4pnVDU4uhj1XW9Se5VeZcX2UDdyjx',
   },
   mainnet: {
     AeFinderHost: 'https://indexer-api.aefinder.io',
@@ -58,6 +67,9 @@ const networkHostMap = {
     RPC_SERVER_AELF: 'https://aelf-public-node.aelf.io',
     RPC_SERVER_TDVV: 'https://tdvv-public-node.aelf.io',
     RPC_SERVER_TDVW: 'https://tdvv-public-node.aelf.io',
+    // todo: add to mainnet address
+    AeFinderContractAddress: '',
+    tokenContractAddress: '7RzVGiuVWkvL4VfVHdZfQF2Tri3sgLe9U991bohHFfSRZXuGX',
   },
 };
 
@@ -94,6 +106,12 @@ export const RPC_SERVER_TDVV =
 
 export const RPC_SERVER_TDVW =
   networkHostMap[network as networkType]?.RPC_SERVER_TDVW;
+
+export const AeFinderContractAddress =
+  networkHostMap[network as networkType]?.AeFinderContractAddress;
+
+export const tokenContractAddress =
+  networkHostMap[network as networkType]?.tokenContractAddress;
 
 export const LogsColor = {
   Debug: '#1890ff',

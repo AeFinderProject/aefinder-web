@@ -7,7 +7,7 @@ import {
   GetSummaryResponse,
 } from '@/types/apikeyType';
 import { CreateAppResponse, GetAppDetailResponse } from '@/types/appType';
-import { GetRegularResponse } from '@/types/marketType';
+import { GetRegularResponse, GetUserAllResponse } from '@/types/marketType';
 import { GetSubscriptionResponse } from '@/types/subscriptionType';
 
 export interface AppSliceState {
@@ -20,6 +20,7 @@ export interface AppSliceState {
   apikeyDetail: ApikeyItemType;
   defaultAeindexersList: AeIndexersItem[];
   defaultAPIList: ApiItem[];
+  orgUserAll: GetUserAllResponse;
   regularData: GetRegularResponse;
 }
 
@@ -37,6 +38,7 @@ const initialState: AppSliceState = {
   apikeyDetail: {} as ApikeyItemType,
   defaultAeindexersList: [],
   defaultAPIList: [],
+  orgUserAll: {} as GetUserAllResponse,
   regularData: {
     productId: '',
     queryCount: '0',
@@ -75,6 +77,9 @@ export const appSlice = createAppSlice({
     setDefaultAPIList: (state, action) => {
       state.defaultAPIList = action.payload;
     },
+    setOrgUserAll: (state, action) => {
+      state.orgUserAll = action.payload;
+    },
     setRegularData: (state, action) => {
       state.regularData = action.payload;
     },
@@ -91,5 +96,6 @@ export const {
   setApikeyDetail,
   setDefaultAeIndexersList,
   setDefaultAPIList,
+  setOrgUserAll,
   setRegularData,
 } = appSlice.actions;

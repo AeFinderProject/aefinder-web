@@ -5,15 +5,24 @@ import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect } from 'react';
 
 import { useAppDispatch } from '@/store/hooks';
-import { setRegularData } from '@/store/slices/appSlice';
+import { setOrgUserAll, setRegularData } from '@/store/slices/appSlice';
 
-import { getMarketRegular } from '@/api/requestMarket';
+import { getMarketRegular, getOrgUserAll } from '@/api/requestMarket';
 
 export default function Billing() {
-  // const [haveUpgrade, setHaveUpgrade] = useState(true);
-  const haveUpgrade = true;
   const dispatch = useAppDispatch();
   const router = useRouter();
+
+  const getOrgUserAllTemp = useCallback(async () => {
+    const res = await getOrgUserAll();
+    if (res.length > 0) {
+      dispatch(setOrgUserAll(res[0]));
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    getOrgUserAllTemp();
+  }, [getOrgUserAllTemp]);
 
   const getMarketRegularTemp = useCallback(async () => {
     const res = await getMarketRegular();
@@ -47,42 +56,38 @@ export default function Billing() {
             />
             Notification
           </Button>
-          {!haveUpgrade && (
-            <Button
-              type='primary'
-              className='ml-[10px] h-[40px] w-[148px] text-sm'
-              onClick={() => {
-                router.push('/dashboard/billing/upgrade');
-              }}
-            >
-              <Image
-                src='/assets/svg/shopping-cart.svg'
-                alt='shopping'
-                width={14}
-                height={14}
-                className='mr-2 inline-block'
-              />
-              Upgrade Plan
-            </Button>
-          )}
-          {haveUpgrade && (
-            <Button
-              type='primary'
-              className='ml-[10px] h-[40px] w-[148px] text-sm'
-              onClick={() => {
-                router.push('/dashboard/billing/manage');
-              }}
-            >
-              <Image
-                src='/assets/svg/manage-accounts.svg'
-                alt='manage'
-                width={14}
-                height={14}
-                className='mr-2 inline-block'
-              />
-              Manage Plan
-            </Button>
-          )}
+          <Button
+            type='primary'
+            className='ml-[10px] h-[40px] w-[148px] text-sm'
+            onClick={() => {
+              router.push('/dashboard/billing/upgrade');
+            }}
+          >
+            <Image
+              src='/assets/svg/shopping-cart.svg'
+              alt='shopping'
+              width={14}
+              height={14}
+              className='mr-2 inline-block'
+            />
+            Upgrade Plan
+          </Button>
+          <Button
+            type='primary'
+            className='ml-[10px] h-[40px] w-[148px] text-sm'
+            onClick={() => {
+              router.push('/dashboard/billing/manage');
+            }}
+          >
+            <Image
+              src='/assets/svg/manage-accounts.svg'
+              alt='manage'
+              width={14}
+              height={14}
+              className='mr-2 inline-block'
+            />
+            Manage Plan
+          </Button>
         </div>
       </div>
       <div className='flex flex-col items-center'>
@@ -108,7 +113,7 @@ export default function Billing() {
         >
           Create API Key
         </Button>
-        {/* <div
+        <div
           className='text-blue-link cursor-pointer'
           onClick={() =>
             window.open('https://docs.aefinder.io/docs/quick-start', '_blank')
@@ -122,7 +127,7 @@ export default function Billing() {
             height={24}
             className='relative top-[-1px] ml-[8px] inline-block'
           />
-        </div> */}
+        </div>
       </div>
     </div>
   );
