@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { openWithBlank } from '@/lib/utils';
+import { openWithBlank, useThrottleCallback } from '@/lib/utils';
 
 import Copy from '@/components/Copy';
 import PrimaryLink from '@/components/links/PrimaryLink';
@@ -17,9 +17,17 @@ import Bindwallet from '@/components/wallet/BindWallet';
 import LogInButton from '@/components/wallet/LoginButton';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import {
+  setApikeySummary,
+  setOrgUserAll,
+  setRegularData,
+} from '@/store/slices/appSlice';
 import { setUserInfo, setUsername } from '@/store/slices/commonSlice';
 
+import { queryAuthToken } from '@/api/apiUtils';
+import { getSummary } from '@/api/requestAPIKeys';
 import { getUsersInfo } from '@/api/requestApp';
+import { getMarketRegular, getOrgUserAll } from '@/api/requestMarket';
 import { CHAIN_ID } from '@/constant';
 
 export default function Header() {
@@ -34,23 +42,52 @@ export default function Header() {
 
   const { disConnectWallet, walletInfo, isConnected } = useConnectWallet();
 
-  const getUsersInfoTemp = useCallback(async () => {
-    if (pathname !== '/' && !isLoginPathname) {
-      const res = await getUsersInfo();
-      console.log('res', res);
-      if (res?.walletAddress) {
-        setAddress(res?.walletAddress);
-      } else {
-        router.push('/login/bindwallet');
-      }
-      dispatch(setUsername(res?.userName));
-      dispatch(setUserInfo(res));
+  const getUsersInfoTemp = useThrottleCallback(async () => {
+    await queryAuthToken();
+    const res = await getUsersInfo();
+    console.log('userInfo', res);
+    if (res?.walletAddress) {
+      setAddress(res?.walletAddress);
+    } else {
+      router.push('/login/bindwallet');
     }
-  }, [dispatch, pathname, isLoginPathname, router]);
+    dispatch(setUsername(res?.userName));
+    dispatch(setUserInfo(res));
+  }, [dispatch, router]);
+
+  const getOrgUserAllTemp = useThrottleCallback(async () => {
+    const res = await getOrgUserAll();
+    if (res.length > 0) {
+      dispatch(setOrgUserAll(res[0]));
+    }
+  }, [dispatch]);
+
+  const getMarketRegularTemp = useThrottleCallback(async () => {
+    const res = await getMarketRegular();
+    dispatch(setRegularData(res));
+  }, [dispatch]);
+
+  const getSummaryTemp = useThrottleCallback(async () => {
+    const res = await getSummary();
+    console.log('res', res);
+    dispatch(setApikeySummary(res));
+  }, [dispatch]);
 
   useEffect(() => {
-    getUsersInfoTemp();
-  }, [getUsersInfoTemp, pathname]);
+    if (pathname !== '/' && !isLoginPathname) {
+      getUsersInfoTemp();
+      getOrgUserAllTemp();
+      getMarketRegularTemp();
+      getSummaryTemp();
+    }
+  }, [
+    getUsersInfoTemp,
+    getOrgUserAllTemp,
+    getMarketRegularTemp,
+    getSummaryTemp,
+    pathname,
+    isLoginPathname,
+  ]);
 
   useEffect(() => {
     const logoutContainer = document?.getElementById('logout-container');

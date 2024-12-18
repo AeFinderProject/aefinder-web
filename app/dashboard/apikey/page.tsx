@@ -6,20 +6,15 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { getQueryFee } from '@/lib/utils';
+import { getQueryFee, useThrottleCallback } from '@/lib/utils';
 
 import CreateApiKeyModal from '@/components/apikey/CreateApiKeyModal';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import {
-  setApikeyList,
-  setApikeySummary,
-  setRegularData,
-} from '@/store/slices/appSlice';
+import { setApikeyList, setApikeySummary } from '@/store/slices/appSlice';
 
 import { queryAuthToken } from '@/api/apiUtils';
 import { getApiKeysList, getSummary } from '@/api/requestAPIKeys';
-import { getMarketRegular } from '@/api/requestMarket';
 
 import { ApikeyItemType } from '@/types/apikeyType';
 
@@ -97,7 +92,7 @@ export default function Apikey() {
     },
   ];
 
-  const getSummaryTemp = useCallback(async () => {
+  const getSummaryTemp = useThrottleCallback(async () => {
     await queryAuthToken();
     const res = await getSummary();
     console.log('res', res);
@@ -107,15 +102,6 @@ export default function Apikey() {
   useEffect(() => {
     getSummaryTemp();
   }, [isShowCreateModal, getSummaryTemp]);
-
-  const getMarketRegularTemp = useCallback(async () => {
-    const res = await getMarketRegular();
-    dispatch(setRegularData(res));
-  }, [dispatch]);
-
-  useEffect(() => {
-    getMarketRegularTemp();
-  }, [getMarketRegularTemp]);
 
   const getApikeyListTemp = useCallback(async () => {
     const param = {

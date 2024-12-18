@@ -19,6 +19,7 @@ const networkHostMap = {
     AeFinderContractAddress:
       'RXcxgSXuagn8RrvhQAV81Z652EEYSwR6JLnqHYJ5UVpEptW8Y',
     tokenContractAddress: '7RzVGiuVWkvL4VfVHdZfQF2Tri3sgLe9U991bohHFfSRZXuGX',
+    aelfscanAddress: 'https://testnet.aelfscan.io',
   },
   devnet: {
     AeFinderHost: 'http://192.168.71.128:8081',
@@ -36,6 +37,7 @@ const networkHostMap = {
     AeFinderContractAddress:
       'RXcxgSXuagn8RrvhQAV81Z652EEYSwR6JLnqHYJ5UVpEptW8Y',
     tokenContractAddress: '7RzVGiuVWkvL4VfVHdZfQF2Tri3sgLe9U991bohHFfSRZXuGX',
+    aelfscanAddress: 'https://testnet.aelfscan.io',
   },
   testnet: {
     AeFinderHost: 'https://test-indexer-api.aefinder.io',
@@ -53,6 +55,7 @@ const networkHostMap = {
     // todo: testnet address
     AeFinderContractAddress: '',
     tokenContractAddress: 'ASh2Wt7nSEmYqnGxPPzp4pnVDU4uhj1XW9Se5VeZcX2UDdyjx',
+    aelfscanAddress: 'https://testnet.aelfscan.io',
   },
   mainnet: {
     AeFinderHost: 'https://indexer-api.aefinder.io',
@@ -70,6 +73,7 @@ const networkHostMap = {
     // todo: add to mainnet address
     AeFinderContractAddress: '',
     tokenContractAddress: '7RzVGiuVWkvL4VfVHdZfQF2Tri3sgLe9U991bohHFfSRZXuGX',
+    aelfscanAddress: 'https://aelfscan.io',
   },
 };
 
@@ -112,6 +116,9 @@ export const AeFinderContractAddress =
 
 export const tokenContractAddress =
   networkHostMap[network as networkType]?.tokenContractAddress;
+
+export const aelfscanAddress =
+  networkHostMap[network as networkType]?.aelfscanAddress;
 
 export const LogsColor = {
   Debug: '#1890ff',

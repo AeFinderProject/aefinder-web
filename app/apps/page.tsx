@@ -26,6 +26,7 @@ import { getAppDetail } from '@/api/requestApp';
 import { getSubscriptions } from '@/api/requestSubscription';
 
 import { CurrentTourStepEnum, AppStatusType } from '@/types/appType';
+import { useThrottleCallback } from '@/lib/utils';
 
 export default function AppDetail() {
   const dispatch = useAppDispatch();
@@ -96,20 +97,21 @@ export default function AppDetail() {
     return () => clearInterval(interval);
   }, [appId]);
 
-  useEffect(() => {
-    const getAppDetailTemp = async () => {
-      await queryAuthToken();
-      if (appId) {
-        const res = await getAppDetail({ appId: String(appId) });
-        dispatch(setCurrentAppDetail(res));
-        // set default version
-        if (res.versions?.currentVersion) {
-          dispatch(setCurrentVersion(res.versions?.currentVersion));
-        }
+  const getAppDetailTemp = useThrottleCallback(async () => {
+    await queryAuthToken();
+    if (appId) {
+      const res = await getAppDetail({ appId: String(appId) });
+      dispatch(setCurrentAppDetail(res));
+      // set default version
+      if (res.versions?.currentVersion) {
+        dispatch(setCurrentVersion(res.versions?.currentVersion));
       }
-    };
-    getAppDetailTemp();
+    }
   }, [dispatch, deployDrawerVisible, appId]);
+
+  useEffect(() => {
+    getAppDetailTemp();
+  }, [getAppDetailTemp]);
 
   useEffect(() => {
     // when currentVersion is null, it means the app is not deployed

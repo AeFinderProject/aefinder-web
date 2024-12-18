@@ -61,7 +61,7 @@ export type ResourceBillPlanResponse = {
 };
 
 export type CreateOrderRequest = {
-  appId: string;
+  appId?: string;
   organizationId: string;
   productId: string;
   productNumber: number;

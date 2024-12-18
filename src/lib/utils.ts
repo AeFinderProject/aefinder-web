@@ -334,3 +334,21 @@ export function divDecimalsStr(
   const n = divDecimals(a, decimals);
   return isEffectiveNumber(n) ? n.toFormat() : defaultVal;
 }
+
+export function calcProductNumber(
+  queryCount: number,
+  feeCount: number,
+  productQueryCount: number
+) {
+  if (!queryCount || !productQueryCount) {
+    return 0;
+  }
+
+  const queryCountBignumber = BigNumber(queryCount);
+  const feeCountBignumber = BigNumber(feeCount);
+  const productQueryCountBignumber = BigNumber(productQueryCount);
+  return queryCountBignumber
+    .times(1000)
+    .minus(feeCountBignumber)
+    .dividedBy(productQueryCountBignumber);
+}

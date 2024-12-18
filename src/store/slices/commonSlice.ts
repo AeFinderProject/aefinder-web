@@ -1,6 +1,7 @@
 import { createAppSlice } from '@/store/createAppSlice';
 
 import { BalanceType, UserInfoType } from '@/types/appType';
+import { GetOrgBalanceResponse } from '@/types/marketType';
 
 export interface CommonSliceState {
   isLoading: boolean;
@@ -8,6 +9,7 @@ export interface CommonSliceState {
   userInfo: UserInfoType;
   usdtBalance: BalanceType;
   elfBalance: BalanceType;
+  orgBalance: GetOrgBalanceResponse;
 }
 
 const initialState: CommonSliceState = {
@@ -30,6 +32,16 @@ const initialState: CommonSliceState = {
     owner: '',
     symbol: 'ELF',
   },
+  orgBalance: {
+    chainId: '',
+    address: '',
+    symbol: 'USDT',
+    balance: 0,
+    lockedBalance: 0,
+    token: {
+      Symbol: 'USDT',
+    },
+  },
 };
 
 export const commonSlice = createAppSlice({
@@ -51,6 +63,9 @@ export const commonSlice = createAppSlice({
     setElfBalance: (state, action) => {
       state.elfBalance = action.payload;
     },
+    setOrgBalance: (state, action) => {
+      state.orgBalance = action.payload;
+    },
   },
 });
 
@@ -60,4 +75,5 @@ export const {
   setUserInfo,
   setUsdtBalance,
   setElfBalance,
+  setOrgBalance,
 } = commonSlice.actions;

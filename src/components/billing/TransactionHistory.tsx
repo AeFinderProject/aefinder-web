@@ -1,9 +1,97 @@
+import type { TableColumnsType } from 'antd';
+import { Table } from 'antd';
 import Image from 'next/image';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+
+import { openWithBlank, useThrottleCallback } from '@/lib/utils';
+
+import { useAppSelector } from '@/store/hooks';
+
+import { getTransactionHistory } from '@/api/requestMarket';
+import { aelfscanAddress, CHAIN_ID } from '@/constant';
+
+import { TransactionHistoryItem } from '@/types/marketType';
 
 export default function TransactionHistory() {
-  // const [transactionHistoryList, setTransactionHistoryList] = useState([]);
-  const transactionHistoryList = [];
+  const orgUserAll = useAppSelector((state) => state.app.orgUserAll);
+  const [transactionHistoryList, setTransactionHistoryList] = useState<
+    TransactionHistoryItem[]
+  >([]);
+
+  const getTransactionHistoryList = useThrottleCallback(async () => {
+    const { items } = await getTransactionHistory({
+      organizationId: orgUserAll?.id,
+    });
+    setTransactionHistoryList(items);
+  }, [orgUserAll?.id]);
+
+  useEffect(() => {
+    getTransactionHistoryList();
+  }, [getTransactionHistoryList]);
+
+  const columns: TableColumnsType = [
+    {
+      title: 'Transaction ID',
+      dataIndex: 'transactionId',
+      key: 'transactionId',
+    },
+    {
+      title: 'Date',
+      dataIndex: 'transactionDate',
+      key: 'transactionDate',
+    },
+    {
+      title: 'Description',
+      dataIndex: 'transactionDescription',
+      key: 'transactionDescription',
+    },
+    {
+      title: 'Amount',
+      dataIndex: 'transactionAmount',
+      key: 'transactionAmount',
+      render: (text: number) => (
+        <div>
+          {text}
+          <span className='ml-[4px] text-sm'>USDT</span>
+        </div>
+      ),
+    },
+    {
+      title: 'Balance After',
+      dataIndex: 'BalanceAfter',
+      key: 'BalanceAfter',
+      render: (text: number) => (
+        <div>
+          {text}
+          <span className='ml-[4px] text-sm'>USDT</span>
+        </div>
+      ),
+    },
+    {
+      title: 'Payment Method',
+      dataIndex: 'PaymentMethod',
+      key: 'PaymentMethod',
+    },
+    {
+      title: 'View',
+      dataIndex: '',
+      key: 'View',
+      render: (_, record: TransactionHistoryItem) => {
+        return (
+          <div
+            className='text-blue-link cursor-pointer'
+            onClick={() => {
+              openWithBlank(
+                `${aelfscanAddress}/${CHAIN_ID}/tx/${record?.transactionId}`
+              );
+            }}
+          >
+            Detail
+          </div>
+        );
+      },
+    },
+  ];
 
   return (
     <div>
@@ -23,6 +111,16 @@ export default function TransactionHistory() {
             As you add and remove USDT from the billing contract, a record of
             those transaction will show up here
           </div>
+        </div>
+      )}
+      {transactionHistoryList.length > 0 && (
+        <div className='mt-[24px]'>
+          <Table
+            rowKey='transactionId'
+            columns={columns}
+            dataSource={transactionHistoryList}
+            className='w-full'
+          />
         </div>
       )}
     </div>

@@ -4,9 +4,10 @@ import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import type { GetRef, TourProps } from 'antd';
 import { Button, message, Tooltip, Tour } from 'antd';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { getRemainingDays } from '@/lib/utils';
+import { getRemainingDays, useThrottleCallback } from '@/lib/utils';
 
 import AppItemCard from '@/components/dashboard/AppItemCard';
 import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
@@ -30,6 +31,8 @@ import { CurrentTourStepEnum } from '@/types/appType';
 
 export default function Dashboard() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
+
   const createRef = useRef<GetRef<typeof Button>>(null);
   const [createAppDrawerVisible, setCreateAppDrawerVisible] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
@@ -104,9 +107,9 @@ export default function Dashboard() {
     getAppListTemp();
   }, [dispatch, createAppDrawerVisible]);
 
-  const getSummaryTemp = useCallback(async () => {
+  const getSummaryTemp = useThrottleCallback(async () => {
     const res = await getSummary();
-    console.log('res', res);
+    console.log('getSummaryRes', res);
     dispatch(setApikeySummary(res));
   }, [dispatch]);
 
@@ -157,7 +160,7 @@ export default function Dashboard() {
             <Button
               type='primary'
               onClick={() => {
-                console.log('Upgrade Plan click');
+                router.push('/dashboard/billing/upgrade');
               }}
               className='ml-[40px] h-[40px] w-[148px] text-sm'
             >

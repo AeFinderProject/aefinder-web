@@ -1,15 +1,147 @@
 'use client';
 
+import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { LeftOutlined } from '@ant-design/icons';
-import { Button, Col, Divider, Input, InputNumber, Row } from 'antd';
+import { Button, Col, Divider, Input, InputNumber, message, Row } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+import {
+  divDecimalsStr,
+  getOmittedStr,
+  handleErrorMessage,
+  timesDecimals,
+  useDebounceCallback,
+  useThrottleCallback,
+} from '@/lib/utils';
+
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { setElfBalance, setUsdtBalance } from '@/store/slices/commonSlice';
+
+import {
+  AeFinderContractAddress,
+  CHAIN_ID,
+  tokenContractAddress,
+} from '@/constant';
+
+import { ApproveResponseType, GetBalanceResponseType } from '@/types/appType';
 
 export default function Withdraw() {
+  const dispatch = useAppDispatch();
   const router = useRouter();
+  const [messageApi, contextHolder] = message.useMessage();
+  const { callSendMethod, callViewMethod, getAccountByChainId } =
+    useConnectWallet();
+  const [loading, setLoading] = useState(false);
+  const userInfo = useAppSelector((state) => state.common.userInfo);
+  const usdtBalance = useAppSelector((state) => state.common.usdtBalance);
+  const elfBalance = useAppSelector((state) => state.common.elfBalance);
+  const [withdrawAddress, setWithdrawAddress] = useState(
+    userInfo?.walletAddress
+  );
+  const [currentAmount, setCurrentAmount] = useState<number | null>(null);
+
+  const getBalance = useThrottleCallback(async () => {
+    try {
+      const getELFBalance: GetBalanceResponseType = await callViewMethod({
+        chainId: CHAIN_ID,
+        contractAddress: tokenContractAddress,
+        methodName: 'GetBalance',
+        args: {
+          symbol: 'ELF',
+          owner: await getAccountByChainId(CHAIN_ID),
+        },
+      });
+      console.log('getELFBalance', getELFBalance);
+      dispatch(setElfBalance(getELFBalance?.data));
+      const getUSDTBalance: GetBalanceResponseType = await callViewMethod({
+        chainId: CHAIN_ID,
+        contractAddress: tokenContractAddress,
+        methodName: 'GetBalance',
+        args: {
+          symbol: 'USDT',
+          owner: await getAccountByChainId(CHAIN_ID),
+        },
+      });
+      console.log('getUSDTBalance', getUSDTBalance);
+      dispatch(setUsdtBalance(getUSDTBalance?.data));
+    } catch (error) {
+      messageApi.error(handleErrorMessage(error));
+    }
+  }, [callViewMethod, dispatch, setElfBalance, setUsdtBalance, messageApi]);
+
+  useEffect(() => {
+    getBalance();
+  }, [getBalance]);
+
+  const handleWithdraw = useDebounceCallback(async () => {
+    if (!withdrawAddress) {
+      messageApi.warning('Please input withdraw address');
+      return;
+    }
+    if (!currentAmount || currentAmount <= 0) {
+      messageApi.warning('Insufficient withdraw USDT balance');
+      return;
+    }
+    try {
+      setLoading(true);
+      const approveResult: ApproveResponseType = await callSendMethod({
+        contractAddress: tokenContractAddress,
+        methodName: 'Approve',
+        args: {
+          spender: AeFinderContractAddress,
+          symbol: 'USDT',
+          amount: timesDecimals(currentAmount, 6),
+        },
+        chainId: CHAIN_ID,
+      });
+      console.log('approveResult', approveResult);
+      if (approveResult?.data?.Status === 'MINED') {
+        messageApi.open({
+          type: 'success',
+          content: 'Approve successfully, please continue to withdraw',
+        });
+        const withdrawResult: ApproveResponseType = await callSendMethod({
+          contractAddress: AeFinderContractAddress,
+          methodName: 'Withdraw',
+          args: {
+            symbol: 'USDT',
+            amount: timesDecimals(currentAmount, 6),
+            address: withdrawAddress,
+          },
+          chainId: 'tDVV',
+        });
+        if (withdrawResult?.data?.Status === 'MINED') {
+          messageApi.open({
+            type: 'success',
+            content: 'withdraw successfully',
+          });
+          setCurrentAmount(null);
+          await getBalance();
+        } else {
+          messageApi.open({
+            type: 'error',
+            content: 'Deposit failed',
+          });
+        }
+        console.log('withdrawResult', withdrawResult);
+      } else {
+        messageApi.open({
+          type: 'error',
+          content: 'Approve failed',
+        });
+      }
+    } catch (error) {
+      handleErrorMessage(error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return (
     <div className='px-[16px] pb-[40px] sm:px-[40px]'>
+      {contextHolder}
       <div className='border-gray-F0 flex h-[120px] flex-col items-start justify-center border-b'>
         <div>
           <LeftOutlined
@@ -21,10 +153,53 @@ export default function Withdraw() {
       </div>
       <Row gutter={24} className='mt-[24px]'>
         <Col span={14} offset={5}>
-          <div className='mb-[20px] text-xl font-medium text-black'>
+          <div className='text-xl font-medium text-black'>
             <Image
               src='/assets/svg/step1.svg'
               alt='step1'
+              width={24}
+              height={24}
+              className='relative top-[-2px] mr-[16px] inline-block align-middle'
+            />
+            Wallet
+          </div>
+          <div className='mt-[20px]'>
+            <span className='text-gray-80 mr-[20px]'>From </span>
+            <Button
+              icon={
+                <Image
+                  src='/assets/svg/user.svg'
+                  alt='user'
+                  width={18}
+                  height={18}
+                  className='relative top-[4px]'
+                />
+              }
+            >
+              <span>{getOmittedStr(userInfo.walletAddress, 8, 9)}</span>
+            </Button>
+            <div className='mt-[20px] flex items-start justify-start'>
+              <span className='text-gray-80 mr-[20px]'>Balance</span>
+              <div>
+                <div className='text-dark-normal font-medium'>
+                  <span className='mr-[8px]'>
+                    {divDecimalsStr(usdtBalance?.balance || 0, 6)}
+                  </span>
+                  <span>USDT</span>
+                </div>
+                <div className='text-dark-normal mt-[10px] font-medium'>
+                  <span className='mr-[8px]'>
+                    {divDecimalsStr(elfBalance?.balance || 0, 8)}
+                  </span>
+                  <span>ELF</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className='mb-[20px] mt-[40px] text-xl font-medium text-black'>
+            <Image
+              src='/assets/svg/step2.svg'
+              alt='step2'
               width={24}
               height={24}
               className='relative top-[-2px] mr-[16px] inline-block align-middle'
@@ -60,8 +235,8 @@ export default function Withdraw() {
           <Divider className='my-[35px]' />
           <div className='mb-[20px] text-xl font-medium text-black'>
             <Image
-              src='/assets/svg/step2.svg'
-              alt='step2'
+              src='/assets/svg/step3.svg'
+              alt='step3'
               width={24}
               height={24}
               className='relative top-[-2px] mr-[16px] inline-block align-middle'
@@ -69,30 +244,41 @@ export default function Withdraw() {
             Calculator
           </div>
           <div className='border-gray-E0 mb-[20px] rounded-lg border px-[12px] py-[18px]'>
-            <div className='text-gray-80'>Withdrawal Address</div>
+            <div className='text-gray-80'>
+              Withdrawal Address
+              <span className='ml-[10px]'>(default wallet address)</span>
+            </div>
             <Input
               placeholder='Enter an address'
               size='large'
               className='my-[18px] w-full rounded-lg'
+              value={withdrawAddress}
+              onChange={(e) => setWithdrawAddress(e.target.value)}
             />
           </div>
           <div className='border-gray-E0 mb-[35px] rounded-lg border px-[12px] py-[18px]'>
             <div className='text-gray-80'>Withdrawal Amount</div>
             <InputNumber
+              className='my-[18px] w-full'
               addonAfter='USDT'
               size='large'
-              className='my-[18px] w-full'
+              value={currentAmount}
+              onChange={(value) => setCurrentAmount(value as number)}
             />
             <div className='mb-[18px]'>
-              <span className='text-gray-80 text-sm'>Estimated Gas Fee: </span>
-              <span className='text-dark-normal text-sm'>1 ELF</span>
-            </div>
-            <div>
-              <span className='text-gray-80 text-sm'>Transaction Fee: </span>
-              <span className='text-dark-normal text-sm'>1 ELF</span>
+              <span className='text-gray-80 text-sm'>
+                Estimated Transaction Fee:{' '}
+              </span>
+              <span className='text-dark-normal text-sm'>0.25885 ELF</span>
             </div>
           </div>
-          <Button type='primary' className='w-full' size='large'>
+          <Button
+            type='primary'
+            className='w-full'
+            size='large'
+            onClick={handleWithdraw}
+            loading={loading}
+          >
             Withdraw
           </Button>
         </Col>

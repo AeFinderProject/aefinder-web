@@ -254,12 +254,10 @@ export default function Deposit() {
               onChange={(value) => setCurrentAmount(value as number)}
             />
             <div className='mb-[18px]'>
-              <span className='text-gray-80 text-sm'>Estimated Gas Fee: </span>
-              <span className='text-dark-normal text-sm'>1 ELF</span>
-            </div>
-            <div>
-              <span className='text-gray-80 text-sm'>Transaction Fee: </span>
-              <span className='text-dark-normal text-sm'>1 ELF</span>
+              <span className='text-gray-80 text-sm'>
+                Estimated Transaction Fee:{' '}
+              </span>
+              <span className='text-dark-normal text-sm'>0.2161 ELF</span>
             </div>
           </div>
           <div className='mb-[20px] text-xl font-medium text-black'>

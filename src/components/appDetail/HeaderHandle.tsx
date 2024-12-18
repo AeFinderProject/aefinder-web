@@ -5,6 +5,8 @@ import { MessageInstance } from 'antd/es/message/interface';
 import Image from 'next/image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
+import DeleteIndexerModal from '@/components/appDetail/DeleteAeIndexerModal';
+import DeletePendingPodModal from '@/components/appDetail/DeletePendingPodModal';
 import DeployDrawer from '@/components/appDetail/DeployDrawer';
 import UpdateCapacityDrawer from '@/components/appDetail/UpdateCapacityDrawer';
 import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
@@ -37,6 +39,10 @@ export default function HeaderHandle({
   const [updateDeployDrawerVisible, setUpdateDeployDrawerVisible] =
     useState(false);
   const [isShowUpdateCapacityModal, setIsShowUpdateCapacityModal] =
+    useState(false);
+  const [isShowDeleteAeIndexModal, setIsShowDeleteAeIndexModal] =
+    useState(false);
+  const [isShowDeletePendingPodModal, setIsShowDeletePendingPodModal] =
     useState(false);
   const { currentAppDetail, currentVersion } = useAppSelector(
     (state) => state.app
@@ -126,28 +132,6 @@ export default function HeaderHandle({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTourStep]);
 
-  const handleDeleteAeIndexer = useCallback(() => {
-    // todo: delete AeIndexer
-    // delete -> Modal confirm -> route.replace('/dashboard')
-    messageApi.open({
-      type: 'warning',
-      content: 'Are you sure you want to delete this AeIndexer?',
-      duration: 3,
-      onClose: () => {
-        messageApi.open({
-          type: 'error',
-          content: 'This AeIndexer has been deleted.',
-          duration: 3,
-        });
-      },
-    });
-  }, [messageApi]);
-
-  const handleDeletePendingPod = useCallback(() => {
-    // todo: delete PendingPod
-    console.log('delete PendingPod');
-  }, []);
-
   const dropdownItems: MenuProps['items'] = [
     {
       key: '1',
@@ -163,7 +147,10 @@ export default function HeaderHandle({
     {
       key: '2',
       label: (
-        <Button className='text-danger-normal' onClick={handleDeleteAeIndexer}>
+        <Button
+          className='text-danger-normal'
+          onClick={() => setIsShowDeleteAeIndexModal(true)}
+        >
           Delete AeIndexer
         </Button>
       ),
@@ -229,7 +216,7 @@ export default function HeaderHandle({
           <Select
             onChange={(value) => handleChangeVersion(value)}
             className='mb-3 h-[40px] w-[100px] sm:mb-0 sm:w-[200px]'
-            defaultValue={currentVersion}
+            value={currentVersion}
           >
             <Select.Option value={currentAppDetail?.versions?.currentVersion}>
               (Current) {currentAppDetail?.versions?.currentVersion}
@@ -238,13 +225,15 @@ export default function HeaderHandle({
               <Select.Option value={currentAppDetail?.versions?.pendingVersion}>
                 <div className='relative w-full truncate pr-[22px]'>
                   {currentAppDetail?.versions?.pendingVersion}
-                  <span className='absolute right-[-4px] top-[-2px] cursor-pointer p-[2px] hover:bg-gray-100'>
+                  <span
+                    className='absolute right-[-4px] cursor-pointer py-[2px] pl-[2px] pr-[6px] hover:bg-gray-100'
+                    onClick={() => setIsShowDeletePendingPodModal(true)}
+                  >
                     <Image
                       src='/assets/svg/delete.svg'
                       alt='delete'
                       width={22}
                       height={22}
-                      onClick={handleDeletePendingPod}
                     />
                   </span>
                 </div>
@@ -298,6 +287,20 @@ export default function HeaderHandle({
         <UpdateCapacityDrawer
           isShowUpdateCapacityModal={isShowUpdateCapacityModal}
           setIsShowUpdateCapacityModal={setIsShowUpdateCapacityModal}
+          messageApi={messageApi}
+        />
+      )}
+      {isShowDeleteAeIndexModal && (
+        <DeleteIndexerModal
+          isShowDeleteIndexerModal={isShowDeleteAeIndexModal}
+          setIsShowDeleteIndexerModal={setIsShowDeleteAeIndexModal}
+          messageApi={messageApi}
+        />
+      )}
+      {isShowDeletePendingPodModal && (
+        <DeletePendingPodModal
+          isShowDeletePendingPodModal={isShowDeletePendingPodModal}
+          setIsShowDeletePendingPodModal={setIsShowDeletePendingPodModal}
           messageApi={messageApi}
         />
       )}

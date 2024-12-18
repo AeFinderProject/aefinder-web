@@ -22,6 +22,7 @@ export interface AppSliceState {
   defaultAPIList: ApiItem[];
   orgUserAll: GetUserAllResponse;
   regularData: GetRegularResponse;
+  freeApiQueryCount: number;
 }
 
 const initialState: AppSliceState = {
@@ -44,6 +45,7 @@ const initialState: AppSliceState = {
     queryCount: '0',
     monthlyUnitPrice: 0.4,
   },
+  freeApiQueryCount: 0,
 };
 
 export const appSlice = createAppSlice({
@@ -83,6 +85,9 @@ export const appSlice = createAppSlice({
     setRegularData: (state, action) => {
       state.regularData = action.payload;
     },
+    setFreeApiQueryCount: (state, action) => {
+      state.freeApiQueryCount = action.payload;
+    },
   },
 });
 
@@ -98,4 +103,5 @@ export const {
   setDefaultAPIList,
   setOrgUserAll,
   setRegularData,
+  setFreeApiQueryCount,
 } = appSlice.actions;

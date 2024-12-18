@@ -2,7 +2,9 @@
 import { Button } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
+
+import { useThrottleCallback } from '@/lib/utils';
 
 import { useAppDispatch } from '@/store/hooks';
 import { setOrgUserAll, setRegularData } from '@/store/slices/appSlice';
@@ -13,7 +15,7 @@ export default function Billing() {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const getOrgUserAllTemp = useCallback(async () => {
+  const getOrgUserAllTemp = useThrottleCallback(async () => {
     const res = await getOrgUserAll();
     if (res.length > 0) {
       dispatch(setOrgUserAll(res[0]));
@@ -24,7 +26,7 @@ export default function Billing() {
     getOrgUserAllTemp();
   }, [getOrgUserAllTemp]);
 
-  const getMarketRegularTemp = useCallback(async () => {
+  const getMarketRegularTemp = useThrottleCallback(async () => {
     const res = await getMarketRegular();
     dispatch(setRegularData(res));
   }, [dispatch]);

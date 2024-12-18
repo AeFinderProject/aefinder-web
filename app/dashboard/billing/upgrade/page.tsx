@@ -1,19 +1,47 @@
 'use client';
 
+import { TWalletInfo } from '@aelf-web-login/wallet-adapter-base';
+import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { ExclamationCircleOutlined, LeftOutlined } from '@ant-design/icons';
 import type { SliderSingleProps } from 'antd';
-import { Button, Col, Divider, Row, Slider, Tag } from 'antd';
+import { Button, Col, Divider, message, Row, Slider, Tag } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+import {
+  calcProductNumber,
+  divDecimalsStr,
+  getOmittedStr,
+  getQueryFee,
+  handleErrorMessage,
+  timesDecimals,
+  useDebounceCallback,
+  useThrottleCallback,
+} from '@/lib/utils';
+
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { setFreeApiQueryCount } from '@/store/slices/appSlice';
+import {
+  setElfBalance,
+  setOrgBalance,
+  setUsdtBalance,
+} from '@/store/slices/commonSlice';
+
+import {
+  createOrder,
+  getApiQueryCountFree,
+  getOrgBalance,
+} from '@/api/requestMarket';
+import {
+  AeFinderContractAddress,
+  CHAIN_ID,
+  tokenContractAddress,
+} from '@/constant';
+
+import { ApproveResponseType, GetBalanceResponseType } from '@/types/appType';
 
 const marks: SliderSingleProps['marks'] = {
-  10: {
-    style: {
-      fontSize: '12px',
-      color: '#808080',
-    },
-    label: <strong>10K</strong>,
-  },
   100: {
     style: {
       fontSize: '12px',
@@ -21,20 +49,238 @@ const marks: SliderSingleProps['marks'] = {
     },
     label: <strong>100K</strong>,
   },
-  200: {
+  300: {
     style: {
       fontSize: '12px',
       color: '#808080',
     },
-    label: <strong>200K</strong>,
+    label: <strong>300K</strong>,
+  },
+  500: {
+    style: {
+      fontSize: '12px',
+      color: '#808080',
+    },
+    label: <strong>500K</strong>,
   },
 };
 
 export default function Upgrade() {
+  const dispatch = useAppDispatch();
   const router = useRouter();
+  const [messageApi, contextHolder] = message.useMessage();
+  const {
+    callSendMethod,
+    callViewMethod,
+    getAccountByChainId,
+    walletInfo,
+    isConnected,
+  } = useConnectWallet();
+
+  const walletInfoRef = useRef<TWalletInfo>();
+  walletInfoRef.current = walletInfo;
+  const isConnectedRef = useRef<boolean>();
+  isConnectedRef.current = isConnected;
+
+  const [loading, setLoading] = useState(false);
+
+  const [currentQueryCount, setCurrentQueryCount] = useState(100);
+  const [currentMonth, setCurrentMonth] = useState<1 | 3 | 6>(1);
+  const [currentAmount, setCurrentAmount] = useState<number>(0);
+  const [currentTotalAmount, setCurrentTotalAmount] = useState<number>(0);
+
+  const userInfo = useAppSelector((state) => state.common.userInfo);
+  const usdtBalance = useAppSelector((state) => state.common.usdtBalance);
+  const elfBalance = useAppSelector((state) => state.common.elfBalance);
+  const orgBalance = useAppSelector((state) => state.common.orgBalance);
+  const orgUserAll = useAppSelector((state) => state.app.orgUserAll);
+  const regularData = useAppSelector((state) => state.app.regularData);
+  const freeApiQueryCount = useAppSelector(
+    (state) => state.app.freeApiQueryCount
+  );
+
+  const getBalance = useThrottleCallback(async () => {
+    if (!isConnectedRef.current || !walletInfoRef.current) {
+      return;
+    }
+    try {
+      const getELFBalance: GetBalanceResponseType = await callViewMethod({
+        chainId: CHAIN_ID,
+        contractAddress: tokenContractAddress,
+        methodName: 'GetBalance',
+        args: {
+          symbol: 'ELF',
+          owner: await getAccountByChainId(CHAIN_ID),
+        },
+      });
+      console.log('getELFBalance', getELFBalance);
+      dispatch(setElfBalance(getELFBalance?.data));
+      const getUSDTBalance: GetBalanceResponseType = await callViewMethod({
+        chainId: CHAIN_ID,
+        contractAddress: tokenContractAddress,
+        methodName: 'GetBalance',
+        args: {
+          symbol: 'USDT',
+          owner: await getAccountByChainId(CHAIN_ID),
+        },
+      });
+      console.log('getUSDTBalance', getUSDTBalance);
+      dispatch(setUsdtBalance(getUSDTBalance?.data));
+    } catch (error) {
+      messageApi.error(handleErrorMessage(error));
+    }
+  }, [callViewMethod, dispatch, setElfBalance, setUsdtBalance, messageApi]);
+
+  useEffect(() => {
+    getBalance();
+  }, [getBalance]);
+
+  const getOrgBalanceTemp = useThrottleCallback(async () => {
+    if (!orgUserAll?.id) {
+      return;
+    }
+    const getOrgBalanceRes = await getOrgBalance({
+      organizationId: orgUserAll?.id,
+    });
+    console.log('getOrgBalance', getOrgBalanceRes);
+    if (getOrgBalanceRes?.balance) {
+      dispatch(setOrgBalance(getOrgBalanceRes));
+    }
+  }, [getOrgBalance, messageApi, orgUserAll?.id]);
+
+  const getApiQueryCountFreeTemp = useThrottleCallback(async () => {
+    if (!orgUserAll?.id) {
+      return;
+    }
+    const res = await getApiQueryCountFree({
+      organizationId: orgUserAll?.id,
+    });
+    if (res) {
+      dispatch(setFreeApiQueryCount(res));
+    }
+  }, [getApiQueryCountFree, orgUserAll?.id]);
+
+  useEffect(() => {
+    getOrgBalanceTemp();
+    getApiQueryCountFreeTemp();
+  }, [getOrgBalanceTemp, getApiQueryCountFreeTemp, orgUserAll?.id]);
+
+  useEffect(() => {
+    let tempAmount = 0;
+    if (currentQueryCount <= 100) {
+      tempAmount = 0;
+    } else {
+      console.log('freeApiQueryCount', freeApiQueryCount);
+      console.log(currentQueryCount * 1000 - freeApiQueryCount);
+      console.log(regularData?.monthlyUnitPrice);
+      tempAmount = getQueryFee(
+        currentQueryCount * 1000 - freeApiQueryCount,
+        regularData?.monthlyUnitPrice
+      );
+      console.log('tempAmount', tempAmount);
+    }
+    setCurrentAmount(tempAmount);
+  }, [currentQueryCount, regularData?.monthlyUnitPrice, freeApiQueryCount]);
+
+  useEffect(() => {
+    setCurrentTotalAmount(currentAmount * currentMonth);
+  }, [currentAmount, currentMonth]);
+
+  const handlePreCreateOrder = useCallback(async () => {
+    const createOrderRes = await createOrder({
+      organizationId: orgUserAll?.id,
+      productId: regularData?.productId,
+      productNumber: Number(
+        calcProductNumber(
+          currentQueryCount,
+          freeApiQueryCount,
+          Number(regularData?.queryCount)
+        )
+      ),
+      periodMonths: currentMonth,
+    });
+    if (createOrderRes?.length > 0) {
+      const { billingId, billingAmount } = createOrderRes[0];
+      return {
+        billingId,
+        billingAmount,
+      };
+    } else {
+      return {
+        billingId: '',
+        billingAmount: 0,
+      };
+    }
+  }, [
+    currentQueryCount,
+    currentMonth,
+    orgUserAll?.id,
+    regularData?.productId,
+    regularData?.queryCount,
+    freeApiQueryCount,
+  ]);
+
+  const handleCreateOrder = useDebounceCallback(async () => {
+    setLoading(true);
+    try {
+      const { billingId, billingAmount } = await handlePreCreateOrder();
+      console.log('billingId, billingAmount', billingId, billingAmount);
+      if (!billingId || !billingAmount) {
+        messageApi.warning('Create order failed');
+        return;
+      }
+      const approveResult: ApproveResponseType = await callSendMethod({
+        contractAddress: tokenContractAddress,
+        methodName: 'Approve',
+        args: {
+          spender: AeFinderContractAddress,
+          symbol: 'USDT',
+          amount: timesDecimals(billingAmount, 6),
+        },
+        chainId: CHAIN_ID,
+      });
+      if (approveResult?.data?.Status === 'MINED') {
+        messageApi.open({
+          type: 'success',
+          content:
+            'Approve successfully, please continue to Confirm monthly purchase',
+        });
+        const lockResult: ApproveResponseType = await callSendMethod({
+          contractAddress: AeFinderContractAddress,
+          methodName: 'Lock',
+          args: {
+            symbol: 'USDT',
+            amount: timesDecimals(billingAmount, 6),
+            billingId: billingId,
+          },
+          chainId: 'tDVV',
+        });
+        if (lockResult?.data?.Status === 'MINED') {
+          messageApi.open({
+            type: 'success',
+            content:
+              'Confirm monthly purchase successfully, please wait for the purchase locked to start',
+            duration: 20,
+          });
+          // refresh balance when Confirm monthly purchase success
+          getBalance();
+          getOrgBalanceTemp();
+        } else {
+          messageApi.open({
+            type: 'error',
+            content: 'Confirm monthly purchase failed',
+          });
+        }
+        console.log('lockResult', lockResult);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [currentMonth]);
 
   return (
     <div className='px-[16px] pb-[36px] sm:px-[40px]'>
+      {contextHolder}
       <div className='border-gray-F0 flex h-[120px] flex-col items-start justify-center border-b'>
         <div>
           <LeftOutlined
@@ -59,17 +305,18 @@ export default function Upgrade() {
                 Estimated number of monthly queries
               </div>
               <div>
-                <span className='text-dark-normal'>200,000</span>
+                <span className='text-dark-normal'>500,000</span>
                 <span className='text-blue-link ml-[16px] cursor-pointer'>
                   Max
                 </span>
               </div>
             </div>
             <Slider
-              defaultValue={50}
-              min={10}
-              max={200}
+              value={currentQueryCount}
+              min={100}
+              max={500}
               step={10}
+              onChange={(value) => setCurrentQueryCount(value)}
               marks={marks}
             />
             <div className='text-gray-80 mt-[20px] text-sm'>
@@ -88,13 +335,23 @@ export default function Upgrade() {
               Prepay for
             </div>
             <div>
-              <Button className='border-blue-link text-blue-link border'>
+              <Button
+                type={currentMonth === 1 ? 'primary' : 'default'}
+                onClick={() => setCurrentMonth(1)}
+              >
                 1 Month
               </Button>
-              <Button className='border-blue-link text-blue-link mx-[10px] border'>
+              <Button
+                type={currentMonth === 3 ? 'primary' : 'default'}
+                onClick={() => setCurrentMonth(3)}
+                className='mx-[10px]'
+              >
                 3 Month
               </Button>
-              <Button className='border-blue-link text-blue-link border'>
+              <Button
+                type={currentMonth === 6 ? 'primary' : 'default'}
+                onClick={() => setCurrentMonth(6)}
+              >
                 6 Month
               </Button>
             </div>
@@ -119,36 +376,31 @@ export default function Upgrade() {
                   height={18}
                   className='hover:text-blue-link mr-3 inline-block'
                 />
-                <span>e055....7286</span>
+                <span>{getOmittedStr(userInfo.walletAddress, 8, 9)}</span>
               </Button>
             </div>
-            <div className='mb-[8px]'>
+            <div className='flex items-start justify-start'>
+              <span className='text-gray-80 mr-[16px] text-sm'>
+                Wallet balance:
+              </span>
+              <div>
+                <div className='text-dark-normal mr-[4px] text-sm'>
+                  {divDecimalsStr(usdtBalance?.balance || 0, 6)} USDT
+                </div>
+                <div className='text-dark-normal text-sm'>
+                  {divDecimalsStr(elfBalance?.balance || 0, 8)} ELF
+                </div>
+              </div>
+            </div>
+            <div className='my-[8px]'>
               <span className='text-gray-80 mr-[16px] text-sm'>
                 Billing balance:
               </span>
               <span className='text-dark-normal mr-[2px] text-sm'>
-                $20.23 USDT{' '}
+                {orgBalance?.balance || '--'} USDT{' '}
               </span>
               <span className='text-gray-80 text-sm'>
-                (Locked: $20.23 USDT)
-              </span>
-            </div>
-            <div>
-              <span className='text-gray-80 mr-[16px] text-sm'>
-                Wallet balance:
-              </span>
-              <span className='text-dark-normal mr-[2px] text-sm'>
-                $20.12 USDT{' '}
-              </span>
-              <span className='text-blue-link cursor-pointer text-sm'>
-                Buy USDT
-                <Image
-                  src='/assets/svg/right-arrow.svg'
-                  alt='arrow'
-                  width={16}
-                  height={16}
-                  className='text-blue-link ml-[4px] inline-block'
-                />
+                (Locked: {orgBalance?.lockedBalance || '--'} USDT)
               </span>
             </div>
             <Tag
@@ -156,36 +408,55 @@ export default function Upgrade() {
                 <ExclamationCircleOutlined className='relative top-[-3px]' />
               }
               color='processing'
-              className='my-[8px] h-[40px] w-full leading-10'
+              className='my-[8px] h-[40px] w-full leading-10 '
             >
-              <span className='text-gray-80 text-sm'>
+              <span className='text-gray-80 w-full overflow-hidden text-sm'>
                 You will be able to withdraw your unlocked balance at any time
               </span>
             </Tag>
-            <Tag
-              icon={
-                <ExclamationCircleOutlined className='relative top-[-3px]' />
-              }
-              color='warning'
-              className='h-[40px] w-full leading-10'
-            >
-              <span className='text-gray-80 text-sm'>
-                You don’t have enough billing balance. Please
-                <span className='text-blue-link mx-[4px] cursor-pointer text-sm'>
-                  top up your balance
+            {currentTotalAmount > orgBalance?.balance && (
+              <Tag
+                icon={
+                  <ExclamationCircleOutlined className='relative top-[-3px]' />
+                }
+                color='warning'
+                className='h-[40px] w-full leading-10'
+              >
+                <span className='text-gray-80 text-sm'>
+                  You don’t have enough billing balance. Please
+                  <span
+                    className='text-blue-link mx-[4px] cursor-pointer text-sm'
+                    onClick={() => router.push('/dashboard/billing/deposit')}
+                  >
+                    top up your balance
+                  </span>
+                  to proceed.
                 </span>
-                to proceed.
-              </span>
-            </Tag>
+              </Tag>
+            )}
             <Divider className='my-[35px]' />
             <div className='align-center mb-[35px] flex justify-between'>
               <div>
                 <div className='text-gray-80 text-sm'>Est. Monthly Cost*</div>
-                <div className='text-dark-normal'>$61.60/month</div>
+                <div className='text-dark-normal'>
+                  {currentAmount} USDT/month
+                </div>
               </div>
-              <Button type='primary' disabled>
-                Insufficient billing balance
-              </Button>
+              {currentTotalAmount > orgBalance?.balance && (
+                <Button type='default' disabled={true}>
+                  Insufficient billing balance
+                </Button>
+              )}
+              {currentTotalAmount <= orgBalance?.balance && (
+                <Button
+                  type='primary'
+                  disabled={currentTotalAmount === 0}
+                  onClick={handleCreateOrder}
+                  loading={loading}
+                >
+                  Confirm monthly purchase
+                </Button>
+              )}
             </div>
             <div className='text-gray-80 text-sm'>
               * This amount will be locked in your Billing Balance and cannot be
@@ -204,21 +475,25 @@ export default function Upgrade() {
             <div className='bg-gray-F5 rounded-lg p-[20px]'>
               <div className='mb-[20px] flex justify-between'>
                 <div className='text-gray-80 text-sm'>Est. Queries</div>
-                <div className='text-dark-normal'>$4/month</div>
+                <div className='text-dark-normal'>{currentQueryCount}K</div>
               </div>
               <div className='flex justify-between'>
                 <div className='text-gray-80 text-sm'>Months</div>
-                <div className='text-dark-normal'>3</div>
+                <div className='text-dark-normal'>{currentMonth}</div>
               </div>
               <Divider />
               <div className='flex justify-between'>
                 <div className='text-gray-80 text-sm'>Est. Monthly Cost</div>
-                <div className='text-dark-normal'>$32.80/month</div>
+                <div className='text-dark-normal'>
+                  {regularData?.monthlyUnitPrice} USDT/month
+                </div>
               </div>
               <Divider />
               <div className='flex justify-between'>
-                <div className='text-dark-normal'>Est. Monthly Cost</div>
-                <div className='text-dark-normal'>$32.80/month</div>
+                <div className='text-dark-normal'>Est. Total Cost</div>
+                <div className='text-dark-normal'>
+                  {currentTotalAmount?.toFixed(2)} USDT
+                </div>
               </div>
             </div>
           </Col>
