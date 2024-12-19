@@ -3,12 +3,11 @@ import { Table, Tag } from 'antd';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 
-import { openWithBlank, useThrottleCallback } from '@/lib/utils';
+import { useDebounceCallback } from '@/lib/utils';
 
 import { useAppSelector } from '@/store/hooks';
 
 import { getInvoices } from '@/api/requestMarket';
-import { aelfscanAddress, CHAIN_ID } from '@/constant';
 
 import { InvoicesItem } from '@/types/marketType';
 
@@ -16,7 +15,7 @@ export default function Invoices() {
   const orgUserAll = useAppSelector((state) => state.app.orgUserAll);
   const [invoiceList, setInvoiceList] = useState<InvoicesItem[]>([]);
 
-  const getInvoicesList = useThrottleCallback(async () => {
+  const getInvoicesList = useDebounceCallback(async () => {
     const { items } = await getInvoices({
       organizationId: orgUserAll?.id,
     });
@@ -30,28 +29,28 @@ export default function Invoices() {
   const columns: TableColumnsType = [
     {
       title: 'Invoice No.',
-      dataIndex: 'BillingId',
-      key: 'BillingId',
+      dataIndex: 'billingId',
+      key: 'billingId',
     },
     {
       title: 'Date Issued',
-      dataIndex: 'BillingDate',
-      key: 'BillingDate',
+      dataIndex: 'billingDate',
+      key: 'billingDate',
     },
     {
       title: 'Billing Period',
-      dataIndex: 'BillingStartDate',
-      key: 'BillingStartDate',
+      dataIndex: 'billingStartDate',
+      key: 'billingStartDate',
     },
     {
       title: 'Due Date',
-      dataIndex: 'BillingEndDate',
-      key: 'BillingEndDate',
+      dataIndex: 'billingEndDate',
+      key: 'billingEndDate',
     },
     {
       title: 'Amount',
-      dataIndex: 'BillingAmount',
-      key: 'BillingAmount',
+      dataIndex: 'billingAmount',
+      key: 'billingAmount',
       render: (text: number) => (
         <div>
           {text}
@@ -61,8 +60,8 @@ export default function Invoices() {
     },
     {
       title: 'Status',
-      dataIndex: 'BillingStatus',
-      key: 'BillingStatus',
+      dataIndex: 'billingStatus',
+      key: 'billingStatus',
       render: (text: number) => {
         return (
           <div>
@@ -73,25 +72,25 @@ export default function Invoices() {
         );
       },
     },
-    {
-      title: 'View',
-      dataIndex: '',
-      key: 'View',
-      render: (_, record: InvoicesItem) => {
-        return (
-          <div
-            className='text-blue-link cursor-pointer'
-            onClick={() => {
-              openWithBlank(
-                `${aelfscanAddress}/${CHAIN_ID}/tx/${record?.BillingId}`
-              );
-            }}
-          >
-            Detail
-          </div>
-        );
-      },
-    },
+    // {
+    //   title: 'View',
+    //   dataIndex: '',
+    //   key: 'View',
+    //   render: (_, record: InvoicesItem) => {
+    //     return (
+    //       <div
+    //         className='text-blue-link cursor-pointer'
+    //         onClick={() => {
+    //           openWithBlank(
+    //             `${aelfscanAddress}/${CHAIN_ID}/tx/${record?.billingId}`
+    //           );
+    //         }}
+    //       >
+    //         Detail
+    //       </div>
+    //     );
+    //   },
+    // },
   ];
 
   return (
@@ -117,7 +116,7 @@ export default function Invoices() {
       {invoiceList.length > 0 && (
         <div className='mt-[24px]'>
           <Table
-            rowKey='BillingId'
+            rowKey={(record) => record?.billingId + record?.billingStatus}
             columns={columns}
             dataSource={invoiceList}
             className='w-full'

@@ -21,7 +21,7 @@ import {
 } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setFreeApiQueryCount } from '@/store/slices/appSlice';
+import { setFreeApiQueryCount, setOrgUserAll } from '@/store/slices/appSlice';
 import {
   setElfBalance,
   setOrgBalance,
@@ -32,6 +32,7 @@ import {
   createOrder,
   getApiQueryCountFree,
   getOrgBalance,
+  getOrgUserAll,
 } from '@/api/requestMarket';
 import {
   AeFinderContractAddress,
@@ -83,7 +84,6 @@ export default function Upgrade() {
   isConnectedRef.current = isConnected;
 
   const [loading, setLoading] = useState(false);
-
   const [currentQueryCount, setCurrentQueryCount] = useState(100);
   const [currentMonth, setCurrentMonth] = useState<1 | 3 | 6>(1);
   const [currentAmount, setCurrentAmount] = useState<number>(0);
@@ -129,41 +129,66 @@ export default function Upgrade() {
     } catch (error) {
       messageApi.error(handleErrorMessage(error));
     }
-  }, [callViewMethod, dispatch, setElfBalance, setUsdtBalance, messageApi]);
+  }, [
+    callViewMethod,
+    dispatch,
+    setElfBalance,
+    setUsdtBalance,
+    messageApi,
+    isConnectedRef.current,
+    walletInfoRef.current,
+  ]);
 
   useEffect(() => {
     getBalance();
   }, [getBalance]);
 
-  const getOrgBalanceTemp = useThrottleCallback(async () => {
-    if (!orgUserAll?.id) {
-      return;
-    }
-    const getOrgBalanceRes = await getOrgBalance({
-      organizationId: orgUserAll?.id,
-    });
-    console.log('getOrgBalance', getOrgBalanceRes);
-    if (getOrgBalanceRes?.balance) {
-      dispatch(setOrgBalance(getOrgBalanceRes));
-    }
-  }, [getOrgBalance, messageApi, orgUserAll?.id]);
+  const getOrgBalanceTemp = useDebounceCallback(
+    async (organizationId) => {
+      console.log('getOrgBalanceTemp', organizationId);
+      if (!organizationId) {
+        return;
+      }
+      const getOrgBalanceRes = await getOrgBalance({
+        organizationId: organizationId,
+      });
+      console.log('getOrgBalance', getOrgBalanceRes);
+      if (getOrgBalanceRes?.balance) {
+        dispatch(setOrgBalance(getOrgBalanceRes));
+      }
+    },
+    [getOrgBalance]
+  );
 
-  const getApiQueryCountFreeTemp = useThrottleCallback(async () => {
-    if (!orgUserAll?.id) {
-      return;
+  const getApiQueryCountFreeTemp = useDebounceCallback(
+    async (organizationId) => {
+      if (!organizationId) {
+        return;
+      }
+      const res = await getApiQueryCountFree({
+        organizationId: organizationId,
+      });
+      if (res) {
+        dispatch(setFreeApiQueryCount(res));
+      }
+    },
+    [getApiQueryCountFree]
+  );
+
+  const getOrgUserAllTemp = useDebounceCallback(async () => {
+    const res = await getOrgUserAll();
+    console.log('getOrgUserAllTemp', res);
+    if (res.length > 0) {
+      dispatch(setOrgUserAll(res[0]));
+      const organizationId = res[0]?.id;
+      getOrgBalanceTemp(organizationId);
+      getApiQueryCountFreeTemp(organizationId);
     }
-    const res = await getApiQueryCountFree({
-      organizationId: orgUserAll?.id,
-    });
-    if (res) {
-      dispatch(setFreeApiQueryCount(res));
-    }
-  }, [getApiQueryCountFree, orgUserAll?.id]);
+  }, [dispatch, getOrgBalanceTemp, getApiQueryCountFreeTemp]);
 
   useEffect(() => {
-    getOrgBalanceTemp();
-    getApiQueryCountFreeTemp();
-  }, [getOrgBalanceTemp, getApiQueryCountFreeTemp, orgUserAll?.id]);
+    getOrgUserAllTemp();
+  }, [getOrgUserAllTemp, orgUserAll]);
 
   useEffect(() => {
     let tempAmount = 0;
@@ -171,8 +196,11 @@ export default function Upgrade() {
       tempAmount = 0;
     } else {
       console.log('freeApiQueryCount', freeApiQueryCount);
-      console.log(currentQueryCount * 1000 - freeApiQueryCount);
-      console.log(regularData?.monthlyUnitPrice);
+      console.log(
+        'currentQueryCount',
+        currentQueryCount * 1000 - freeApiQueryCount
+      );
+      console.log('monthlyUnitPrice', regularData?.monthlyUnitPrice);
       tempAmount = getQueryFee(
         currentQueryCount * 1000 - freeApiQueryCount,
         regularData?.monthlyUnitPrice

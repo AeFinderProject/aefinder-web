@@ -1,11 +1,8 @@
 'use client';
-import {
-  CheckCircleOutlined,
-  IssuesCloseOutlined,
-  LeftOutlined,
-} from '@ant-design/icons';
+import { IssuesCloseOutlined, LeftOutlined } from '@ant-design/icons';
 import type { TableColumnsType } from 'antd';
 import { message, Switch, Table } from 'antd';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
@@ -67,7 +64,12 @@ export default function Notification() {
       render: (record) => (
         <div className='relative'>
           {record ? (
-            <CheckCircleOutlined className='text-blue-link text-2xl' />
+            <Image
+              src='/assets/svg/checkCircle.svg'
+              alt='checkCircle'
+              width={24}
+              height={24}
+            />
           ) : (
             <IssuesCloseOutlined className='text-gray-80 text-2xl' />
           )}

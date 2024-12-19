@@ -6,24 +6,36 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { getQueryFee, useThrottleCallback } from '@/lib/utils';
+import {
+  getQueryFee,
+  useDebounceCallback,
+  useThrottleCallback,
+} from '@/lib/utils';
 
 import CreateApiKeyModal from '@/components/apikey/CreateApiKeyModal';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setApikeyList, setApikeySummary } from '@/store/slices/appSlice';
+import {
+  setApikeyList,
+  setApikeySummary,
+  setOrgUserAll,
+} from '@/store/slices/appSlice';
+import { setOrgBalance } from '@/store/slices/commonSlice';
 
 import { queryAuthToken } from '@/api/apiUtils';
 import { getApiKeysList, getSummary } from '@/api/requestAPIKeys';
+import { getOrgBalance, getOrgUserAll } from '@/api/requestMarket';
 
 import { ApikeyItemType } from '@/types/apikeyType';
 
 export default function Apikey() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+
   const apikeyList = useAppSelector((state) => state.app.apikeyList);
   const apikeySummary = useAppSelector((state) => state.app.apikeySummary);
   const regularData = useAppSelector((state) => state.app.regularData);
+  const orgBalance = useAppSelector((state) => state.common.orgBalance);
 
   const [loading, setLoading] = useState(false);
   const [isShowCreateModal, setIsShowCreateModal] = useState(false);
@@ -68,7 +80,7 @@ export default function Apikey() {
       key: 'periodQuery',
       render: (record) => (
         <span>
-          ${getQueryFee(record?.periodQuery, regularData?.monthlyUnitPrice)}
+          {getQueryFee(record?.periodQuery, regularData?.monthlyUnitPrice)}
           <span className='text-gray-80 ml-[4px]'>USDT</span>
         </span>
       ),
@@ -85,7 +97,7 @@ export default function Apikey() {
       key: 'totalQuery',
       render: (record) => (
         <span>
-          ${getQueryFee(record?.totalQuery, regularData?.monthlyUnitPrice)}
+          {getQueryFee(record?.totalQuery, regularData?.monthlyUnitPrice)}
           <span className='text-gray-80 ml-[4px]'>USDT</span>
         </span>
       ),
@@ -118,6 +130,37 @@ export default function Apikey() {
   useEffect(() => {
     getApikeyListTemp();
   }, [isShowCreateModal, getApikeyListTemp]);
+
+  const getOrgBalanceTemp = useDebounceCallback(
+    async (organizationId) => {
+      console.log('getOrgBalanceTemp', organizationId);
+      if (!organizationId) {
+        return;
+      }
+      const getOrgBalanceRes = await getOrgBalance({
+        organizationId: organizationId,
+      });
+      console.log('getOrgBalance', getOrgBalanceRes);
+      if (getOrgBalanceRes?.balance) {
+        dispatch(setOrgBalance(getOrgBalanceRes));
+      }
+    },
+    [getOrgBalance]
+  );
+
+  const getOrgUserAllTemp = useDebounceCallback(async () => {
+    const res = await getOrgUserAll();
+    console.log('getOrgUserAllTemp', res);
+    if (res.length > 0) {
+      dispatch(setOrgUserAll(res[0]));
+      const organizationId = res[0]?.id;
+      getOrgBalanceTemp(organizationId);
+    }
+  }, [dispatch, getOrgBalanceTemp]);
+
+  useEffect(() => {
+    getOrgUserAllTemp();
+  }, [getOrgUserAllTemp]);
 
   return (
     <div className='px-[16px] pb-[40px] sm:px-[40px]'>
@@ -164,7 +207,6 @@ export default function Apikey() {
             </Tooltip>
           </div>
           <div className='text-dark-normal font-medium'>
-            $
             {getQueryFee(
               apikeySummary?.totalQuery,
               regularData?.monthlyUnitPrice
@@ -191,13 +233,13 @@ export default function Apikey() {
             </Tooltip>
           </div>
           <div className='text-dark-normal font-medium'>
-            $40.00
+            {orgBalance?.balance}
             <span className='text-gray-80 ml-[4px] mr-[12px] font-medium'>
               USDT
             </span>
             <span
               className='text-blue-link cursor-pointer text-sm'
-              onClick={() => router.push('/dashboard/billing')}
+              onClick={() => router.push('/dashboard/billing/deposit')}
             >
               Add
               <Image

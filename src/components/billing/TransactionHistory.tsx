@@ -3,12 +3,13 @@ import { Table } from 'antd';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 
-import { openWithBlank, useThrottleCallback } from '@/lib/utils';
+import { useThrottleCallback } from '@/lib/utils';
+
+import Copy from '@/components/Copy';
 
 import { useAppSelector } from '@/store/hooks';
 
 import { getTransactionHistory } from '@/api/requestMarket';
-import { aelfscanAddress, CHAIN_ID } from '@/constant';
 
 import { TransactionHistoryItem } from '@/types/marketType';
 
@@ -34,6 +35,17 @@ export default function TransactionHistory() {
       title: 'Transaction ID',
       dataIndex: 'transactionId',
       key: 'transactionId',
+      render: (text: string) => (
+        <div>
+          <Copy
+            className='ml-[32px]'
+            label=''
+            content={text}
+            isShowCopy={true}
+            showLittle={true}
+          />
+        </div>
+      ),
     },
     {
       title: 'Date',
@@ -58,8 +70,8 @@ export default function TransactionHistory() {
     },
     {
       title: 'Balance After',
-      dataIndex: 'BalanceAfter',
-      key: 'BalanceAfter',
+      dataIndex: 'balanceAfter',
+      key: 'balanceAfter',
       render: (text: number) => (
         <div>
           {text}
@@ -69,28 +81,28 @@ export default function TransactionHistory() {
     },
     {
       title: 'Payment Method',
-      dataIndex: 'PaymentMethod',
-      key: 'PaymentMethod',
+      dataIndex: 'paymentMethod',
+      key: 'paymentMethod',
     },
-    {
-      title: 'View',
-      dataIndex: '',
-      key: 'View',
-      render: (_, record: TransactionHistoryItem) => {
-        return (
-          <div
-            className='text-blue-link cursor-pointer'
-            onClick={() => {
-              openWithBlank(
-                `${aelfscanAddress}/${CHAIN_ID}/tx/${record?.transactionId}`
-              );
-            }}
-          >
-            Detail
-          </div>
-        );
-      },
-    },
+    // {
+    //   title: 'View',
+    //   dataIndex: '',
+    //   key: 'View',
+    //   render: (_, record: TransactionHistoryItem) => {
+    //     return (
+    //       <div
+    //         className='text-blue-link cursor-pointer'
+    //         onClick={() => {
+    //           openWithBlank(
+    //             `${aelfscanAddress}/${CHAIN_ID}/tx/${record?.transactionId}`
+    //           );
+    //         }}
+    //       >
+    //         Detail
+    //       </div>
+    //     );
+    //   },
+    // },
   ];
 
   return (

@@ -114,6 +114,7 @@ export default function Deposit() {
           messageApi.open({
             type: 'success',
             content: 'Deposit successfully',
+            duration: 10,
           });
           setCurrentAmount(null);
           await getBalance();

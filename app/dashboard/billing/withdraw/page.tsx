@@ -1,11 +1,12 @@
 'use client';
 
+import { TWalletInfo } from '@aelf-web-login/wallet-adapter-base';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { LeftOutlined } from '@ant-design/icons';
 import { Button, Col, Divider, Input, InputNumber, message, Row } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
   divDecimalsStr,
@@ -17,8 +18,14 @@ import {
 } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setElfBalance, setUsdtBalance } from '@/store/slices/commonSlice';
+import { setOrgUserAll } from '@/store/slices/appSlice';
+import {
+  setElfBalance,
+  setOrgBalance,
+  setUsdtBalance,
+} from '@/store/slices/commonSlice';
 
+import { getOrgBalance, getOrgUserAll } from '@/api/requestMarket';
 import {
   AeFinderContractAddress,
   CHAIN_ID,
@@ -31,18 +38,32 @@ export default function Withdraw() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
-  const { callSendMethod, callViewMethod, getAccountByChainId } =
-    useConnectWallet();
+  const {
+    callSendMethod,
+    callViewMethod,
+    getAccountByChainId,
+    walletInfo,
+    isConnected,
+  } = useConnectWallet();
   const [loading, setLoading] = useState(false);
   const userInfo = useAppSelector((state) => state.common.userInfo);
   const usdtBalance = useAppSelector((state) => state.common.usdtBalance);
   const elfBalance = useAppSelector((state) => state.common.elfBalance);
+  const orgBalance = useAppSelector((state) => state.common.orgBalance);
   const [withdrawAddress, setWithdrawAddress] = useState(
     userInfo?.walletAddress
   );
   const [currentAmount, setCurrentAmount] = useState<number | null>(null);
 
+  const walletInfoRef = useRef<TWalletInfo>();
+  walletInfoRef.current = walletInfo;
+  const isConnectedRef = useRef<boolean>();
+  isConnectedRef.current = isConnected;
+
   const getBalance = useThrottleCallback(async () => {
+    if (!isConnectedRef.current || !walletInfoRef.current) {
+      return;
+    }
     try {
       const getELFBalance: GetBalanceResponseType = await callViewMethod({
         chainId: CHAIN_ID,
@@ -69,11 +90,50 @@ export default function Withdraw() {
     } catch (error) {
       messageApi.error(handleErrorMessage(error));
     }
-  }, [callViewMethod, dispatch, setElfBalance, setUsdtBalance, messageApi]);
+  }, [
+    callViewMethod,
+    dispatch,
+    setElfBalance,
+    setUsdtBalance,
+    messageApi,
+    isConnectedRef.current,
+    walletInfoRef.current,
+  ]);
 
   useEffect(() => {
     getBalance();
   }, [getBalance]);
+
+  const getOrgBalanceTemp = useThrottleCallback(
+    async (organizationId) => {
+      console.log('getOrgBalanceTemp', organizationId);
+      if (!organizationId) {
+        return;
+      }
+      const getOrgBalanceRes = await getOrgBalance({
+        organizationId: organizationId,
+      });
+      console.log('getOrgBalance', getOrgBalanceRes);
+      if (getOrgBalanceRes?.balance) {
+        dispatch(setOrgBalance(getOrgBalanceRes));
+      }
+    },
+    [getOrgBalance]
+  );
+
+  const getOrgUserAllTemp = useThrottleCallback(async () => {
+    const res = await getOrgUserAll();
+    console.log('getOrgUserAllTemp', res);
+    if (res.length > 0) {
+      dispatch(setOrgUserAll(res[0]));
+      const organizationId = res[0]?.id;
+      getOrgBalanceTemp(organizationId);
+    }
+  }, [dispatch, getOrgBalanceTemp]);
+
+  useEffect(() => {
+    getOrgUserAllTemp();
+  }, [getOrgUserAllTemp]);
 
   const handleWithdraw = useDebounceCallback(async () => {
     if (!withdrawAddress) {
@@ -82,6 +142,10 @@ export default function Withdraw() {
     }
     if (!currentAmount || currentAmount <= 0) {
       messageApi.warning('Insufficient withdraw USDT balance');
+      return;
+    }
+    if (currentAmount > orgBalance?.balance - orgBalance?.lockedBalance) {
+      messageApi.warning('withdraw USDT balance is not enough');
       return;
     }
     try {
@@ -116,9 +180,11 @@ export default function Withdraw() {
           messageApi.open({
             type: 'success',
             content: 'withdraw successfully',
+            duration: 10,
           });
           setCurrentAmount(null);
           await getBalance();
+          await getOrgUserAllTemp();
         } else {
           messageApi.open({
             type: 'error',
@@ -179,7 +245,7 @@ export default function Withdraw() {
               <span>{getOmittedStr(userInfo.walletAddress, 8, 9)}</span>
             </Button>
             <div className='mt-[20px] flex items-start justify-start'>
-              <span className='text-gray-80 mr-[20px]'>Balance</span>
+              <span className='text-gray-80 mr-[20px]'>Wallet Balance:</span>
               <div>
                 <div className='text-dark-normal font-medium'>
                   <span className='mr-[8px]'>
@@ -194,6 +260,15 @@ export default function Withdraw() {
                   <span>ELF</span>
                 </div>
               </div>
+            </div>
+            <div className='my-[8px]'>
+              <span className='text-gray-80 mr-[20px]'>Billing balance:</span>
+              <span className='text-dark-normal mr-[2px] font-medium'>
+                {orgBalance?.balance || '--'} USDT{' '}
+              </span>
+              <span className='text-gray-80 font-medium'>
+                (Locked: {orgBalance?.lockedBalance || '--'} USDT)
+              </span>
             </div>
           </div>
           <div className='mb-[20px] mt-[40px] text-xl font-medium text-black'>

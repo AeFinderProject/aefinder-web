@@ -54,10 +54,10 @@ export type ResourceBillPlanRequest = {
 };
 
 export type ResourceBillPlanResponse = {
-  MonthlyUnitPrice: number;
+  monthlyUnitPrice: number;
   firstMonthCost: number;
   billingCycleMonthCount: number;
-  PeriodicCost: number;
+  periodicCost: number;
 };
 
 export type CreateOrderRequest = {
@@ -152,8 +152,8 @@ export type TransactionHistoryItem = {
   transactionDescription: string;
   transactionAmount: number;
   transactionDate: string;
-  BalanceAfter: number;
-  PaymentMethod: string;
+  balanceAfter: number;
+  paymentMethod: string;
 };
 
 export type GetTransactionHistoryResponse = {
@@ -166,14 +166,14 @@ export type GetInvoicesRequest = {
 };
 
 export type InvoicesItem = {
-  BillingId: string;
-  BillingType: number;
-  BillingDate: string;
-  BillingStartDate: string;
-  BillingEndDate: string;
-  BillingAmount: number;
-  Description: string;
-  BillingStatus: number;
+  billingId: string;
+  billingType: number;
+  billingDate: string;
+  billingStartDate: string;
+  billingEndDate: string;
+  billingAmount: number;
+  description: string;
+  billingStatus: number;
 };
 
 export type GetInvoicesResponse = {

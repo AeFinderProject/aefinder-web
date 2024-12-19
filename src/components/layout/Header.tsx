@@ -133,7 +133,7 @@ export default function Header() {
         className='cursor-pointer'
         style={{ width: '150px', height: '24px' }}
       />
-      {isLoginPathname && (
+      {pathname === '/login' && (
         <div>
           <LogInButton className='mx-auto h-[40px] w-[160px] md:w-[170px]' />
         </div>
