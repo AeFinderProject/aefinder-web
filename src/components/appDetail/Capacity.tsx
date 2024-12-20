@@ -18,22 +18,20 @@ export default function Capacity() {
     (state) => state.app.currentAppDetail
   );
   const currentVersion = useAppSelector((state) => state.app.currentVersion);
-  const orgUserAll = useAppSelector((state) => state.app.orgUserAll);
 
   const getResourcesFullTemp = useThrottleCallback(async () => {
-    if (!currentAppDetail?.appId || !orgUserAll?.id) return;
+    if (!currentAppDetail?.appId) return;
     const res = await getResourcesFull({
       appId: currentAppDetail?.appId,
-      organizationId: orgUserAll?.id,
     });
     if (res?.productId) {
       setResources(res);
     }
-  }, [currentAppDetail?.appId, orgUserAll?.id]);
+  }, [currentAppDetail?.appId]);
 
   useEffect(() => {
     getResourcesFullTemp();
-  }, [getResourcesFullTemp, currentAppDetail?.appId, orgUserAll?.id]);
+  }, [getResourcesFullTemp]);
 
   const getFullPodUsageTemp = useThrottleCallback(async () => {
     if (!currentAppDetail?.appId || !currentVersion) return;

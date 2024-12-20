@@ -114,10 +114,13 @@ export default function Deposit() {
           messageApi.open({
             type: 'success',
             content: 'Deposit successfully',
-            duration: 10,
+            duration: 3,
           });
           setCurrentAmount(null);
           await getBalance();
+          setTimeout(() => {
+            router.back();
+          }, 4000);
         } else {
           messageApi.open({
             type: 'error',

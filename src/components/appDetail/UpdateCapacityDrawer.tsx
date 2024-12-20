@@ -67,7 +67,6 @@ export default function UpdateCapacityDrawer({
   const currentAppDetail = useAppSelector(
     (state) => state.app.currentAppDetail
   );
-  const orgUserAll = useAppSelector((state) => state.app.orgUserAll);
   // const resourcesLevelList = useAppSelector((state) => state.app.resourcesLevelList);
   console.log('resourcesLevelList appSlice', resourcesLevelList);
 
@@ -160,36 +159,26 @@ export default function UpdateCapacityDrawer({
     }
   }, [resourceBillPlanTemp, resourcesLevelList?.length]);
 
-  const getOrgBalanceTemp = useDebounceCallback(
-    async (organizationId) => {
-      console.log('getOrgBalanceTemp', organizationId);
-      if (!organizationId) {
-        return;
-      }
-      const getOrgBalanceRes = await getOrgBalance({
-        organizationId: organizationId,
-      });
-      console.log('getOrgBalance', getOrgBalanceRes);
-      if (getOrgBalanceRes?.balance) {
-        dispatch(setOrgBalance(getOrgBalanceRes));
-      }
-    },
-    [getOrgBalance]
-  );
+  const getOrgBalanceTemp = useDebounceCallback(async () => {
+    const getOrgBalanceRes = await getOrgBalance();
+    console.log('getOrgBalance', getOrgBalanceRes);
+    if (getOrgBalanceRes?.balance) {
+      dispatch(setOrgBalance(getOrgBalanceRes));
+    }
+  }, [getOrgBalance]);
 
   const getOrgUserAllTemp = useDebounceCallback(async () => {
     const res = await getOrgUserAll();
     console.log('getOrgUserAllTemp', res);
     if (res.length > 0) {
       dispatch(setOrgUserAll(res[0]));
-      const organizationId = res[0]?.id;
-      getOrgBalanceTemp(organizationId);
     }
-  }, [dispatch, getOrgBalanceTemp]);
+  }, [dispatch]);
 
   useEffect(() => {
     getOrgUserAllTemp();
-  }, [getOrgUserAllTemp]);
+    getOrgBalanceTemp();
+  }, [getOrgUserAllTemp, getOrgBalanceTemp]);
 
   const onChange: CollapseProps['onChange'] = (key) => {
     console.log(key);
@@ -209,7 +198,6 @@ export default function UpdateCapacityDrawer({
     }
     const createOrderRes = await createOrder({
       appId: currentAppDetail?.appId,
-      organizationId: orgUserAll?.id,
       productId: currentCapacity?.productId,
       // default 1 number 1 month
       productNumber: 1,
@@ -227,7 +215,7 @@ export default function UpdateCapacityDrawer({
         billingAmount: 0,
       };
     }
-  }, [currentCapacity?.productId, orgUserAll?.id, currentAppDetail?.appId]);
+  }, [currentCapacity?.productId, currentAppDetail?.appId]);
 
   const handleSave = useDebounceCallback(async () => {
     setLoading(true);
@@ -270,9 +258,9 @@ export default function UpdateCapacityDrawer({
             content: 'Successfully updated capacity',
             duration: 10,
           });
-          handleClose();
           // refresh balance when Confirm monthly purchase success
           getOrgBalanceTemp();
+          handleClose();
         } else {
           messageApi.open({
             type: 'error',

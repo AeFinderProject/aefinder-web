@@ -4,10 +4,6 @@ export type GetUserAllResponse = {
   creationTime: string;
 };
 
-export type GetOrgBalanceRequest = {
-  organizationId: string;
-};
-
 export type GetOrgBalanceResponse = {
   chainId: string;
   address: string;
@@ -31,12 +27,7 @@ export type ResourcesLevelItem = {
 };
 
 export type GetResourcesFullRequest = {
-  organizationId: string;
   appId: string;
-};
-
-export type GetApiQueryCountFreeRequest = {
-  organizationId: string;
 };
 
 export type GetResourcesLevelResponse = ResourcesLevelItem[];
@@ -62,7 +53,6 @@ export type ResourceBillPlanResponse = {
 
 export type CreateOrderRequest = {
   appId?: string;
-  organizationId: string;
   productId: string;
   productNumber: number;
   periodMonths: number;
@@ -136,7 +126,6 @@ export type SetNotificationRequest = {
 
 export type AppDeployObliterateRequest = {
   appId: string;
-  organizationId: string;
 };
 
 export type DestroyPendingRequest = {
@@ -144,7 +133,8 @@ export type DestroyPendingRequest = {
 };
 
 export type GetTransactionHistoryRequest = {
-  organizationId: string;
+  skipCount: number;
+  maxResultCount: number;
 };
 
 export type TransactionHistoryItem = {
@@ -161,11 +151,8 @@ export type GetTransactionHistoryResponse = {
   items: TransactionHistoryItem[];
 };
 
-export type GetInvoicesRequest = {
-  organizationId: string;
-};
-
 export type InvoicesItem = {
+  id: string;
   billingId: string;
   billingType: number;
   billingDate: string;
@@ -174,6 +161,7 @@ export type InvoicesItem = {
   billingAmount: number;
   description: string;
   billingStatus: number;
+  transactionState: string;
 };
 
 export type GetInvoicesResponse = {

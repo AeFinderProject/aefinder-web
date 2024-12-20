@@ -35,6 +35,7 @@ export const AuthList = {
     target: `${AeFinderHost}/api/users/register`,
     baseConfig: { method: 'POST' },
   },
+  checkRegisterEmail: `${AeFinderHost}/api/users/register/pending`,
   resend: {
     target: `${AeFinderHost}/api/users/register/resend`,
     baseConfig: { method: 'POST' },

@@ -1,30 +1,46 @@
 import type { TableColumnsType } from 'antd';
 import { Table } from 'antd';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useThrottleCallback } from '@/lib/utils';
 
 import Copy from '@/components/Copy';
-
-import { useAppSelector } from '@/store/hooks';
 
 import { getTransactionHistory } from '@/api/requestMarket';
 
 import { TransactionHistoryItem } from '@/types/marketType';
 
 export default function TransactionHistory() {
-  const orgUserAll = useAppSelector((state) => state.app.orgUserAll);
   const [transactionHistoryList, setTransactionHistoryList] = useState<
     TransactionHistoryItem[]
   >([]);
+  const [skipCount, setSkipCount] = useState(1);
+  const [maxResultCount, setMaxResultCount] = useState(10);
+  const [totalCountItems, setTotalCountItems] = useState(0);
+
+  const tableOnChange = useCallback(
+    (page: number, pageSize: number) => {
+      if (page !== skipCount) {
+        setSkipCount(page);
+      }
+      if (maxResultCount !== pageSize) {
+        // pageSize change and skipCount need init 1
+        setSkipCount(1);
+        setMaxResultCount(pageSize);
+      }
+    },
+    [skipCount, maxResultCount]
+  );
 
   const getTransactionHistoryList = useThrottleCallback(async () => {
-    const { items } = await getTransactionHistory({
-      organizationId: orgUserAll?.id,
+    const { items, totalCount } = await getTransactionHistory({
+      skipCount: (skipCount - 1) * maxResultCount,
+      maxResultCount: maxResultCount,
     });
     setTransactionHistoryList(items);
-  }, [orgUserAll?.id]);
+    setTotalCountItems(totalCount);
+  }, [skipCount, maxResultCount]);
 
   useEffect(() => {
     getTransactionHistoryList();
@@ -37,13 +53,7 @@ export default function TransactionHistory() {
       key: 'transactionId',
       render: (text: string) => (
         <div>
-          <Copy
-            className='ml-[32px]'
-            label=''
-            content={text}
-            isShowCopy={true}
-            showLittle={true}
-          />
+          <Copy label='' content={text} isShowCopy={true} showLittle={true} />
         </div>
       ),
     },
@@ -132,6 +142,16 @@ export default function TransactionHistory() {
             columns={columns}
             dataSource={transactionHistoryList}
             className='w-full'
+            pagination={{
+              current: skipCount,
+              pageSize: maxResultCount,
+              total: totalCountItems,
+              onChange: tableOnChange,
+              showSizeChanger: true,
+              showTitle: true,
+              showTotal: (total) => `Total ${total} transaction`,
+              pageSizeOptions: ['10', '20', '50'],
+            }}
           />
         </div>
       )}

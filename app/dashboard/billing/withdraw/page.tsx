@@ -104,36 +104,26 @@ export default function Withdraw() {
     getBalance();
   }, [getBalance]);
 
-  const getOrgBalanceTemp = useThrottleCallback(
-    async (organizationId) => {
-      console.log('getOrgBalanceTemp', organizationId);
-      if (!organizationId) {
-        return;
-      }
-      const getOrgBalanceRes = await getOrgBalance({
-        organizationId: organizationId,
-      });
-      console.log('getOrgBalance', getOrgBalanceRes);
-      if (getOrgBalanceRes?.balance) {
-        dispatch(setOrgBalance(getOrgBalanceRes));
-      }
-    },
-    [getOrgBalance]
-  );
+  const getOrgBalanceTemp = useThrottleCallback(async () => {
+    const getOrgBalanceRes = await getOrgBalance();
+    console.log('getOrgBalance', getOrgBalanceRes);
+    if (getOrgBalanceRes?.balance) {
+      dispatch(setOrgBalance(getOrgBalanceRes));
+    }
+  }, [getOrgBalance]);
 
   const getOrgUserAllTemp = useThrottleCallback(async () => {
     const res = await getOrgUserAll();
     console.log('getOrgUserAllTemp', res);
     if (res.length > 0) {
       dispatch(setOrgUserAll(res[0]));
-      const organizationId = res[0]?.id;
-      getOrgBalanceTemp(organizationId);
     }
-  }, [dispatch, getOrgBalanceTemp]);
+  }, [dispatch]);
 
   useEffect(() => {
     getOrgUserAllTemp();
-  }, [getOrgUserAllTemp]);
+    getOrgBalanceTemp();
+  }, [getOrgUserAllTemp, getOrgBalanceTemp]);
 
   const handleWithdraw = useDebounceCallback(async () => {
     if (!withdrawAddress) {
@@ -180,11 +170,14 @@ export default function Withdraw() {
           messageApi.open({
             type: 'success',
             content: 'withdraw successfully',
-            duration: 10,
+            duration: 3,
           });
           setCurrentAmount(null);
           await getBalance();
           await getOrgUserAllTemp();
+          setTimeout(() => {
+            router.back();
+          }, 4000);
         } else {
           messageApi.open({
             type: 'error',

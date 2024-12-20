@@ -1,5 +1,7 @@
 import { handleErrorMessage } from '@/lib/utils';
 
+import { AuthList } from '@/api/list';
+
 import { request } from './index';
 import {
   createAppGuest,
@@ -172,6 +174,19 @@ export const register = async (params: RegisterRequest): Promise<boolean> => {
     return true;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'register error'));
+  }
+};
+
+export const checkRegisterEmail = async (
+  params: ResendRequest
+): Promise<boolean> => {
+  try {
+    const res = await request.auth.checkRegisterEmail({
+      url: `${AuthList.checkRegisterEmail}?email=${params?.email}`,
+    });
+    return res;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'checkRegisterEmail error'));
   }
 };
 

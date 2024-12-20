@@ -23,7 +23,6 @@ export default function DeleteIndexerModal({
   const currentAppDetail = useAppSelector(
     (state) => state.app.currentAppDetail
   );
-  const orgUserAll = useAppSelector((state) => state.app.orgUserAll);
   console.log(currentAppDetail);
 
   const handleClose = useCallback(() => {
@@ -33,7 +32,6 @@ export default function DeleteIndexerModal({
   const handleDelete = useCallback(async () => {
     const res = await appDeployObliterate({
       appId: currentAppDetail?.appId,
-      organizationId: orgUserAll?.id,
     });
     if (res) {
       messageApi.open({
@@ -43,13 +41,7 @@ export default function DeleteIndexerModal({
       handleClose();
       router.replace('/dashboard');
     }
-  }, [
-    messageApi,
-    handleClose,
-    router,
-    currentAppDetail?.appId,
-    orgUserAll?.id,
-  ]);
+  }, [messageApi, handleClose, router, currentAppDetail?.appId]);
 
   return (
     <Modal

@@ -10,12 +10,9 @@ import {
   CreateOrderResponse,
   DestroyPendingRequest,
   EmailSendCodeRequest,
-  GetApiQueryCountFreeRequest,
   GetFullPodUsageRequest,
   GetFullPodUsageResponse,
-  GetInvoicesRequest,
   GetInvoicesResponse,
-  GetOrgBalanceRequest,
   GetOrgBalanceResponse,
   GetRegularResponse,
   GetResourcesFullRequest,
@@ -38,11 +35,9 @@ export const getOrgUserAll = async (): Promise<GetUserAllResponse[]> => {
   }
 };
 
-export const getOrgBalance = async (
-  params: GetOrgBalanceRequest
-): Promise<GetOrgBalanceResponse> => {
+export const getOrgBalance = async (): Promise<GetOrgBalanceResponse> => {
   try {
-    const res = await request.market.getOrgBalance({ params });
+    const res = await request.market.getOrgBalance();
     return res;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'getOrgBalance error'));
@@ -70,22 +65,18 @@ export const getResourcesFull = async (
   }
 };
 
-export const getApiQueryCountFree = async (
-  params: GetApiQueryCountFreeRequest
-): Promise<number> => {
+export const getApiQueryCountFree = async (): Promise<number> => {
   try {
-    const res = await request.market.getApiQueryCountFree({ params });
+    const res = await request.market.getApiQueryCountFree();
     return res;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'getApiQueryCountFree error'));
   }
 };
 
-export const getApiQueryCountMonthly = async (
-  params: GetApiQueryCountFreeRequest
-): Promise<number> => {
+export const getApiQueryCountMonthly = async (): Promise<number> => {
   try {
-    const res = await request.market.getApiQueryCountMonthly({ params });
+    const res = await request.market.getApiQueryCountMonthly();
     return res;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'getApiQueryCountMonthly error'));
@@ -203,11 +194,9 @@ export const getTransactionHistory = async (
   }
 };
 
-export const getInvoices = async (
-  params: GetInvoicesRequest
-): Promise<GetInvoicesResponse> => {
+export const getInvoices = async (): Promise<GetInvoicesResponse> => {
   try {
-    const res = await request.market.getInvoices({ params });
+    const res = await request.market.getInvoices();
     return res;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'getInvoices error'));

@@ -131,22 +131,13 @@ export default function Apikey() {
     getApikeyListTemp();
   }, [isShowCreateModal, getApikeyListTemp]);
 
-  const getOrgBalanceTemp = useDebounceCallback(
-    async (organizationId) => {
-      console.log('getOrgBalanceTemp', organizationId);
-      if (!organizationId) {
-        return;
-      }
-      const getOrgBalanceRes = await getOrgBalance({
-        organizationId: organizationId,
-      });
-      console.log('getOrgBalance', getOrgBalanceRes);
-      if (getOrgBalanceRes?.balance) {
-        dispatch(setOrgBalance(getOrgBalanceRes));
-      }
-    },
-    [getOrgBalance]
-  );
+  const getOrgBalanceTemp = useDebounceCallback(async () => {
+    const getOrgBalanceRes = await getOrgBalance();
+    console.log('getOrgBalance', getOrgBalanceRes);
+    if (getOrgBalanceRes?.balance) {
+      dispatch(setOrgBalance(getOrgBalanceRes));
+    }
+  }, [getOrgBalance]);
 
   const getOrgUserAllTemp = useDebounceCallback(async () => {
     const res = await getOrgUserAll();

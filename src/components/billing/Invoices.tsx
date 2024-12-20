@@ -5,22 +5,19 @@ import React, { useEffect, useState } from 'react';
 
 import { useDebounceCallback } from '@/lib/utils';
 
-import { useAppSelector } from '@/store/hooks';
+import Copy from '@/components/Copy';
 
 import { getInvoices } from '@/api/requestMarket';
 
 import { InvoicesItem } from '@/types/marketType';
 
 export default function Invoices() {
-  const orgUserAll = useAppSelector((state) => state.app.orgUserAll);
   const [invoiceList, setInvoiceList] = useState<InvoicesItem[]>([]);
 
   const getInvoicesList = useDebounceCallback(async () => {
-    const { items } = await getInvoices({
-      organizationId: orgUserAll?.id,
-    });
+    const { items } = await getInvoices();
     setInvoiceList(items);
-  }, [orgUserAll?.id]);
+  }, []);
 
   useEffect(() => {
     getInvoicesList();
@@ -31,6 +28,11 @@ export default function Invoices() {
       title: 'Invoice No.',
       dataIndex: 'billingId',
       key: 'billingId',
+      render: (text: string) => (
+        <div>
+          <Copy label='' content={text} isShowCopy={true} showLittle={true} />
+        </div>
+      ),
     },
     {
       title: 'Date Issued',
@@ -71,6 +73,11 @@ export default function Invoices() {
           </div>
         );
       },
+    },
+    {
+      title: 'TransactionState',
+      dataIndex: 'transactionState',
+      key: 'transactionState',
     },
     // {
     //   title: 'View',
@@ -116,7 +123,7 @@ export default function Invoices() {
       {invoiceList.length > 0 && (
         <div className='mt-[24px]'>
           <Table
-            rowKey={(record) => record?.billingId + record?.billingStatus}
+            rowKey='id'
             columns={columns}
             dataSource={invoiceList}
             className='w-full'

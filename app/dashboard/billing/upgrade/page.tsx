@@ -17,7 +17,6 @@ import {
   handleErrorMessage,
   timesDecimals,
   useDebounceCallback,
-  useThrottleCallback,
 } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -31,6 +30,7 @@ import {
 import {
   createOrder,
   getApiQueryCountFree,
+  getApiQueryCountMonthly,
   getOrgBalance,
   getOrgUserAll,
 } from '@/api/requestMarket';
@@ -93,13 +93,23 @@ export default function Upgrade() {
   const usdtBalance = useAppSelector((state) => state.common.usdtBalance);
   const elfBalance = useAppSelector((state) => state.common.elfBalance);
   const orgBalance = useAppSelector((state) => state.common.orgBalance);
-  const orgUserAll = useAppSelector((state) => state.app.orgUserAll);
   const regularData = useAppSelector((state) => state.app.regularData);
   const freeApiQueryCount = useAppSelector(
     (state) => state.app.freeApiQueryCount
   );
 
-  const getBalance = useThrottleCallback(async () => {
+  const getApiQueryCountMonthlyTemp = useCallback(async () => {
+    const res = await getApiQueryCountMonthly();
+    if (res) {
+      setCurrentQueryCount(res / 1000);
+    }
+  }, []);
+
+  useEffect(() => {
+    getApiQueryCountMonthlyTemp();
+  }, [getApiQueryCountMonthlyTemp]);
+
+  const getBalance = useCallback(async () => {
     if (!isConnectedRef.current || !walletInfoRef.current) {
       return;
     }
@@ -129,66 +139,40 @@ export default function Upgrade() {
     } catch (error) {
       messageApi.error(handleErrorMessage(error));
     }
-  }, [
-    callViewMethod,
-    dispatch,
-    setElfBalance,
-    setUsdtBalance,
-    messageApi,
-    isConnectedRef.current,
-    walletInfoRef.current,
-  ]);
+  }, [callViewMethod, getAccountByChainId, dispatch, messageApi]);
 
   useEffect(() => {
     getBalance();
   }, [getBalance]);
 
-  const getOrgBalanceTemp = useDebounceCallback(
-    async (organizationId) => {
-      console.log('getOrgBalanceTemp', organizationId);
-      if (!organizationId) {
-        return;
-      }
-      const getOrgBalanceRes = await getOrgBalance({
-        organizationId: organizationId,
-      });
-      console.log('getOrgBalance', getOrgBalanceRes);
-      if (getOrgBalanceRes?.balance) {
-        dispatch(setOrgBalance(getOrgBalanceRes));
-      }
-    },
-    [getOrgBalance]
-  );
+  const getOrgBalanceTemp = useCallback(async () => {
+    const getOrgBalanceRes = await getOrgBalance();
+    console.log('getOrgBalance', getOrgBalanceRes);
+    if (getOrgBalanceRes?.balance) {
+      dispatch(setOrgBalance(getOrgBalanceRes));
+    }
+  }, [dispatch]);
 
-  const getApiQueryCountFreeTemp = useDebounceCallback(
-    async (organizationId) => {
-      if (!organizationId) {
-        return;
-      }
-      const res = await getApiQueryCountFree({
-        organizationId: organizationId,
-      });
-      if (res) {
-        dispatch(setFreeApiQueryCount(res));
-      }
-    },
-    [getApiQueryCountFree]
-  );
+  const getApiQueryCountFreeTemp = useCallback(async () => {
+    const res = await getApiQueryCountFree();
+    if (res) {
+      dispatch(setFreeApiQueryCount(res));
+    }
+  }, [dispatch]);
 
   const getOrgUserAllTemp = useDebounceCallback(async () => {
     const res = await getOrgUserAll();
     console.log('getOrgUserAllTemp', res);
     if (res.length > 0) {
       dispatch(setOrgUserAll(res[0]));
-      const organizationId = res[0]?.id;
-      getOrgBalanceTemp(organizationId);
-      getApiQueryCountFreeTemp(organizationId);
+      getOrgBalanceTemp();
+      getApiQueryCountFreeTemp();
     }
   }, [dispatch, getOrgBalanceTemp, getApiQueryCountFreeTemp]);
 
   useEffect(() => {
     getOrgUserAllTemp();
-  }, [getOrgUserAllTemp, orgUserAll]);
+  }, [getOrgUserAllTemp]);
 
   useEffect(() => {
     let tempAmount = 0;
@@ -216,7 +200,6 @@ export default function Upgrade() {
 
   const handlePreCreateOrder = useCallback(async () => {
     const createOrderRes = await createOrder({
-      organizationId: orgUserAll?.id,
       productId: regularData?.productId,
       productNumber: Number(
         calcProductNumber(
@@ -242,7 +225,6 @@ export default function Upgrade() {
   }, [
     currentQueryCount,
     currentMonth,
-    orgUserAll?.id,
     regularData?.productId,
     regularData?.queryCount,
     freeApiQueryCount,
@@ -286,13 +268,15 @@ export default function Upgrade() {
         if (lockResult?.data?.Status === 'MINED') {
           messageApi.open({
             type: 'success',
-            content:
-              'Confirm monthly purchase successfully, please wait for the purchase locked to start',
-            duration: 20,
+            content: 'Confirm monthly purchase successfully',
+            duration: 3,
           });
           // refresh balance when Confirm monthly purchase success
-          getBalance();
-          getOrgBalanceTemp();
+          await getBalance();
+          await getOrgBalanceTemp();
+          setTimeout(() => {
+            router.back();
+          }, 4000);
         } else {
           messageApi.open({
             type: 'error',

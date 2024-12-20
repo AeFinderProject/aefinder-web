@@ -28,7 +28,6 @@ export default function Overview() {
 
   const apikeySummary = useAppSelector((state) => state.app.apikeySummary);
   const regularData = useAppSelector((state) => state.app.regularData);
-  const orgUserAll = useAppSelector((state) => state.app.orgUserAll);
   const orgBalance = useAppSelector((state) => state.common.orgBalance);
 
   const config = {
@@ -65,52 +64,34 @@ export default function Overview() {
     getSnapshotsData();
   }, [getSummaryTemp, getSnapshotsData]);
 
-  const getOrgBalanceTemp = useDebounceCallback(
-    async (organizationId) => {
-      console.log('getOrgBalanceTemp', organizationId);
-      if (!organizationId) {
-        return;
-      }
-      const getOrgBalanceRes = await getOrgBalance({
-        organizationId: organizationId,
-      });
-      console.log('getOrgBalance', getOrgBalanceRes);
-      if (getOrgBalanceRes?.balance) {
-        dispatch(setOrgBalance(getOrgBalanceRes));
-      }
-    },
-    [getOrgBalance]
-  );
+  const getOrgBalanceTemp = useCallback(async () => {
+    const getOrgBalanceRes = await getOrgBalance();
+    console.log('getOrgBalance', getOrgBalanceRes);
+    if (getOrgBalanceRes?.balance) {
+      dispatch(setOrgBalance(getOrgBalanceRes));
+    }
+  }, [dispatch]);
 
-  const getApiQueryCountFreeTemp = useDebounceCallback(
-    async (organizationId) => {
-      if (!organizationId) {
-        return;
-      }
-      const res = await getApiQueryCountFree({
-        organizationId: organizationId,
-      });
-      if (res) {
-        dispatch(setFreeApiQueryCount(res));
-      }
-    },
-    [getApiQueryCountFree]
-  );
+  const getApiQueryCountFreeTemp = useCallback(async () => {
+    const res = await getApiQueryCountFree();
+    if (res) {
+      dispatch(setFreeApiQueryCount(res));
+    }
+  }, [dispatch]);
 
   const getOrgUserAllTemp = useDebounceCallback(async () => {
     const res = await getOrgUserAll();
     console.log('getOrgUserAllTemp', res);
     if (res.length > 0) {
       dispatch(setOrgUserAll(res[0]));
-      const organizationId = res[0]?.id;
-      getOrgBalanceTemp(organizationId);
-      getApiQueryCountFreeTemp(organizationId);
     }
-  }, [dispatch, getOrgBalanceTemp, getApiQueryCountFreeTemp]);
+  }, [dispatch]);
 
   useEffect(() => {
     getOrgUserAllTemp();
-  }, [getOrgUserAllTemp, orgUserAll]);
+    getOrgBalanceTemp();
+    getApiQueryCountFreeTemp();
+  }, [getOrgUserAllTemp, getOrgBalanceTemp, getApiQueryCountFreeTemp]);
 
   return (
     <div>

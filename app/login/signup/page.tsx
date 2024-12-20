@@ -1,12 +1,12 @@
 'use client';
 
-import { Button, Form, Input, message } from 'antd';
+import { Button, Form, Input, message, Modal } from 'antd';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useState } from 'react';
 
 import { useDebounceCallback } from '@/lib/utils';
 
-import { register, resend } from '@/api/requestApp';
+import { checkRegisterEmail, register, resend } from '@/api/requestApp';
 
 export default function Signup() {
   const [form] = Form.useForm();
@@ -17,6 +17,7 @@ export default function Signup() {
   const [currentStep, setCurrentStep] = useState(1);
   const [currentEmail, setCurrentEmail] = useState('');
   const [countdown, setCountdown] = useState(60);
+  const [isShowCheckModal, setIsShowCheckModal] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
   const handleCountdown = useCallback(() => {
@@ -69,6 +70,25 @@ export default function Signup() {
     return true;
   }, [form, messageApi]);
 
+  const handleResendEmail = useDebounceCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await resend({
+        email: currentEmail,
+      });
+      if (res) {
+        messageApi.open({
+          type: 'success',
+          content: 'Email has been sent, please check your email to register!',
+        });
+        handleCountdown();
+        setCurrentStep(2);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [handleCountdown, checkoutFormValue, currentEmail]);
+
   const handleVerifyEmail = useDebounceCallback(async () => {
     if (!checkoutFormValue()) return;
     setLoading(true);
@@ -92,23 +112,23 @@ export default function Signup() {
     }
   }, [setLoading, form]);
 
-  const handleResendEmail = useDebounceCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await resend({
-        email: currentEmail,
-      });
-      if (res) {
-        messageApi.open({
-          type: 'success',
-          content: 'email has been sent',
-        });
-        handleCountdown();
-      }
-    } finally {
-      setLoading(false);
+  const checkRegisterEmailTemp = useDebounceCallback(async () => {
+    const values = form.getFieldsValue();
+    const { email } = values;
+    const res = await checkRegisterEmail({ email });
+    if (res) {
+      setCurrentEmail(email);
+      // open confirm modal
+      setIsShowCheckModal(true);
+    } else {
+      handleVerifyEmail();
     }
-  }, [handleCountdown, checkoutFormValue]);
+  }, [form, messageApi]);
+
+  const handleConfirm = useDebounceCallback(() => {
+    handleResendEmail();
+    setIsShowCheckModal(false);
+  }, [handleResendEmail]);
 
   return (
     <div className='mt-[80px] flex w-full flex-col items-center justify-center text-center'>
@@ -123,7 +143,7 @@ export default function Signup() {
             <Form
               form={form}
               layout='vertical'
-              onFinish={() => handleVerifyEmail()}
+              onFinish={() => checkRegisterEmailTemp()}
             >
               <FormItem
                 name='username'
@@ -248,6 +268,36 @@ export default function Signup() {
           )}
         </div>
       </div>
+      <Modal
+        title=''
+        open={isShowCheckModal}
+        onCancel={() => setIsShowCheckModal(false)}
+        footer={false}
+        className='p-[50px]'
+      >
+        <div className='text-dark-normal mb-[4px] mt-[24px] font-medium'>
+          Email:
+          <span className='text-blue-link mx-[10px]'>{currentEmail}</span>
+          has been register, do you want to use it, please check your email!
+        </div>
+        <div className='mt-[24px] flex items-center justify-between'>
+          <Button
+            className='w-[48%]'
+            size='large'
+            onClick={() => setIsShowCheckModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            className='w-[48%]'
+            size='large'
+            type='primary'
+            onClick={handleConfirm}
+          >
+            Confirm
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }

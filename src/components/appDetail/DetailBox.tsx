@@ -27,16 +27,15 @@ export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
     if (!currentAppDetail?.appId || !orgUserAll?.id) return;
     const res = await getResourcesFull({
       appId: currentAppDetail?.appId,
-      organizationId: orgUserAll?.id,
     });
     if (res?.productId) {
       setResources(res);
     }
-  }, [currentAppDetail?.appId, orgUserAll?.id]);
+  }, [currentAppDetail?.appId]);
 
   useEffect(() => {
     getResourcesFullTemp();
-  }, [getResourcesFullTemp, currentAppDetail?.appId, orgUserAll?.id]);
+  }, [getResourcesFullTemp, currentAppDetail?.appId]);
 
   return (
     <div className='bg-gray-F5 mt-[30px] flex w-full items-start justify-start rounded-md px-[20px] py-[30px]'>
