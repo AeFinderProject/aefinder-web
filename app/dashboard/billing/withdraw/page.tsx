@@ -134,7 +134,7 @@ export default function Withdraw() {
       messageApi.warning('Insufficient withdraw USDT balance');
       return;
     }
-    if (currentAmount > orgBalance?.balance - orgBalance?.lockedBalance) {
+    if (currentAmount > orgBalance?.balance) {
       messageApi.warning('withdraw USDT balance is not enough');
       return;
     }
@@ -181,7 +181,7 @@ export default function Withdraw() {
         } else {
           messageApi.open({
             type: 'error',
-            content: 'Deposit failed',
+            content: 'withdraw failed',
           });
         }
         console.log('withdrawResult', withdrawResult);

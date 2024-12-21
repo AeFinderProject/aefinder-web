@@ -28,11 +28,13 @@ import {
 } from '@/store/slices/commonSlice';
 
 import {
+  cancelPayment,
   createOrder,
   getApiQueryCountFree,
   getApiQueryCountMonthly,
   getOrgBalance,
   getOrgUserAll,
+  pendingPayment,
 } from '@/api/requestMarket';
 import {
   AeFinderContractAddress,
@@ -240,8 +242,8 @@ export default function Upgrade() {
 
   const handleCreateOrder = useDebounceCallback(async () => {
     setLoading(true);
+    const { billingId, billingAmount } = await handlePreCreateOrder();
     try {
-      const { billingId, billingAmount } = await handlePreCreateOrder();
       console.log('billingId, billingAmount', billingId, billingAmount);
       if (!billingId || !billingAmount) {
         messageApi.warning('Create order failed');
@@ -282,6 +284,9 @@ export default function Upgrade() {
           // refresh balance when Confirm monthly purchase success
           await getBalance();
           await getOrgBalanceTemp();
+          await pendingPayment({
+            billingId: billingId,
+          });
           setTimeout(() => {
             router.back();
           }, 4000);
@@ -293,6 +298,14 @@ export default function Upgrade() {
         }
         console.log('lockResult', lockResult);
       }
+    } catch (error) {
+      messageApi.open({
+        type: 'error',
+        content: 'Confirm monthly purchase failed',
+      });
+      await cancelPayment({
+        billingId: billingId,
+      });
     } finally {
       setLoading(false);
     }
@@ -437,8 +450,7 @@ export default function Upgrade() {
                 You will be able to withdraw your unlocked balance at any time
               </span>
             </Tag>
-            {currentTotalAmount >
-              orgBalance?.balance - orgBalance?.lockedBalance && (
+            {currentTotalAmount > orgBalance?.balance && (
               <Tag
                 icon={
                   <ExclamationCircleOutlined className='relative top-[-3px]' />
@@ -466,14 +478,12 @@ export default function Upgrade() {
                   {currentAmount} USDT/month
                 </div>
               </div>
-              {currentTotalAmount >
-                orgBalance?.balance - orgBalance?.lockedBalance && (
+              {currentTotalAmount > orgBalance?.balance && (
                 <Button type='default' disabled={true}>
                   Insufficient billing balance
                 </Button>
               )}
-              {currentTotalAmount <=
-                orgBalance?.balance - orgBalance?.lockedBalance && (
+              {currentTotalAmount <= orgBalance?.balance && (
                 <Button
                   type='primary'
                   disabled={currentTotalAmount === 0}

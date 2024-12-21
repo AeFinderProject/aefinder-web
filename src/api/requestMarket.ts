@@ -20,6 +20,7 @@ import {
   GetTransactionHistoryRequest,
   GetTransactionHistoryResponse,
   GetUserAllResponse,
+  PaymentRequestType,
   ResourceBillPlanRequest,
   ResourceBillPlanResponse,
   ResourcesLevelItem,
@@ -200,5 +201,33 @@ export const getInvoices = async (): Promise<GetInvoicesResponse> => {
     return res;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'getInvoices error'));
+  }
+};
+
+export const pendingPayment = async (
+  params: PaymentRequestType
+): Promise<boolean> => {
+  try {
+    await request.market.pendingPayment({
+      params,
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+    return true;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'pendingPayment error'));
+  }
+};
+
+export const cancelPayment = async (
+  params: PaymentRequestType
+): Promise<boolean> => {
+  try {
+    await request.market.cancelPayment({
+      params,
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+    return true;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'cancelPayment error'));
   }
 };

@@ -19,10 +19,12 @@ import { setOrgUserAll } from '@/store/slices/appSlice';
 import { setOrgBalance } from '@/store/slices/commonSlice';
 
 import {
+  cancelPayment,
   createOrder,
   getOrgBalance,
   getOrgUserAll,
   getResourcesLevel,
+  pendingPayment,
   resourceBillPlan,
 } from '@/api/requestMarket';
 import {
@@ -67,6 +69,7 @@ export default function UpdateCapacityDrawer({
   const currentAppDetail = useAppSelector(
     (state) => state.app.currentAppDetail
   );
+
   // const resourcesLevelList = useAppSelector((state) => state.app.resourcesLevelList);
   console.log('resourcesLevelList appSlice', resourcesLevelList);
 
@@ -219,8 +222,8 @@ export default function UpdateCapacityDrawer({
 
   const handleSave = useDebounceCallback(async () => {
     setLoading(true);
+    const { billingId, billingAmount } = await handlePreCreateOrder();
     try {
-      const { billingId, billingAmount } = await handlePreCreateOrder();
       console.log('billingId, billingAmount', billingId, billingAmount);
       if (!billingId || !billingAmount) {
         messageApi.warning('Create order failed');
@@ -260,6 +263,9 @@ export default function UpdateCapacityDrawer({
           });
           // refresh balance when Confirm monthly purchase success
           getOrgBalanceTemp();
+          await pendingPayment({
+            billingId: billingId,
+          });
           handleClose();
         } else {
           messageApi.open({
@@ -269,6 +275,15 @@ export default function UpdateCapacityDrawer({
         }
         console.log('lockResult', lockResult);
       }
+    } catch (error) {
+      console.log('error', error);
+      messageApi.open({
+        type: 'error',
+        content: 'Confirm monthly purchase failed',
+      });
+      await cancelPayment({
+        billingId: billingId,
+      });
     } finally {
       setLoading(false);
     }
@@ -277,18 +292,13 @@ export default function UpdateCapacityDrawer({
   const displayDepositAmount = useCallback(() => {
     const tempAmount =
       (currentResourceBillPlan?.firstMonthCost || 0) -
-      (orgBalance?.balance || 0) +
-      (orgBalance?.lockedBalance || 0);
+      (orgBalance?.balance || 0);
     if (tempAmount > 0) {
       return tempAmount;
     } else {
       return 0;
     }
-  }, [
-    orgBalance?.balance,
-    orgBalance?.lockedBalance,
-    currentResourceBillPlan?.firstMonthCost,
-  ]);
+  }, [orgBalance?.balance, currentResourceBillPlan?.firstMonthCost]);
 
   return (
     <Drawer

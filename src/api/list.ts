@@ -191,6 +191,14 @@ export const marketList = {
   },
   getTransactionHistory: `${AeFinderHost}/api/market/transaction-history`,
   getInvoices: `${AeFinderHost}/api/market/invoices`,
+  pendingPayment: {
+    target: `${AeFinderHost}/api/market/bill/pending-payment`,
+    baseConfig: { method: 'POST' },
+  },
+  cancelPayment: {
+    target: `${AeFinderHost}/api/market/bill/cancel`,
+    baseConfig: { method: 'POST' },
+  },
 };
 
 /**

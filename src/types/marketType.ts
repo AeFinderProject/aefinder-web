@@ -168,3 +168,7 @@ export type GetInvoicesResponse = {
   totalCount: number;
   items: InvoicesItem[];
 };
+
+export type PaymentRequestType = {
+  billingId: string;
+};
