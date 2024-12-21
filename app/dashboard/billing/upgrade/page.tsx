@@ -318,7 +318,10 @@ export default function Upgrade() {
               </div>
               <div>
                 <span className='text-dark-normal'>500,000</span>
-                <span className='text-blue-link ml-[16px] cursor-pointer'>
+                <span
+                  className='text-blue-link ml-[16px] cursor-pointer'
+                  onClick={() => setCurrentQueryCount(500)}
+                >
                   Max
                 </span>
               </div>

@@ -2,7 +2,7 @@
 
 import { LeftOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import type { TabsProps } from 'antd';
-import { Button, Tabs, Tag } from 'antd';
+import { Button, Tabs } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -47,9 +47,6 @@ export default function BillingManage() {
             onClick={() => router.back()}
           />
           <div className='text-3xl text-black'>Billing</div>
-          <Tag color='#9DCBFF' className='ml-[16px]'>
-            Paid Plan
-          </Tag>
         </div>
         <div>
           <Button

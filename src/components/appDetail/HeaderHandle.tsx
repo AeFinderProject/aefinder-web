@@ -5,6 +5,8 @@ import { MessageInstance } from 'antd/es/message/interface';
 import Image from 'next/image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useDebounceCallback } from '@/lib/utils';
+
 import DeleteIndexerModal from '@/components/appDetail/DeleteAeIndexerModal';
 import DeletePendingPodModal from '@/components/appDetail/DeletePendingPodModal';
 import DeployDrawer from '@/components/appDetail/DeployDrawer';
@@ -13,6 +15,8 @@ import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setCurrentVersion } from '@/store/slices/appSlice';
+
+import { getResourcesFull } from '@/api/requestMarket';
 
 import { AppStatusType, CurrentTourStepEnum } from '@/types/appType';
 
@@ -32,6 +36,7 @@ export default function HeaderHandle({
   const dispatch = useAppDispatch();
   const DeployRef = useRef<GetRef<typeof Button>>(null);
   const UpdateRef = useRef<GetRef<typeof Button>>(null);
+  const [deployLoading, setDeployLoading] = useState(false);
   const [openDeployTour, setOpenDeployTour] = useState(false);
   const [openUpdateTour, setOpenUpdateTour] = useState(false);
   const username = useAppSelector((state) => state.common.username);
@@ -157,6 +162,27 @@ export default function HeaderHandle({
     },
   ];
 
+  const handleClickDeploy = useDebounceCallback(async () => {
+    // need to check the aeindexer has buy cpu and memory or not
+    // if yes, then deploy the aeindexer and show the updateCapacity drawer
+    try {
+      setDeployLoading(true);
+      handleDeployCloseTour();
+      if (!currentAppDetail?.appId) return;
+      const res = await getResourcesFull({
+        appId: currentAppDetail?.appId,
+      });
+      if (res?.productId) {
+        setDeployDrawerVisible(true);
+      } else {
+        messageApi.info('Please update capacity first');
+        setIsShowUpdateCapacityModal(true);
+      }
+    } finally {
+      setDeployLoading(false);
+    }
+  }, [currentAppDetail?.appId]);
+
   return (
     <div className='border-gray-F0 flex h-[130px] items-center justify-between border-b pt-[14px]'>
       <div>
@@ -187,16 +213,14 @@ export default function HeaderHandle({
             className='border-blue-link text-blue-link mr-3'
             onClick={() => setEditAppDrawerVisible(true)}
           >
-            <EditOutlined className='align-middle' />
+            <EditOutlined className='relative top-[-4px]' />
             Edit
           </Button>
           <Button
             ref={DeployRef}
             type='primary'
-            onClick={() => {
-              handleDeployCloseTour();
-              setDeployDrawerVisible(true);
-            }}
+            onClick={handleClickDeploy}
+            loading={deployLoading}
           >
             Deploy...
           </Button>
