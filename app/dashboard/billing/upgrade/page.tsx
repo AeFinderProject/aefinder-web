@@ -292,16 +292,26 @@ export default function Upgrade() {
           }, 4000);
         } else {
           messageApi.open({
-            type: 'error',
+            type: 'info',
             content: 'Confirm monthly purchase failed',
+          });
+          await cancelPayment({
+            billingId: billingId,
           });
         }
         console.log('lockResult', lockResult);
+      } else {
+        await cancelPayment({
+          billingId: billingId,
+        });
       }
     } catch (error) {
       messageApi.open({
         type: 'error',
-        content: 'Confirm monthly purchase failed',
+        content: `${handleErrorMessage(
+          error,
+          'Confirm monthly purchase failed'
+        )}`,
       });
       await cancelPayment({
         billingId: billingId,

@@ -269,11 +269,18 @@ export default function UpdateCapacityDrawer({
           handleClose();
         } else {
           messageApi.open({
-            type: 'error',
+            type: 'info',
             content: 'Confirm monthly purchase failed',
+          });
+          await cancelPayment({
+            billingId: billingId,
           });
         }
         console.log('lockResult', lockResult);
+      } else {
+        await cancelPayment({
+          billingId: billingId,
+        });
       }
     } catch (error) {
       console.log('error', error);
