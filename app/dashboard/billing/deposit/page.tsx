@@ -1,11 +1,11 @@
 'use client';
-
+import { TWalletInfo } from '@aelf-web-login/wallet-adapter-base';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { LeftOutlined } from '@ant-design/icons';
 import { Button, Col, Divider, InputNumber, message, Row } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
   divDecimals,
@@ -32,8 +32,13 @@ export default function Deposit() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
-  const { callSendMethod, callViewMethod, getAccountByChainId } =
-    useConnectWallet();
+  const {
+    callSendMethod,
+    callViewMethod,
+    getAccountByChainId,
+    walletInfo,
+    isConnected,
+  } = useConnectWallet();
   const [loading, setLoading] = useState(false);
   const [currentAmount, setCurrentAmount] = useState<number | null>(null);
 
@@ -41,7 +46,15 @@ export default function Deposit() {
   const usdtBalance = useAppSelector((state) => state.common.usdtBalance);
   const elfBalance = useAppSelector((state) => state.common.elfBalance);
 
+  const walletInfoRef = useRef<TWalletInfo>();
+  walletInfoRef.current = walletInfo;
+  const isConnectedRef = useRef<boolean>();
+  isConnectedRef.current = isConnected;
+
   const getBalance = useThrottleCallback(async () => {
+    if (!isConnectedRef.current || !walletInfoRef.current) {
+      return;
+    }
     try {
       const getELFBalance: GetBalanceResponseType = await callViewMethod({
         chainId: CHAIN_ID,
@@ -68,7 +81,15 @@ export default function Deposit() {
     } catch (error) {
       messageApi.error(handleErrorMessage(error));
     }
-  }, [callViewMethod, dispatch, setElfBalance, setUsdtBalance, messageApi]);
+  }, [
+    callViewMethod,
+    dispatch,
+    setElfBalance,
+    setUsdtBalance,
+    messageApi,
+    walletInfoRef.current,
+    isConnectedRef.current,
+  ]);
 
   useEffect(() => {
     getBalance();

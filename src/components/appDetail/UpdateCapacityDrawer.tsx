@@ -276,7 +276,7 @@ export default function UpdateCapacityDrawer({
 
   const displayDepositAmount = useCallback(() => {
     const tempAmount =
-      (currentResourceBillPlan?.monthlyUnitPrice || 0) -
+      (currentResourceBillPlan?.firstMonthCost || 0) -
       (orgBalance?.balance || 0) +
       (orgBalance?.lockedBalance || 0);
     if (tempAmount > 0) {
@@ -287,7 +287,7 @@ export default function UpdateCapacityDrawer({
   }, [
     orgBalance?.balance,
     orgBalance?.lockedBalance,
-    currentResourceBillPlan?.monthlyUnitPrice,
+    currentResourceBillPlan?.firstMonthCost,
   ]);
 
   return (

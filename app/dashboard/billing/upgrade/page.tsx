@@ -139,7 +139,15 @@ export default function Upgrade() {
     } catch (error) {
       messageApi.error(handleErrorMessage(error));
     }
-  }, [callViewMethod, getAccountByChainId, dispatch, messageApi]);
+    // eslint-disable-next-line
+  }, [
+    callViewMethod,
+    getAccountByChainId,
+    dispatch,
+    messageApi,
+    walletInfoRef.current,
+    isConnectedRef.current,
+  ]);
 
   useEffect(() => {
     getBalance();
@@ -423,19 +431,20 @@ export default function Upgrade() {
                 <ExclamationCircleOutlined className='relative top-[-3px]' />
               }
               color='processing'
-              className='my-[8px] h-[40px] w-full leading-10 '
+              className='my-[8px] h-[40px] w-full truncate leading-10'
             >
-              <span className='text-gray-80 w-full overflow-hidden text-sm'>
+              <span className='text-gray-80 w-full text-sm'>
                 You will be able to withdraw your unlocked balance at any time
               </span>
             </Tag>
-            {currentTotalAmount > orgBalance?.balance && (
+            {currentTotalAmount >
+              orgBalance?.balance - orgBalance?.lockedBalance && (
               <Tag
                 icon={
                   <ExclamationCircleOutlined className='relative top-[-3px]' />
                 }
                 color='warning'
-                className='h-[40px] w-full leading-10'
+                className='h-[40px] w-full truncate leading-10'
               >
                 <span className='text-gray-80 text-sm'>
                   You don’t have enough billing balance. Please
@@ -457,12 +466,14 @@ export default function Upgrade() {
                   {currentAmount} USDT/month
                 </div>
               </div>
-              {currentTotalAmount > orgBalance?.balance && (
+              {currentTotalAmount >
+                orgBalance?.balance - orgBalance?.lockedBalance && (
                 <Button type='default' disabled={true}>
                   Insufficient billing balance
                 </Button>
               )}
-              {currentTotalAmount <= orgBalance?.balance && (
+              {currentTotalAmount <=
+                orgBalance?.balance - orgBalance?.lockedBalance && (
                 <Button
                   type='primary'
                   disabled={currentTotalAmount === 0}
