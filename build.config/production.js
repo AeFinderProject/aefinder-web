@@ -3,9 +3,10 @@ const commonConfig = require('./common');
 module.exports = {
   ...commonConfig,
   swcMinify: true,
-  compiler: {
-    removeConsole: {
-      exclude: ['error'],
-    },
-  },
+  // todo: enable removeConsole when test end
+  // compiler: {
+  //   removeConsole: {
+  //     exclude: ['error'],
+  //   },
+  // },
 };
