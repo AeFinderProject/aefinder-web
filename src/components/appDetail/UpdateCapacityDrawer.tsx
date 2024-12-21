@@ -277,13 +277,18 @@ export default function UpdateCapacityDrawer({
   const displayDepositAmount = useCallback(() => {
     const tempAmount =
       (currentResourceBillPlan?.monthlyUnitPrice || 0) -
-      (orgBalance?.balance || 0);
+      (orgBalance?.balance || 0) +
+      (orgBalance?.lockedBalance || 0);
     if (tempAmount > 0) {
       return tempAmount;
     } else {
       return 0;
     }
-  }, [orgBalance?.balance, currentResourceBillPlan?.monthlyUnitPrice]);
+  }, [
+    orgBalance?.balance,
+    orgBalance?.lockedBalance,
+    currentResourceBillPlan?.monthlyUnitPrice,
+  ]);
 
   return (
     <Drawer
@@ -363,8 +368,14 @@ export default function UpdateCapacityDrawer({
         </div>
         <Divider className='my-[20px]' />
         <div className='flex items-center justify-between'>
-          <span className='text-gray-80 text-sm'>Current Balance</span>
+          <span className='text-gray-80 text-sm'>Billing Balance</span>
           <span className='text-dark-normal'>{orgBalance?.balance} USDT</span>
+        </div>
+        <div className='mt-[10px] flex items-center justify-between'>
+          <span className='text-gray-80 text-sm'>Locked</span>
+          <span className='text-dark-normal'>
+            {orgBalance?.lockedBalance} USDT
+          </span>
         </div>
         <Divider className='my-[20px]' />
         <div className='flex items-center justify-between'>
