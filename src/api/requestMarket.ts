@@ -10,6 +10,7 @@ import {
   CreateOrderResponse,
   DestroyPendingRequest,
   EmailSendCodeRequest,
+  GetBillingOverviewResponse,
   GetFullPodUsageRequest,
   GetFullPodUsageResponse,
   GetInvoicesResponse,
@@ -241,3 +242,13 @@ export const getPendingBills = async (): Promise<GetPendingBillsResponse> => {
     throw new Error(handleErrorMessage(error, 'getPendingBills error'));
   }
 };
+
+export const getBillingOverview =
+  async (): Promise<GetBillingOverviewResponse> => {
+    try {
+      const res = await request.market.getBillingOverview();
+      return res;
+    } catch (error) {
+      throw new Error(handleErrorMessage(error, 'getBillingOverview error'));
+    }
+  };

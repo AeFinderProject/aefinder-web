@@ -200,6 +200,7 @@ export const marketList = {
     baseConfig: { method: 'POST' },
   },
   getPendingBills: `${AeFinderHost}/api/market/pending/bills`,
+  getBillingOverview: `${AeFinderHost}/api/market/billing/overview/api-query`,
 };
 
 /**

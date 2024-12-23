@@ -15,16 +15,20 @@ import { setOrgBalance } from '@/store/slices/commonSlice';
 import { getSnapshots, getSummary } from '@/api/requestAPIKeys';
 import {
   getApiQueryCountFree,
+  getBillingOverview,
   getOrgBalance,
   getOrgUserAll,
 } from '@/api/requestMarket';
 
 import { SnapshotsItemType } from '@/types/apikeyType';
+import { GetBillingOverviewResponse } from '@/types/marketType';
 
 export default function Overview() {
   const dispatch = useAppDispatch();
 
   const [snapshotsData, setSnapshotsData] = useState<SnapshotsItemType[]>([]);
+  const [billingOverview, setBillingOverview] =
+    useState<GetBillingOverviewResponse>();
 
   const apikeySummary = useAppSelector((state) => state.app.apikeySummary);
   const regularData = useAppSelector((state) => state.app.regularData);
@@ -59,10 +63,17 @@ export default function Overview() {
     setSnapshotsData(items);
   }, []);
 
+  const getBillingOverviewTemp = useCallback(async () => {
+    const res = await getBillingOverview();
+    console.log('getBillingOverviewRes', res);
+    setBillingOverview(res);
+  }, []);
+
   useEffect(() => {
     getSummaryTemp();
     getSnapshotsData();
-  }, [getSummaryTemp, getSnapshotsData]);
+    getBillingOverviewTemp();
+  }, [getSummaryTemp, getSnapshotsData, getBillingOverviewTemp]);
 
   const getOrgBalanceTemp = useCallback(async () => {
     const getOrgBalanceRes = await getOrgBalance();
@@ -106,20 +117,25 @@ export default function Overview() {
             valueStyle={{ fontSize: '16px', fontWeight: 500 }}
           />
           <div className='text-gray-80 mt-[6px] text-sm'>
-            ({`${orgBalance?.lockedBalance} USDT`} Locked)
+            {`${orgBalance?.lockedBalance} USDT`} Locked
           </div>
         </Col>
         <Col span={6}>
           <Statistic
             title='Daily Cost Average'
-            value='$1.02 USDT'
+            value={`${billingOverview?.apiQueryDailyCostAverage ?? '--'} USDT`}
             valueStyle={{ fontSize: '16px', fontWeight: 500 }}
           />
+          <div className='text-gray-80 mt-[6px] text-sm'>
+            {`${billingOverview?.apiQueryLockedBalance ?? '--'} USDT`} Locked
+          </div>
         </Col>
         <Col span={6}>
           <Statistic
             title='Monthly Cost Average'
-            value={`${regularData?.monthlyUnitPrice} USDT`}
+            value={`${
+              billingOverview?.apiQueryMonthlyCostAverage ?? '--'
+            } USDT`}
             valueStyle={{ fontSize: '16px', fontWeight: 500 }}
           />
         </Col>

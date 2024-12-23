@@ -184,3 +184,9 @@ export type PendingBillsItem = {
 };
 
 export type GetPendingBillsResponse = PendingBillsItem[];
+
+export type GetBillingOverviewResponse = {
+  apiQueryLockedBalance: number;
+  apiQueryDailyCostAverage: number;
+  apiQueryMonthlyCostAverage: number;
+};
