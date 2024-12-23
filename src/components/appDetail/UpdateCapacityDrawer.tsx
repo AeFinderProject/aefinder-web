@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import {
+  handleErrorMessage,
   timesDecimals,
   useDebounceCallback,
   useThrottleCallback,
@@ -27,11 +28,7 @@ import {
   pendingPayment,
   resourceBillPlan,
 } from '@/api/requestMarket';
-import {
-  AeFinderContractAddress,
-  CHAIN_ID,
-  tokenContractAddress,
-} from '@/constant';
+import { AeFinderContractAddress } from '@/constant';
 
 import { ApproveResponseType } from '@/types/appType';
 import {
@@ -229,64 +226,45 @@ export default function UpdateCapacityDrawer({
         messageApi.warning('Create order failed');
         return;
       }
-      const approveResult: ApproveResponseType = await callSendMethod({
-        contractAddress: tokenContractAddress,
-        methodName: 'Approve',
+      const lockResult: ApproveResponseType = await callSendMethod({
+        contractAddress: AeFinderContractAddress,
+        methodName: 'Lock',
         args: {
-          spender: AeFinderContractAddress,
           symbol: 'USDT',
           amount: timesDecimals(billingAmount, 6),
+          billingId: billingId,
         },
-        chainId: CHAIN_ID,
+        chainId: 'tDVV',
       });
-      if (approveResult?.data?.Status === 'MINED') {
+      if (lockResult?.data?.Status === 'MINED') {
         messageApi.open({
           type: 'success',
-          content:
-            'Approve successfully, please continue to Confirm monthly purchase',
+          content: 'Successfully updated capacity',
+          duration: 10,
         });
-        const lockResult: ApproveResponseType = await callSendMethod({
-          contractAddress: AeFinderContractAddress,
-          methodName: 'Lock',
-          args: {
-            symbol: 'USDT',
-            amount: timesDecimals(billingAmount, 6),
-            billingId: billingId,
-          },
-          chainId: 'tDVV',
+        // refresh balance when Confirm monthly purchase success
+        getOrgBalanceTemp();
+        await pendingPayment({
+          billingId: billingId,
         });
-        if (lockResult?.data?.Status === 'MINED') {
-          messageApi.open({
-            type: 'success',
-            content: 'Successfully updated capacity',
-            duration: 10,
-          });
-          // refresh balance when Confirm monthly purchase success
-          getOrgBalanceTemp();
-          await pendingPayment({
-            billingId: billingId,
-          });
-          handleClose();
-        } else {
-          messageApi.open({
-            type: 'info',
-            content: 'Confirm monthly purchase failed',
-          });
-          await cancelPayment({
-            billingId: billingId,
-          });
-        }
-        console.log('lockResult', lockResult);
+        handleClose();
       } else {
+        messageApi.open({
+          type: 'info',
+          content: 'Confirm monthly purchase failed',
+        });
         await cancelPayment({
           billingId: billingId,
         });
       }
+      console.log('lockResult', lockResult);
     } catch (error) {
       console.log('error', error);
       messageApi.open({
         type: 'error',
-        content: 'Confirm monthly purchase failed',
+        content: `Confirm monthly purchase failed: ${handleErrorMessage(
+          error
+        )}`,
       });
       await cancelPayment({
         billingId: billingId,

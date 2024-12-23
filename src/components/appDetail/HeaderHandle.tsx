@@ -16,7 +16,7 @@ import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setCurrentVersion } from '@/store/slices/appSlice';
 
-import { getResourcesFull } from '@/api/requestMarket';
+import { getPendingBills, getResourcesFull } from '@/api/requestMarket';
 
 import { AppStatusType, CurrentTourStepEnum } from '@/types/appType';
 
@@ -169,10 +169,19 @@ export default function HeaderHandle({
       setDeployLoading(true);
       handleDeployCloseTour();
       if (!currentAppDetail?.appId) return;
-      const res = await getResourcesFull({
+      const res = await getPendingBills();
+      if (res?.length > 0) {
+        messageApi.open({
+          type: 'warning',
+          content:
+            'There have pending bill, please await finish plan first, thank you',
+        });
+        return;
+      }
+      const getResourcesFullRes = await getResourcesFull({
         appId: currentAppDetail?.appId,
       });
-      if (res?.productId) {
+      if (getResourcesFullRes?.productId) {
         setDeployDrawerVisible(true);
       } else {
         messageApi.info('Please update capacity first');

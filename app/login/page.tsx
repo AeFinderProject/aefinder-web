@@ -43,7 +43,6 @@ export default function LogIn() {
     // clear localStorage jwt
     if (pathname === '/login') {
       resetLocalJWT();
-      sessionStorage.setItem('isGuest', 'false');
       initialTourValues();
     }
   }, [pathname, initialTourValues]);
@@ -62,7 +61,6 @@ export default function LogIn() {
 
   const handleLogin = useDebounceCallback(async () => {
     setLoading(true);
-    sessionStorage.setItem('isGuest', 'false');
     try {
       const res = await queryAuthApi({
         username: form.getFieldValue('username'),

@@ -14,6 +14,7 @@ import {
   GetFullPodUsageResponse,
   GetInvoicesResponse,
   GetOrgBalanceResponse,
+  GetPendingBillsResponse,
   GetRegularResponse,
   GetResourcesFullRequest,
   GetResourcesLevelResponse,
@@ -229,5 +230,14 @@ export const cancelPayment = async (
     return true;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'cancelPayment error'));
+  }
+};
+
+export const getPendingBills = async (): Promise<GetPendingBillsResponse> => {
+  try {
+    const res = await request.market.getPendingBills();
+    return res;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'getPendingBills error'));
   }
 };

@@ -7,14 +7,11 @@ import { useAppSelector } from '@/store/hooks';
 
 import { appApiList } from '@/api/list';
 
-import GuestPlayground from './GuestPlayground/GuestPlayground';
-
 export default function Playground() {
   const { currentAppDetail, currentVersion } = useAppSelector(
     (state) => state.app
   );
   const { appId } = currentAppDetail;
-  const isGuest = sessionStorage.getItem('isGuest');
 
   const getGraphiqlhUI = useCallback(() => {
     // when currentVersion is null, it means the app is not deployed
@@ -33,7 +30,7 @@ export default function Playground() {
 
   return (
     <div id='graphiql-box' className='relative h-[756px] w-full'>
-      {isGuest === 'true' ? <GuestPlayground /> : getGraphiqlhUI()}
+      {getGraphiqlhUI()}
     </div>
   );
 }

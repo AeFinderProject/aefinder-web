@@ -140,59 +140,40 @@ export default function Withdraw() {
     }
     try {
       setLoading(true);
-      const approveResult: ApproveResponseType = await callSendMethod({
-        contractAddress: tokenContractAddress,
-        methodName: 'Approve',
+      const withdrawResult: ApproveResponseType = await callSendMethod({
+        contractAddress: AeFinderContractAddress,
+        methodName: 'Withdraw',
         args: {
-          spender: AeFinderContractAddress,
           symbol: 'USDT',
           amount: timesDecimals(currentAmount, 6),
+          address: withdrawAddress,
         },
-        chainId: CHAIN_ID,
+        chainId: 'tDVV',
       });
-      console.log('approveResult', approveResult);
-      if (approveResult?.data?.Status === 'MINED') {
+      if (withdrawResult?.data?.Status === 'MINED') {
         messageApi.open({
           type: 'success',
-          content: 'Approve successfully, please continue to withdraw',
+          content: 'withdraw successfully',
+          duration: 3,
         });
-        const withdrawResult: ApproveResponseType = await callSendMethod({
-          contractAddress: AeFinderContractAddress,
-          methodName: 'Withdraw',
-          args: {
-            symbol: 'USDT',
-            amount: timesDecimals(currentAmount, 6),
-            address: withdrawAddress,
-          },
-          chainId: 'tDVV',
-        });
-        if (withdrawResult?.data?.Status === 'MINED') {
-          messageApi.open({
-            type: 'success',
-            content: 'withdraw successfully',
-            duration: 3,
-          });
-          setCurrentAmount(null);
-          await getBalance();
-          await getOrgUserAllTemp();
-          setTimeout(() => {
-            router.back();
-          }, 4000);
-        } else {
-          messageApi.open({
-            type: 'error',
-            content: 'withdraw failed',
-          });
-        }
-        console.log('withdrawResult', withdrawResult);
+        setCurrentAmount(null);
+        await getBalance();
+        await getOrgUserAllTemp();
+        setTimeout(() => {
+          router.back();
+        }, 4000);
       } else {
         messageApi.open({
           type: 'error',
-          content: 'Approve failed',
+          content: 'withdraw failed',
         });
       }
+      console.log('withdrawResult', withdrawResult);
     } catch (error) {
-      handleErrorMessage(error);
+      messageApi.open({
+        type: 'error',
+        content: `withdraw failed: ${handleErrorMessage(error)}`,
+      });
     } finally {
       setLoading(false);
     }

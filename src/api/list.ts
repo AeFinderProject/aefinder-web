@@ -199,6 +199,7 @@ export const marketList = {
     target: `${AeFinderHost}/api/market/bill/cancel`,
     baseConfig: { method: 'POST' },
   },
+  getPendingBills: `${AeFinderHost}/api/market/pending/bills`,
 };
 
 /**

@@ -3,14 +3,6 @@ import { handleErrorMessage } from '@/lib/utils';
 import { AuthList } from '@/api/list';
 
 import { request } from './index';
-import {
-  createAppGuest,
-  getAppDetailGuest,
-  getAppListGuest,
-  getAppLogGuest,
-  modifyAppGuest,
-  resetPasswordGuest,
-} from './requestAppGuest';
 
 import {
   CreateAppRequest,
@@ -35,11 +27,6 @@ import {
 export const createApp = async (
   params: CreateAppRequest
 ): Promise<CreateAppResponse> => {
-  const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest === 'true') {
-    return createAppGuest(params);
-  }
-
   try {
     const res = await request.app.createApp({ data: params });
     return res;
@@ -51,11 +38,6 @@ export const createApp = async (
 export const modifyApp = async (
   params: ModifyAppRequest
 ): Promise<CreateAppResponse> => {
-  const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest === 'true') {
-    return modifyAppGuest(params);
-  }
-
   try {
     const { appId, ...rest } = params;
     const res = await request.app.modifyApp({ query: appId, data: rest });
@@ -68,10 +50,6 @@ export const modifyApp = async (
 export const getAppDetail = async (
   params: GetAppDetailRequest
 ): Promise<GetAppDetailResponse> => {
-  const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest === 'true') {
-    return getAppDetailGuest(params);
-  }
   try {
     const { appId } = params;
     const res = await request.app.getAppDetail({ query: appId });
@@ -82,11 +60,6 @@ export const getAppDetail = async (
 };
 
 export const getAppList = async (): Promise<GetAppListResponse> => {
-  const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest === 'true') {
-    return getAppListGuest();
-  }
-
   try {
     const res = await request.app.getAppList();
     return res;
@@ -98,11 +71,6 @@ export const getAppList = async (): Promise<GetAppListResponse> => {
 export const getLog = async (
   params: GetLogRequest
 ): Promise<GetLogResponse[]> => {
-  const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest === 'true') {
-    return getAppLogGuest(params);
-  }
-
   try {
     const res: GetLogResponse[] = await request.app.getLog({ params });
     return res;
@@ -114,11 +82,6 @@ export const getLog = async (
 export const resetPassword = async (
   params: ResetPasswordRequest
 ): Promise<boolean> => {
-  const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest === 'true') {
-    return resetPasswordGuest(params);
-  }
-
   try {
     const res: boolean = await request.auth.resetPassword({ data: params });
     return res;
@@ -130,16 +93,6 @@ export const resetPassword = async (
 export const bindWallet = async (
   params: BindWalletRequest
 ): Promise<BindWalletResponse> => {
-  const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest === 'true') {
-    return {
-      userName: 'Guest',
-      email: '',
-      emailConfirmed: false,
-      walletAddress: '2qgHANBSZN6ywSboJ4sWXw2PZfD8uw4xbuTJ5nDs83S23bNh7Y',
-    };
-  }
-
   try {
     const res = await request.auth.bindWallet({ data: params });
     return res;
@@ -149,17 +102,6 @@ export const bindWallet = async (
 };
 
 export const getUsersInfo = async (): Promise<UserInfoType> => {
-  const isGuest = sessionStorage.getItem('isGuest');
-  if (isGuest === 'true') {
-    return {
-      userName: 'Guest',
-      email: '',
-      emailConfirmed: false,
-      notification: false,
-      walletAddress: '',
-    };
-  }
-
   try {
     const res = await request.app.getUsersInfo();
     return res;

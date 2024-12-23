@@ -34,6 +34,7 @@ import {
   getApiQueryCountMonthly,
   getOrgBalance,
   getOrgUserAll,
+  getPendingBills,
   pendingPayment,
 } from '@/api/requestMarket';
 import {
@@ -209,6 +210,15 @@ export default function Upgrade() {
   }, [currentAmount, currentMonth]);
 
   const handlePreCreateOrder = useCallback(async () => {
+    const res = await getPendingBills();
+    if (res?.length > 0) {
+      messageApi.open({
+        type: 'warning',
+        content:
+          'There have pending bill, please await finish plan first, thank you',
+      });
+      return;
+    }
     const createOrderRes = await createOrder({
       productId: regularData?.productId,
       productNumber: Number(
@@ -238,79 +248,59 @@ export default function Upgrade() {
     regularData?.productId,
     regularData?.queryCount,
     freeApiQueryCount,
+    messageApi,
   ]);
 
   const handleCreateOrder = useDebounceCallback(async () => {
     setLoading(true);
-    const { billingId, billingAmount } = await handlePreCreateOrder();
+    const { billingId = '', billingAmount } =
+      (await handlePreCreateOrder()) || {};
     try {
       console.log('billingId, billingAmount', billingId, billingAmount);
       if (!billingId || !billingAmount) {
         messageApi.warning('Create order failed');
         return;
       }
-      const approveResult: ApproveResponseType = await callSendMethod({
-        contractAddress: tokenContractAddress,
-        methodName: 'Approve',
+      const lockResult: ApproveResponseType = await callSendMethod({
+        contractAddress: AeFinderContractAddress,
+        methodName: 'Lock',
         args: {
-          spender: AeFinderContractAddress,
           symbol: 'USDT',
           amount: timesDecimals(billingAmount, 6),
+          billingId: billingId,
         },
-        chainId: CHAIN_ID,
+        chainId: 'tDVV',
       });
-      if (approveResult?.data?.Status === 'MINED') {
+      if (lockResult?.data?.Status === 'MINED') {
         messageApi.open({
           type: 'success',
-          content:
-            'Approve successfully, please continue to Confirm monthly purchase',
+          content: 'Confirm monthly purchase successfully',
+          duration: 3,
         });
-        const lockResult: ApproveResponseType = await callSendMethod({
-          contractAddress: AeFinderContractAddress,
-          methodName: 'Lock',
-          args: {
-            symbol: 'USDT',
-            amount: timesDecimals(billingAmount, 6),
-            billingId: billingId,
-          },
-          chainId: 'tDVV',
+        // refresh balance when Confirm monthly purchase success
+        await getBalance();
+        await getOrgBalanceTemp();
+        await pendingPayment({
+          billingId: billingId,
         });
-        if (lockResult?.data?.Status === 'MINED') {
-          messageApi.open({
-            type: 'success',
-            content: 'Confirm monthly purchase successfully',
-            duration: 3,
-          });
-          // refresh balance when Confirm monthly purchase success
-          await getBalance();
-          await getOrgBalanceTemp();
-          await pendingPayment({
-            billingId: billingId,
-          });
-          setTimeout(() => {
-            router.back();
-          }, 4000);
-        } else {
-          messageApi.open({
-            type: 'info',
-            content: 'Confirm monthly purchase failed',
-          });
-          await cancelPayment({
-            billingId: billingId,
-          });
-        }
-        console.log('lockResult', lockResult);
+        setTimeout(() => {
+          router.back();
+        }, 4000);
       } else {
+        messageApi.open({
+          type: 'info',
+          content: 'Confirm monthly purchase failed',
+        });
         await cancelPayment({
           billingId: billingId,
         });
       }
+      console.log('lockResult', lockResult);
     } catch (error) {
       messageApi.open({
         type: 'error',
-        content: `${handleErrorMessage(
-          error,
-          'Confirm monthly purchase failed'
+        content: `Confirm monthly purchase failed : ${handleErrorMessage(
+          error
         )}`,
       });
       await cancelPayment({

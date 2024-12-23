@@ -172,3 +172,15 @@ export type GetInvoicesResponse = {
 export type PaymentRequestType = {
   billingId: string;
 };
+
+export type PendingBillsItem = {
+  billingId: string;
+  billingType: number;
+  billingAmount: number;
+  refundAmount: number;
+  billingStatus: number;
+  transactionState: string;
+  productType: number;
+};
+
+export type GetPendingBillsResponse = PendingBillsItem[];
