@@ -3,8 +3,9 @@ export type CreateAppRequest = {
 };
 
 export enum AppStatusType {
-  Deployed = 1,
   UnDeployed = 0,
+  Deployed = 1,
+  Deactivated = 2,
 }
 
 export interface CreateAppResponse {

@@ -7,6 +7,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useDebounceCallback } from '@/lib/utils';
 
+import DeactivatedModal from '@/components/appDetail/DeactivatedModal';
 import DeleteIndexerModal from '@/components/appDetail/DeleteAeIndexerModal';
 import DeletePendingPodModal from '@/components/appDetail/DeletePendingPodModal';
 import DeployDrawer from '@/components/appDetail/DeployDrawer';
@@ -49,6 +50,7 @@ export default function HeaderHandle({
     useState(false);
   const [isShowDeletePendingPodModal, setIsShowDeletePendingPodModal] =
     useState(false);
+  const [isShowDeactivatedModal, setIsShowDeactivatedModal] = useState(true);
   const { currentAppDetail, currentVersion } = useAppSelector(
     (state) => state.app
   );
@@ -230,8 +232,11 @@ export default function HeaderHandle({
             type='primary'
             onClick={handleClickDeploy}
             loading={deployLoading}
+            disabled={currentAppDetail?.status === AppStatusType.Deactivated}
           >
-            Deploy...
+            {currentAppDetail?.status === AppStatusType.Deactivated
+              ? 'Deactivated'
+              : 'Deploy...'}
           </Button>
           <Dropdown
             menu={{ items: dropdownItems }}
@@ -334,6 +339,13 @@ export default function HeaderHandle({
         <DeletePendingPodModal
           isShowDeletePendingPodModal={isShowDeletePendingPodModal}
           setIsShowDeletePendingPodModal={setIsShowDeletePendingPodModal}
+          messageApi={messageApi}
+        />
+      )}
+      {currentAppDetail?.status === AppStatusType.Deactivated && (
+        <DeactivatedModal
+          isShowDeactivatedModal={isShowDeactivatedModal}
+          setIsShowDeactivatedModal={setIsShowDeactivatedModal}
           messageApi={messageApi}
         />
       )}
