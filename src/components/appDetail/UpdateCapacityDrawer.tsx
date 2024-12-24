@@ -224,6 +224,8 @@ export default function UpdateCapacityDrawer({
       console.log('billingId, billingAmount', billingId, billingAmount);
       if (!billingId || !billingAmount) {
         messageApi.warning('Create order failed');
+        setLoading(false);
+        setIsShowUpdateCapacityModal(false);
         return;
       }
       const lockResult: ApproveResponseType = await callSendMethod({
