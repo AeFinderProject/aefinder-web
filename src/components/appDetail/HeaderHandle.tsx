@@ -346,6 +346,7 @@ export default function HeaderHandle({
         <DeactivatedModal
           isShowDeactivatedModal={isShowDeactivatedModal}
           setIsShowDeactivatedModal={setIsShowDeactivatedModal}
+          setIsShowUpdateCapacityModal={setIsShowUpdateCapacityModal}
           messageApi={messageApi}
         />
       )}
