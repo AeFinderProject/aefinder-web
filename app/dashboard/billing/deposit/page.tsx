@@ -32,6 +32,7 @@ export default function Deposit() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
+  const isMobile = window?.innerWidth < 640;
   const {
     callSendMethod,
     callViewMethod,
@@ -175,7 +176,7 @@ export default function Deposit() {
         </div>
       </div>
       <Row gutter={24} className='mt-[24px]'>
-        <Col span={14} offset={5}>
+        <Col sm={20} md={14} offset={isMobile ? 2 : 5}>
           <div className='text-xl font-medium text-black'>
             <Image
               src='/assets/svg/step1.svg'
@@ -304,7 +305,7 @@ export default function Deposit() {
                 onClick={handleApprove}
                 loading={loading}
               >
-                Approve & Top up
+                Deposit
               </Button>
             </div>
             <div className='w-[48%]'></div>

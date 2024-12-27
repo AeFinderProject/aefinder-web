@@ -180,7 +180,7 @@ export default function Header() {
             Docs
           </Link>
           <div
-            className='border-gray-E0 relative inline-block min-h-10 min-w-[240px] cursor-pointer rounded border pl-[20px] pr-[30px] text-center leading-[40px]'
+            className='border-gray-E0 relative inline-block min-h-10 min-w-[180px] cursor-pointer rounded border pl-[20px] pr-[30px] text-center leading-[40px] sm:min-w-[240px]'
             onClick={() => {
               setTimeout(() => {
                 setIsShowBox(!isShowBox);
@@ -214,6 +214,18 @@ export default function Header() {
                 className='hover:bg-gray-F5 w-full border-none px-[16px] sm:hidden'
               >
                 My Dashboard
+              </PrimaryLink>
+              <PrimaryLink
+                href='/dashboard/billing'
+                className='hover:bg-gray-F5 w-full border-none px-[16px] sm:hidden'
+              >
+                Billing
+              </PrimaryLink>
+              <PrimaryLink
+                href='/dashboard/apikey'
+                className='hover:bg-gray-F5 w-full border-none px-[16px] sm:hidden'
+              >
+                Api Key
               </PrimaryLink>
               <div className='hover:bg-gray-F5 border-gray-F0 w-full border-b border-t px-[16px] text-left sm:hidden'>
                 <UnstyledLink

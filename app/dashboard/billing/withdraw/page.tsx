@@ -38,6 +38,7 @@ export default function Withdraw() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
+  const isMobile = window?.innerWidth < 640;
   const {
     callSendMethod,
     callViewMethod,
@@ -192,7 +193,7 @@ export default function Withdraw() {
         </div>
       </div>
       <Row gutter={24} className='mt-[24px]'>
-        <Col span={14} offset={5}>
+        <Col sm={20} md={14} offset={isMobile ? 1 : 5}>
           <div className='text-xl font-medium text-black'>
             <Image
               src='/assets/svg/step1.svg'
@@ -238,10 +239,13 @@ export default function Withdraw() {
             <div className='my-[8px]'>
               <span className='text-gray-80 mr-[20px]'>Billing balance:</span>
               <span className='text-dark-normal mr-[2px] font-medium'>
-                {orgBalance?.balance || '--'} USDT{' '}
+                {orgBalance?.balance || '--'} USDT
               </span>
-              <span className='text-gray-80 font-medium'>
-                (Locked: {orgBalance?.lockedBalance || '--'} USDT)
+            </div>
+            <div className='my-[8px]'>
+              <span className='text-gray-80 mr-[12px]'>Locked balance:</span>
+              <span className='text-gray-80 mt-[6px] font-medium'>
+                {orgBalance?.lockedBalance || '--'} USDT
               </span>
             </div>
           </div>

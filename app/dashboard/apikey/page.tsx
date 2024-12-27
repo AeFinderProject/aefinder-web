@@ -1,7 +1,7 @@
 'use client';
 
 import type { TableColumnsType } from 'antd';
-import { Button, Table, Tag, Tooltip } from 'antd';
+import { Button, Col, Row, Table, Tag, Tooltip } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -31,7 +31,7 @@ import { ApikeyItemType } from '@/types/apikeyType';
 export default function Apikey() {
   const dispatch = useAppDispatch();
   const router = useRouter();
-
+  const isMobile = window?.innerWidth < 640;
   const apikeyList = useAppSelector((state) => state.app.apikeyList);
   const apikeySummary = useAppSelector((state) => state.app.apikeySummary);
   const regularData = useAppSelector((state) => state.app.regularData);
@@ -154,12 +154,15 @@ export default function Apikey() {
   }, [getOrgUserAllTemp]);
 
   return (
-    <div className='px-[16px] pb-[40px] sm:px-[40px]'>
+    <div className='overflow-hidden px-[16px] pb-[40px] sm:px-[40px]'>
       <div className='text-dark-normal mb-[31px] mt-[48px] text-3xl font-medium'>
         API Keys
       </div>
-      <div className='border-gray-E0 bg-gray-F5 mb-[48px] flex items-center justify-between rounded-lg border p-[24px]'>
-        <div>
+      <Row
+        gutter={24}
+        className='border-gray-E0 bg-gray-F5 mb-[48px] flex items-center justify-between rounded-lg border p-[24px]'
+      >
+        <Col sm={12} md={4} className='my-[10px] sm:my-[0px]'>
           <div className='mb-[4px]'>
             <span className='text-gray-80 mr-[8px] text-sm'>Total Queries</span>
             <Tooltip
@@ -178,8 +181,8 @@ export default function Apikey() {
           <div className='text-dark-normal font-medium'>
             {apikeySummary.totalQuery}
           </div>
-        </div>
-        <div>
+        </Col>
+        <Col sm={12} md={5} className='my-[10px] sm:my-[0px]'>
           <div className='mb-[4px]'>
             <span className='text-gray-80 mr-[8px] text-sm'>
               Total Query fees
@@ -204,8 +207,8 @@ export default function Apikey() {
             )}
             <span className='text-gray-80 ml-[4px] font-medium'>USDT</span>
           </div>
-        </div>
-        <div>
+        </Col>
+        <Col sm={12} md={5} className='my-[10px] sm:my-[0px]'>
           <div className='mb-[4px]'>
             <span className='text-gray-80 mr-[8px] text-sm'>
               Billing Balance
@@ -242,8 +245,8 @@ export default function Apikey() {
               />
             </span>
           </div>
-        </div>
-        <div>
+        </Col>
+        <Col sm={12} md={5} className='my-[10px] sm:my-[0px]'>
           <div className='mb-[4px]'>
             <span className='text-gray-80 mr-[8px] text-sm'>
               Total API Keys
@@ -265,20 +268,25 @@ export default function Apikey() {
             {apikeySummary.apiKeyCount}/{apikeySummary.maxApiKeyCount || 10}
             <span className='text-gray-80 ml-[4px] font-medium'>Used</span>
           </div>
-        </div>
-        <Button
-          onClick={() => setIsShowCreateModal(true)}
-          className='text-blue-link border-blue-link w-[180px] border'
-        >
-          Create New API Key
-        </Button>
-      </div>
+        </Col>
+        <Col sm={12} md={5} className='mt-[20px] sm:my-[0px]'>
+          <Button
+            onClick={() => setIsShowCreateModal(true)}
+            className='text-blue-link border-blue-link w-[180px] border'
+          >
+            Create New API Key
+          </Button>
+        </Col>
+      </Row>
       <Table
         rowKey={(record) => record.id}
         columns={columns}
         dataSource={apikeyList}
         loading={loading}
         pagination={false}
+        scroll={{ x: 'max-content' }}
+        className='w-full'
+        size={isMobile ? 'small' : 'middle'}
         locale={{
           emptyText: (
             <div className='flex flex-col items-center justify-center'>

@@ -85,6 +85,7 @@ export default function Upgrade() {
   walletInfoRef.current = walletInfo;
   const isConnectedRef = useRef<boolean>();
   isConnectedRef.current = isConnected;
+  const isMobile = window?.innerWidth < 640;
 
   const [loading, setLoading] = useState(false);
   const [currentQueryCount, setCurrentQueryCount] = useState(100);
@@ -325,7 +326,7 @@ export default function Upgrade() {
       </div>
       <div className='mt-[24px]'>
         <Row gutter={24}>
-          <Col span={14}>
+          <Col xs={24} md={14}>
             <div className='mb-[28px] flex items-center justify-between'>
               <div className='text-xl font-medium text-black'>
                 <Image
@@ -428,16 +429,18 @@ export default function Upgrade() {
                 </div>
               </div>
             </div>
-            <div className='my-[8px]'>
+            <div className='my-[8px] flex items-start justify-start'>
               <span className='text-gray-80 mr-[16px] text-sm'>
                 Billing balance:
               </span>
-              <span className='text-dark-normal mr-[2px] text-sm'>
-                {orgBalance?.balance || '--'} USDT{' '}
-              </span>
-              <span className='text-gray-80 text-sm'>
-                (Locked: {orgBalance?.lockedBalance || '--'} USDT)
-              </span>
+              <div>
+                <div className='text-dark-normal mr-[2px] text-sm'>
+                  {orgBalance?.balance || '--'} USDT{' '}
+                </div>
+                <div className='text-gray-80 mt-[6px] text-sm'>
+                  Locked: {orgBalance?.lockedBalance || '--'} USDT
+                </div>
+              </div>
             </div>
             <Tag
               icon={
@@ -501,7 +504,12 @@ export default function Upgrade() {
               unlocked and available for withdrawal.
             </div>
           </Col>
-          <Col span={9} offset={1}>
+          <Col
+            xs={24}
+            md={9}
+            offset={isMobile ? 0 : 1}
+            className='mt-[24px] sm:mt-[0px]'
+          >
             <div className='text-xl font-medium text-black'>
               Your Plan Details
             </div>

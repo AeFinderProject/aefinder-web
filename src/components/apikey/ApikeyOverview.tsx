@@ -380,7 +380,7 @@ export default function ApikeyOverview() {
           )}
           <div className='mt-[40px]'>
             <div className='text-dark-normal mb-[8px] text-2xl font-medium'>
-              Authorised AeIndexers
+              Auth AeIndexers
             </div>
             <div className='text-gray-80'>
               Only the AeIndexers in this list will be able to use this API key.

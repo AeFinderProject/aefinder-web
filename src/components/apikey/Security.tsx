@@ -38,6 +38,7 @@ export default function Security() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
   const [messageApi, contextHolder] = message.useMessage();
+  const isMobile = window?.innerWidth < 640;
 
   const [loading, setLoading] = useState(false);
   const [isShowAddAeIndexerModal, setIsShowAddAeIndexerModal] = useState(false);
@@ -295,7 +296,7 @@ export default function Security() {
             To limit usage, restrict to specific Subgraphs. Only authorized
             AeIndexers will be able to use the Test Key.
           </div>
-          <div className='border-gray-E0 rounded-lg border px-[24px] pb-[12px] pt-[32px]'>
+          <div className='border-gray-E0 rounded-lg border px-[4px] pb-[12px] pt-[32px] sm:px-[24px]'>
             {apikeyDetail?.authorisedAeIndexers?.length === 0 && (
               <div className='text-center'>
                 <div className='text-gray-80 mb-[8px] text-xs'>
@@ -305,7 +306,7 @@ export default function Security() {
                   className='bg-gray-F5 text-dark-normal text-sm'
                   onClick={() => setIsShowAddAeIndexerModal(true)}
                 >
-                  Restrict to a AeIndexer
+                  {isMobile ? 'Add Restrict' : 'Restrict to a AeIndexer'}
                 </Button>
               </div>
             )}
@@ -353,7 +354,7 @@ export default function Security() {
               size='large'
               onClick={() => setIsShowAddAeIndexerModal(true)}
             >
-              Add Authorized AeIndexers
+              Auth AeIndexers
             </Button>
           )}
         </Col>
@@ -365,7 +366,7 @@ export default function Security() {
             To limit usage, restrict to specific domains. Only authorized
             domains will be able to use the Test Key.
           </div>
-          <div className='border-gray-E0 rounded-lg border px-[24px] pb-[12px] pt-[32px]'>
+          <div className='border-gray-E0 rounded-lg border px-[4px] pb-[12px] pt-[32px] sm:px-[24px]'>
             {apikeyDetail?.authorisedDomains?.length === 0 && (
               <div className='text-center'>
                 <div className='text-gray-80 mb-[8px] text-xs'>
@@ -375,7 +376,7 @@ export default function Security() {
                   className='bg-gray-F5 text-dark-normal text-sm'
                   onClick={() => setIsShowAddDomainModal(true)}
                 >
-                  Restrict to a Domain
+                  {isMobile ? 'Add Restrict' : 'Restrict to a Domain'}
                 </Button>
               </div>
             )}
@@ -411,7 +412,7 @@ export default function Security() {
               size='large'
               onClick={() => setIsShowAddDomainModal(true)}
             >
-              Add Authorized Domains
+              Auth Domains
             </Button>
           )}
         </Col>
@@ -425,7 +426,7 @@ export default function Security() {
             To limit usage, restrict to specific AeFinder APIs. Only authorized
             APIs will be able to use the Test Key.
           </div>
-          <div className='border-gray-E0 rounded-lg border px-[24px] pb-[12px] pt-[32px]'>
+          <div className='border-gray-E0 rounded-lg border px-[4px] pb-[12px] pt-[32px] sm:px-[24px]'>
             {apikeyDetail?.authorisedApis?.length === 0 && (
               <div className='text-center'>
                 <div className='text-gray-80 mb-[8px] text-xs'>
@@ -473,7 +474,7 @@ export default function Security() {
               size='large'
               onClick={() => setIsShowEditAPIModal(true)}
             >
-              Edit Authorised APIs
+              Auth APIs
             </Button>
           )}
         </Col>
@@ -493,12 +494,12 @@ export default function Security() {
         <div className='text-dark-normal mb-[24px] font-medium'>
           Authorise AeIndexers
         </div>
-        <div>Select Authorised AeIndexers</div>
+        <div>Select Auth AeIndexers</div>
         <Select
           className='h-[60px] w-full py-[12px]'
           value={currentAppId}
           onChange={(value) => setCurrentAppId(value)}
-          placeholder='Select Authorised AeIndexers'
+          placeholder='Select Auth AeIndexers'
           showSearch
           onSearch={(value) => handleAeIndexerSearch(value)}
         >
@@ -511,17 +512,17 @@ export default function Security() {
           })}
         </Select>
         <div className='mt-[24px] flex items-center  justify-between'>
-          <Button className='w-[35%]' size='large' onClick={handleCancel}>
+          <Button className='w-[32%]' size='large' onClick={handleCancel}>
             Cancel
           </Button>
           <Button
-            className='w-[60%]'
+            className='w-[65%]'
             size='large'
             type='primary'
             onClick={handleAuthAeIndexers}
             loading={loading}
           >
-            Authorise AeIndexers
+            Auth AeIndexers
           </Button>
         </div>
       </Modal>
@@ -550,17 +551,17 @@ export default function Security() {
           Note: You can authorise all subdomains using a wildcard *.example.com
         </div>
         <div className='mt-[24px] flex items-center  justify-between'>
-          <Button className='w-[35%]' size='large' onClick={handleCancel}>
+          <Button className='w-[32%]' size='large' onClick={handleCancel}>
             Cancel
           </Button>
           <Button
-            className='w-[60%]'
+            className='w-[65%]'
             size='large'
             type='primary'
             onClick={handleAuthDomain}
             loading={loading}
           >
-            Authorise Domains
+            Auth Domains
           </Button>
         </div>
       </Modal>

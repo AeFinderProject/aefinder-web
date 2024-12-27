@@ -18,6 +18,7 @@ export default function TransactionHistory() {
   const [skipCount, setSkipCount] = useState(1);
   const [maxResultCount, setMaxResultCount] = useState(10);
   const [totalCountItems, setTotalCountItems] = useState(0);
+  const isMobile = window?.innerWidth < 640;
 
   const tableOnChange = useCallback(
     (page: number, pageSize: number) => {
@@ -94,25 +95,6 @@ export default function TransactionHistory() {
       dataIndex: 'paymentMethod',
       key: 'paymentMethod',
     },
-    // {
-    //   title: 'View',
-    //   dataIndex: '',
-    //   key: 'View',
-    //   render: (_, record: TransactionHistoryItem) => {
-    //     return (
-    //       <div
-    //         className='text-blue-link cursor-pointer'
-    //         onClick={() => {
-    //           openWithBlank(
-    //             `${aelfscanAddress}/${CHAIN_ID}/tx/${record?.transactionId}`
-    //           );
-    //         }}
-    //       >
-    //         Detail
-    //       </div>
-    //     );
-    //   },
-    // },
   ];
 
   return (
@@ -136,12 +118,14 @@ export default function TransactionHistory() {
         </div>
       )}
       {transactionHistoryList.length > 0 && (
-        <div className='mt-[24px]'>
+        <div className='mt-[4px]'>
           <Table
             rowKey='transactionId'
             columns={columns}
             dataSource={transactionHistoryList}
             className='w-full'
+            size={isMobile ? 'small' : 'middle'}
+            scroll={{ x: 'max-content' }}
             pagination={{
               current: skipCount,
               pageSize: maxResultCount,

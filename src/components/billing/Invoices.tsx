@@ -13,6 +13,7 @@ import { InvoicesItem } from '@/types/marketType';
 
 export default function Invoices() {
   const [invoiceList, setInvoiceList] = useState<InvoicesItem[]>([]);
+  const isMobile = window?.innerWidth < 640;
 
   const getInvoicesList = useDebounceCallback(async () => {
     const { items } = await getInvoices();
@@ -78,26 +79,14 @@ export default function Invoices() {
       title: 'TransactionState',
       dataIndex: 'transactionState',
       key: 'transactionState',
+      render: (text: string) => (
+        <div>
+          {text === 'NOTEXISTED' && <Tag color='#FF9900'>NOTEXISTED</Tag>}
+          {text === 'MINED' && <Tag color='green'>MINED</Tag>}
+          {text === 'FAILED' && <Tag color='red'>FAILED</Tag>}
+        </div>
+      ),
     },
-    // {
-    //   title: 'View',
-    //   dataIndex: '',
-    //   key: 'View',
-    //   render: (_, record: InvoicesItem) => {
-    //     return (
-    //       <div
-    //         className='text-blue-link cursor-pointer'
-    //         onClick={() => {
-    //           openWithBlank(
-    //             `${aelfscanAddress}/${CHAIN_ID}/tx/${record?.billingId}`
-    //           );
-    //         }}
-    //       >
-    //         Detail
-    //       </div>
-    //     );
-    //   },
-    // },
   ];
 
   return (
@@ -121,12 +110,15 @@ export default function Invoices() {
         </div>
       )}
       {invoiceList.length > 0 && (
-        <div className='mt-[24px]'>
+        <div className='mt-[4px]'>
           <Table
             rowKey='id'
             columns={columns}
             dataSource={invoiceList}
             className='w-full'
+            size={isMobile ? 'small' : 'middle'}
+            pagination={false}
+            scroll={{ x: 'max-content' }}
           />
         </div>
       )}

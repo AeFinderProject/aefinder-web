@@ -162,7 +162,7 @@ export default function Dashboard() {
               onClick={() => {
                 router.push('/dashboard/billing/upgrade');
               }}
-              className='ml-[40px] h-[40px] w-[148px] text-sm'
+              className='ml-[40px] hidden h-[40px] w-[148px] text-sm sm:inline-block'
             >
               <Image
                 src='/assets/svg/shopping-cart.svg'
@@ -221,7 +221,7 @@ export default function Dashboard() {
           <div></div>
         </div>
       </div>
-      <div className='px-[40px]'>
+      <div className='px-[20px] sm:px-[40px]'>
         <div className='border-gray-70 border-b'></div>
       </div>
       <div className='text-gray-80 ml-[40px] mt-[31px]'>

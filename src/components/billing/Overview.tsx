@@ -108,9 +108,9 @@ export default function Overview() {
     <div>
       <Row
         gutter={24}
-        className='border-gray-E0 bg-gray-F5 my-[30px] rounded-lg border p-[24px]'
+        className='border-gray-E0 bg-gray-F5 mb-[30px] rounded-lg border p-[24px]'
       >
-        <Col span={6}>
+        <Col sm={12} md={6}>
           <Statistic
             title='Remaining Balance'
             value={`${orgBalance?.balance} USDT`}
@@ -120,7 +120,7 @@ export default function Overview() {
             {`${orgBalance?.lockedBalance} USDT`} Locked
           </div>
         </Col>
-        <Col span={6}>
+        <Col sm={12} md={6}>
           <Statistic
             title='Daily Cost Average'
             value={`${billingOverview?.apiQueryDailyCostAverage ?? '--'} USDT`}
@@ -130,7 +130,7 @@ export default function Overview() {
             {`${billingOverview?.apiQueryLockedBalance ?? '--'} USDT`} Locked
           </div>
         </Col>
-        <Col span={6}>
+        <Col sm={12} md={6} className='mt-[20px] sm:mt-[0px]'>
           <Statistic
             title='Monthly Cost Average'
             value={`${
@@ -139,7 +139,7 @@ export default function Overview() {
             valueStyle={{ fontSize: '16px', fontWeight: 500 }}
           />
         </Col>
-        <Col span={6}>
+        <Col sm={12} md={6} className='mt-[20px] sm:mt-[0px]'>
           <Statistic
             title='Renews in'
             value={`${getRemainingDays()} Days`}
@@ -148,7 +148,11 @@ export default function Overview() {
         </Col>
       </Row>
       <Row gutter={24} className='gap-[14px]'>
-        <Col span={8} className='border-gray-E0 rounded-lg border p-[24px]'>
+        <Col
+          sm={16}
+          md={8}
+          className='border-gray-E0 rounded-lg border p-[24px]'
+        >
           <div className='items-top flex justify-between'>
             <Statistic
               title='Queries made'
@@ -166,7 +170,11 @@ export default function Overview() {
             disabled
           />
         </Col>
-        <Col span={8} className='border-gray-E0 rounded-lg border p-[24px]'>
+        <Col
+          sm={8}
+          md={8}
+          className='border-gray-E0 rounded-lg border p-[24px]'
+        >
           <Statistic
             title='API Keys'
             value={`${apikeySummary.apiKeyCount}/${apikeySummary.maxApiKeyCount}`}

@@ -40,8 +40,8 @@ export default function BillingManage() {
 
   return (
     <div className='px-[16px] pb-[40px] sm:px-[40px]'>
-      <div className='flex h-[120px] items-center justify-between'>
-        <div className='flex items-center'>
+      <div className='flex flex-wrap items-center justify-between sm:h-[120px]'>
+        <div className='my-[20px] flex items-center sm:my-[0px]'>
           <LeftOutlined
             className='relative top-[-2px] mr-[16px] cursor-pointer align-middle text-sm'
             onClick={() => router.back()}
@@ -77,7 +77,7 @@ export default function BillingManage() {
           </Button>
           <Button
             type='primary'
-            className='ml-[10px] h-[40px] w-[148px] text-sm'
+            className='my-[20px] ml-[0px] h-[40px] w-[148px] text-sm sm:my-[0px] sm:ml-[10px]'
             onClick={() => {
               router.push('/dashboard/billing/withdraw');
             }}

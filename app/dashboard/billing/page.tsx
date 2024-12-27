@@ -36,11 +36,9 @@ export default function Billing() {
   }, [getMarketRegularTemp]);
 
   return (
-    <div className='px-[16px] pb-[40px] sm:px-[40px]'>
-      <div className='border-gray-F0 flex h-[120px] items-center justify-between border-b'>
-        <div className='flex items-center'>
-          <div className='text-3xl text-black'>Billing</div>
-        </div>
+    <div className='overflow-hidden px-[16px] pb-[40px] sm:px-[40px]'>
+      <div className='border-gray-F0 flex flex-wrap items-center justify-between border-b sm:h-[120px]'>
+        <div className='my-[20px] text-3xl text-black sm:my-[0px]'>Billing</div>
         <div>
           <Button
             type='primary'
@@ -76,7 +74,7 @@ export default function Billing() {
           </Button>
           <Button
             type='primary'
-            className='ml-[10px] h-[40px] w-[148px] text-sm'
+            className='my-[20px] ml-[0px] h-[40px] w-[148px] text-sm sm:my-[0px] sm:ml-[10px]'
             onClick={() => {
               router.push('/dashboard/billing/manage');
             }}
