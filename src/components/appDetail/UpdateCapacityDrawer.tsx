@@ -16,16 +16,13 @@ import {
 } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setOrgUserAll } from '@/store/slices/appSlice';
 import { setOrgBalance } from '@/store/slices/commonSlice';
 
 import {
-  cancelPayment,
+  cancelOrder,
   createOrder,
   getOrgBalance,
-  getOrgUserAll,
-  getResourcesLevel,
-  pendingPayment,
+  payOrder,
   resourceBillPlan,
 } from '@/api/requestMarket';
 import { AeFinderContractAddress } from '@/constant';
@@ -71,11 +68,13 @@ export default function UpdateCapacityDrawer({
   console.log('resourcesLevelList appSlice', resourcesLevelList);
 
   const getResourcesLevelTemp = useThrottleCallback(async () => {
-    const getResourcesLevelRes = await getResourcesLevel();
-    console.log('getResourcesLevelRes drawer', getResourcesLevelRes);
-    if (getResourcesLevelRes?.length > 0) {
-      setResourcesLevelList(getResourcesLevelRes);
-    }
+    // todo: merchandises list
+    // const getResourcesLevelRes = await getResourcesLevel();
+    // console.log('getResourcesLevelRes drawer', getResourcesLevelRes);
+    // if (getResourcesLevelRes?.length > 0) {
+    //   setResourcesLevelList(getResourcesLevelRes);
+    // }
+    setResourcesLevelList([]);
   }, [isShowUpdateCapacityModal]);
 
   useEffect(() => {
@@ -167,18 +166,9 @@ export default function UpdateCapacityDrawer({
     }
   }, [getOrgBalance]);
 
-  const getOrgUserAllTemp = useDebounceCallback(async () => {
-    const res = await getOrgUserAll();
-    console.log('getOrgUserAllTemp', res);
-    if (res.length > 0) {
-      dispatch(setOrgUserAll(res[0]));
-    }
-  }, [dispatch]);
-
   useEffect(() => {
-    getOrgUserAllTemp();
     getOrgBalanceTemp();
-  }, [getOrgUserAllTemp, getOrgBalanceTemp]);
+  }, [getOrgBalanceTemp]);
 
   const onChange: CollapseProps['onChange'] = (key) => {
     console.log(key);
@@ -246,8 +236,8 @@ export default function UpdateCapacityDrawer({
         });
         // refresh balance when Confirm monthly purchase success
         getOrgBalanceTemp();
-        await pendingPayment({
-          billingId: billingId,
+        await payOrder({
+          id: billingId,
         });
         handleClose();
       } else {
@@ -255,8 +245,8 @@ export default function UpdateCapacityDrawer({
           type: 'info',
           content: 'Confirm monthly purchase failed',
         });
-        await cancelPayment({
-          billingId: billingId,
+        await cancelOrder({
+          id: billingId,
         });
       }
       console.log('lockResult', lockResult);
@@ -268,8 +258,8 @@ export default function UpdateCapacityDrawer({
           error
         )}`,
       });
-      await cancelPayment({
-        billingId: billingId,
+      await cancelOrder({
+        id: billingId,
       });
     } finally {
       setLoading(false);

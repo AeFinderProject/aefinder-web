@@ -2,7 +2,7 @@ import { Button, InputNumber, Modal, Switch } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
 import { useCallback, useState } from 'react';
 
-import { getQueryFee, getRemainingDays } from '@/lib/utils';
+import { getRemainingDays } from '@/lib/utils';
 
 import { useAppSelector } from '@/store/hooks';
 
@@ -22,7 +22,6 @@ export default function ManageSpendingModal({
   setIsShowManageSpendingModal,
 }: ManageSpendingProps) {
   const apikeyDetail = useAppSelector((state) => state.app.apikeyDetail);
-  const regularData = useAppSelector((state) => state.app.regularData);
 
   const [currentIsEnableSpendingLimit, setCurrentIsEnableSpendingLimit] =
     useState(apikeyDetail.isEnableSpendingLimit);
@@ -78,14 +77,7 @@ export default function ManageSpendingModal({
       <div className='border-gray-E0 mb-[24px] flex items-center justify-between rounded-md border p-[12px]'>
         <div>
           <div className='text-gray-80 text-xs'>Period Cost</div>
-          <div className='text-dark-normal text-sm'>
-            $
-            {getQueryFee(
-              apikeyDetail?.totalQuery,
-              regularData?.monthlyUnitPrice
-            )}{' '}
-            USD
-          </div>
+          <div className='text-dark-normal text-sm'>$ 123 USD</div>
         </div>
         <div className='border-gray-D6 border-l pl-[30px]'>
           <div className='text-gray-80 text-xs'>Renews in</div>

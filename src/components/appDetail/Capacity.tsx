@@ -5,12 +5,12 @@ import { useThrottleCallback } from '@/lib/utils';
 
 import { useAppSelector } from '@/store/hooks';
 
-import { getFullPodUsage, getResourcesFull } from '@/api/requestMarket';
+import { getFullPodUsage } from '@/api/requestMarket';
 
-import { FullPodUsageItem, ResourcesLevelItem } from '@/types/marketType';
+import { FullPodUsageItem } from '@/types/marketType';
 
 export default function Capacity() {
-  const [resources, setResources] = useState<ResourcesLevelItem>();
+  // const [resources, setResources] = useState<ResourcesLevelItem>();
   const [podUsage, setPodUsage] = useState<FullPodUsageItem>();
   console.log('podUsage', podUsage);
 
@@ -18,20 +18,6 @@ export default function Capacity() {
     (state) => state.app.currentAppDetail
   );
   const currentVersion = useAppSelector((state) => state.app.currentVersion);
-
-  const getResourcesFullTemp = useThrottleCallback(async () => {
-    if (!currentAppDetail?.appId) return;
-    const res = await getResourcesFull({
-      appId: currentAppDetail?.appId,
-    });
-    if (res?.productId) {
-      setResources(res);
-    }
-  }, [currentAppDetail?.appId]);
-
-  useEffect(() => {
-    getResourcesFullTemp();
-  }, [getResourcesFullTemp]);
 
   const getFullPodUsageTemp = useThrottleCallback(async () => {
     if (!currentAppDetail?.appId || !currentVersion) return;
@@ -56,11 +42,11 @@ export default function Capacity() {
         <div>
           AeIndexer Capacity
           <Tag color='processing' className='ml-[8px]'>
-            {resources?.levelName}
+            {/* {resources?.levelName} */}
           </Tag>
         </div>
         <div className='text-gray-80 text-xs'>
-          Est. {resources?.monthlyUnitPrice} USDT/Month
+          {/* Est. {resources?.monthlyUnitPrice} USDT/Month */}
         </div>
       </div>
       <div className='mt-[14px] flex items-center justify-between gap-[14px]'>

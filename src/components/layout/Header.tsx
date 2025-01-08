@@ -17,17 +17,12 @@ import Bindwallet from '@/components/wallet/BindWallet';
 import LogInButton from '@/components/wallet/LoginButton';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import {
-  setApikeySummary,
-  setOrgUserAll,
-  setRegularData,
-} from '@/store/slices/appSlice';
+import { setApikeySummary } from '@/store/slices/appSlice';
 import { setUserInfo, setUsername } from '@/store/slices/commonSlice';
 
 import { queryAuthToken } from '@/api/apiUtils';
 import { getSummary } from '@/api/requestAPIKeys';
 import { getUsersInfo } from '@/api/requestApp';
-import { getMarketRegular, getOrgUserAll } from '@/api/requestMarket';
 import { CHAIN_ID } from '@/constant';
 
 export default function Header() {
@@ -55,18 +50,6 @@ export default function Header() {
     dispatch(setUserInfo(res));
   }, [dispatch, router]);
 
-  const getOrgUserAllTemp = useThrottleCallback(async () => {
-    const res = await getOrgUserAll();
-    if (res.length > 0) {
-      dispatch(setOrgUserAll(res[0]));
-    }
-  }, [dispatch]);
-
-  const getMarketRegularTemp = useThrottleCallback(async () => {
-    const res = await getMarketRegular();
-    dispatch(setRegularData(res));
-  }, [dispatch]);
-
   const getSummaryTemp = useThrottleCallback(async () => {
     const res = await getSummary();
     console.log('res', res);
@@ -76,18 +59,9 @@ export default function Header() {
   useEffect(() => {
     if (pathname !== '/' && !isLoginPathname) {
       getUsersInfoTemp();
-      getOrgUserAllTemp();
-      getMarketRegularTemp();
       getSummaryTemp();
     }
-  }, [
-    getUsersInfoTemp,
-    getOrgUserAllTemp,
-    getMarketRegularTemp,
-    getSummaryTemp,
-    pathname,
-    isLoginPathname,
-  ]);
+  }, [getUsersInfoTemp, getSummaryTemp, pathname, isLoginPathname]);
 
   useEffect(() => {
     const logoutContainer = document?.getElementById('logout-container');

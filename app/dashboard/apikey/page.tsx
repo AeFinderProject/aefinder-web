@@ -6,35 +6,25 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import {
-  getQueryFee,
-  useDebounceCallback,
-  useThrottleCallback,
-} from '@/lib/utils';
+import { useDebounceCallback, useThrottleCallback } from '@/lib/utils';
 
 import CreateApiKeyModal from '@/components/apikey/CreateApiKeyModal';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import {
-  setApikeyList,
-  setApikeySummary,
-  setOrgUserAll,
-} from '@/store/slices/appSlice';
+import { setApikeyList, setApikeySummary } from '@/store/slices/appSlice';
 import { setOrgBalance } from '@/store/slices/commonSlice';
 
 import { queryAuthToken } from '@/api/apiUtils';
 import { getApiKeysList, getSummary } from '@/api/requestAPIKeys';
-import { getOrgBalance, getOrgUserAll } from '@/api/requestMarket';
+import { getOrgBalance } from '@/api/requestMarket';
 
 import { ApikeyItemType } from '@/types/apikeyType';
 
 export default function Apikey() {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const isMobile = window?.innerWidth < 640;
   const apikeyList = useAppSelector((state) => state.app.apikeyList);
   const apikeySummary = useAppSelector((state) => state.app.apikeySummary);
-  const regularData = useAppSelector((state) => state.app.regularData);
   const orgBalance = useAppSelector((state) => state.common.orgBalance);
 
   const [loading, setLoading] = useState(false);
@@ -78,9 +68,9 @@ export default function Apikey() {
       title: 'Period Cost',
       dataIndex: '',
       key: 'periodQuery',
-      render: (record) => (
+      render: () => (
         <span>
-          {getQueryFee(record?.periodQuery, regularData?.monthlyUnitPrice)}
+          123
           <span className='text-gray-80 ml-[4px]'>USDT</span>
         </span>
       ),
@@ -95,9 +85,9 @@ export default function Apikey() {
       title: 'Total Query Fees',
       dataIndex: '',
       key: 'totalQuery',
-      render: (record) => (
+      render: () => (
         <span>
-          {getQueryFee(record?.totalQuery, regularData?.monthlyUnitPrice)}
+          123
           <span className='text-gray-80 ml-[4px]'>USDT</span>
         </span>
       ),
@@ -139,19 +129,9 @@ export default function Apikey() {
     }
   }, [getOrgBalance]);
 
-  const getOrgUserAllTemp = useDebounceCallback(async () => {
-    const res = await getOrgUserAll();
-    console.log('getOrgUserAllTemp', res);
-    if (res.length > 0) {
-      dispatch(setOrgUserAll(res[0]));
-      const organizationId = res[0]?.id;
-      getOrgBalanceTemp(organizationId);
-    }
-  }, [dispatch, getOrgBalanceTemp]);
-
   useEffect(() => {
-    getOrgUserAllTemp();
-  }, [getOrgUserAllTemp]);
+    getOrgBalanceTemp();
+  }, [getOrgBalanceTemp]);
 
   return (
     <div className='overflow-hidden px-[16px] pb-[40px] sm:px-[40px]'>
@@ -201,10 +181,7 @@ export default function Apikey() {
             </Tooltip>
           </div>
           <div className='text-dark-normal font-medium'>
-            {getQueryFee(
-              apikeySummary?.totalQuery,
-              regularData?.monthlyUnitPrice
-            )}
+            123
             <span className='text-gray-80 ml-[4px] font-medium'>USDT</span>
           </div>
         </Col>
@@ -286,7 +263,6 @@ export default function Apikey() {
         pagination={false}
         scroll={{ x: 'max-content' }}
         className='w-full'
-        size={isMobile ? 'small' : 'middle'}
         locale={{
           emptyText: (
             <div className='flex flex-col items-center justify-center'>

@@ -18,14 +18,13 @@ import {
 } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setOrgUserAll } from '@/store/slices/appSlice';
 import {
   setElfBalance,
   setOrgBalance,
   setUsdtBalance,
 } from '@/store/slices/commonSlice';
 
-import { getOrgBalance, getOrgUserAll } from '@/api/requestMarket';
+import { getOrgBalance } from '@/api/requestMarket';
 import {
   AeFinderContractAddress,
   CHAIN_ID,
@@ -113,18 +112,9 @@ export default function Withdraw() {
     }
   }, [getOrgBalance]);
 
-  const getOrgUserAllTemp = useThrottleCallback(async () => {
-    const res = await getOrgUserAll();
-    console.log('getOrgUserAllTemp', res);
-    if (res.length > 0) {
-      dispatch(setOrgUserAll(res[0]));
-    }
-  }, [dispatch]);
-
   useEffect(() => {
-    getOrgUserAllTemp();
     getOrgBalanceTemp();
-  }, [getOrgUserAllTemp, getOrgBalanceTemp]);
+  }, [getOrgBalanceTemp]);
 
   const handleWithdraw = useDebounceCallback(async () => {
     if (!withdrawAddress) {
@@ -159,7 +149,6 @@ export default function Withdraw() {
         });
         setCurrentAmount(null);
         await getBalance();
-        await getOrgUserAllTemp();
         setTimeout(() => {
           router.back();
         }, 4000);

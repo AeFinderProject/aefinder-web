@@ -16,7 +16,7 @@ import Image from 'next/image';
 import React, { useCallback, useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { getQueryFee, useDebounceCallback } from '@/lib/utils';
+import { useDebounceCallback } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
@@ -59,7 +59,6 @@ export default function ApikeyOverview() {
     (state) => state.app.defaultAeindexersList
   );
   const defaultAPIList = useAppSelector((state) => state.app.defaultAPIList);
-  const regularData = useAppSelector((state) => state.app.regularData);
 
   const tabsItems: TabsProps['items'] = [
     {
@@ -337,11 +336,7 @@ export default function ApikeyOverview() {
                 </Tooltip>
               </div>
               <div className='text-dark-normal font-medium'>
-                $
-                {getQueryFee(
-                  apikeyDetail?.totalQuery,
-                  regularData?.monthlyUnitPrice
-                )}
+                $ 123
                 <span className='text-gray-80 ml-[4px] font-medium'>USDT</span>
               </div>
             </div>
@@ -364,7 +359,7 @@ export default function ApikeyOverview() {
                 </Tooltip>
               </div>
               <div className='text-dark-normal font-medium'>
-                ${regularData?.monthlyUnitPrice / 10000}
+                123
                 <span className='text-gray-80 ml-[4px] mr-[12px] font-medium'>
                   USDT
                 </span>
@@ -424,11 +419,7 @@ export default function ApikeyOverview() {
                     </Col>
                     <Col span={5} className='text-gray-80'>
                       <div className='font-medium'>
-                        $
-                        {getQueryFee(
-                          item?.totalQuery,
-                          regularData?.monthlyUnitPrice
-                        )}
+                        $ 123
                         <span className='text-gray-80 ml-[4px] font-medium'>
                           USDT
                         </span>
@@ -480,11 +471,7 @@ export default function ApikeyOverview() {
                     </Col>
                     <Col span={5} className='text-gray-80'>
                       <div className='font-medium'>
-                        $
-                        {getQueryFee(
-                          item?.totalQuery,
-                          regularData?.monthlyUnitPrice
-                        )}
+                        $ 123
                         <span className='text-gray-80 ml-[4px] font-medium'>
                           USDT
                         </span>

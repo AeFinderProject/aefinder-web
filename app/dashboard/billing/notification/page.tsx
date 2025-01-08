@@ -15,7 +15,6 @@ import { getUsersInfo } from '@/api/requestApp';
 import { setNotification } from '@/api/requestMarket';
 
 export default function Notification() {
-  const isMobile = window?.innerWidth < 640;
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [messageApi, contextHolder] = message.useMessage();
@@ -106,7 +105,6 @@ export default function Notification() {
           columns={columns}
           dataSource={alertList}
           className='w-full'
-          size={isMobile ? 'small' : 'middle'}
           pagination={false}
         />
       </div>

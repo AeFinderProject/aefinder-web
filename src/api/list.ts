@@ -153,13 +153,7 @@ export const apiKeyList = {
 };
 
 export const marketList = {
-  getOrgUserAll: `${AeFinderHost}/api/organizations/user/all`,
   getOrgBalance: `${AeFinderHost}/api/organizations/balance`,
-  getResourcesLevel: `${AeFinderHost}/api/market/pod-resources/level`,
-  getResourcesFull: `${AeFinderHost}/api/market/pod-resource/full`,
-  getApiQueryCountFree: `${AeFinderHost}/api/market/api-query-count/free`,
-  getApiQueryCountMonthly: `${AeFinderHost}/api/market/api-query-count/monthly`,
-  getRegular: `${AeFinderHost}/api/market/api-query-count/regular`,
   resourceBillPlan: {
     target: `${AeFinderHost}/api/market/calculate/resource-bill-plan`,
     baseConfig: { method: 'POST' },
@@ -189,18 +183,35 @@ export const marketList = {
     target: `${AeFinderHost}/api/app-deploy/destroy-pending`,
     baseConfig: { method: 'POST' },
   },
-  getTransactionHistory: `${AeFinderHost}/api/market/transaction-history`,
-  getInvoices: `${AeFinderHost}/api/market/invoices`,
-  pendingPayment: {
-    target: `${AeFinderHost}/api/market/bill/pending-payment`,
-    baseConfig: { method: 'POST' },
-  },
-  cancelPayment: {
-    target: `${AeFinderHost}/api/market/bill/cancel`,
-    baseConfig: { method: 'POST' },
-  },
+  getTransactionHistory: `${AeFinderHost}/api/organizations/transaction-history`,
   getPendingBills: `${AeFinderHost}/api/market/pending/bills`,
   getBillingOverview: `${AeFinderHost}/api/market/billing/overview/api-query`,
+  getMerchandisesList: `${AeFinderHost}/api/merchandises`,
+  getOrdersList: `${AeFinderHost}/api/orders`,
+  getOrdersDetail: `${AeFinderHost}/api/orders`,
+  watchOrdersCost: {
+    target: `${AeFinderHost}/api/orders/cost`,
+    baseConfig: { method: 'POST' },
+  },
+  order: {
+    target: `${AeFinderHost}/api/orders`,
+    baseConfig: { method: 'POST' },
+  },
+  pay: {
+    target: `${AeFinderHost}/api/orders`,
+    baseConfig: { method: 'POST' },
+  },
+  cancel: {
+    target: `${AeFinderHost}/api/orders`,
+    baseConfig: { method: 'POST' },
+  },
+  getAssetsList: `${AeFinderHost}/api/assets`,
+  getAssetsRelate: {
+    target: `${AeFinderHost}/api/assets/relate`,
+    baseConfig: { method: 'POST' },
+  },
+  getBillingsList: `${AeFinderHost}/api/billings`,
+  getBillingsDetail: `${AeFinderHost}/api/billings`,
 };
 
 /**

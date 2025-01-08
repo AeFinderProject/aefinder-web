@@ -10,17 +10,14 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
-  calcProductNumber,
   divDecimalsStr,
   getOmittedStr,
-  getQueryFee,
   handleErrorMessage,
   timesDecimals,
   useDebounceCallback,
 } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setFreeApiQueryCount, setOrgUserAll } from '@/store/slices/appSlice';
 import {
   setElfBalance,
   setOrgBalance,
@@ -28,14 +25,13 @@ import {
 } from '@/store/slices/commonSlice';
 
 import {
-  cancelPayment,
-  createOrder,
-  getApiQueryCountFree,
-  getApiQueryCountMonthly,
+  cancelOrder,
+  getAssetsList,
+  getMerchandisesList,
   getOrgBalance,
-  getOrgUserAll,
-  getPendingBills,
-  pendingPayment,
+  order,
+  payOrder,
+  watchOrdersCost,
 } from '@/api/requestMarket';
 import {
   AeFinderContractAddress,
@@ -44,6 +40,7 @@ import {
 } from '@/constant';
 
 import { ApproveResponseType, GetBalanceResponseType } from '@/types/appType';
+import { MerchandisesItem } from '@/types/marketType';
 
 const marks: SliderSingleProps['marks'] = {
   100: {
@@ -88,30 +85,41 @@ export default function Upgrade() {
   const isMobile = window?.innerWidth < 640;
 
   const [loading, setLoading] = useState(false);
+  const [freeQuantity, setFreeQuantity] = useState<number>(100);
   const [currentQueryCount, setCurrentQueryCount] = useState(100);
-  const [currentMonth, setCurrentMonth] = useState<1 | 3 | 6>(1);
   const [currentAmount, setCurrentAmount] = useState<number>(0);
-  const [currentTotalAmount, setCurrentTotalAmount] = useState<number>(0);
+  const [currentDeductionAmount, setCurrentDeductionAmount] =
+    useState<number>(0);
+  const [currentActualAmount, setCurrentActualAmount] = useState<number>(0);
+  const [isLocked, setIsLocked] = useState(true);
+  const [merchandisesItem, setMerchandisesItem] = useState<MerchandisesItem>();
+  const [originalAssetId, setOriginalAssetId] = useState<string>();
 
   const userInfo = useAppSelector((state) => state.common.userInfo);
   const usdtBalance = useAppSelector((state) => state.common.usdtBalance);
   const elfBalance = useAppSelector((state) => state.common.elfBalance);
   const orgBalance = useAppSelector((state) => state.common.orgBalance);
-  const regularData = useAppSelector((state) => state.app.regularData);
-  const freeApiQueryCount = useAppSelector(
-    (state) => state.app.freeApiQueryCount
-  );
 
-  const getApiQueryCountMonthlyTemp = useCallback(async () => {
-    const res = await getApiQueryCountMonthly();
-    if (res) {
-      setCurrentQueryCount(res / 1000);
+  const getAssetsListTemp = useCallback(async () => {
+    const getAssetsListRes = await getAssetsList({
+      type: 0,
+      category: 0,
+      skipCount: 0,
+      maxResultCount: 100,
+    });
+    console.log('getAssetsList', getAssetsListRes);
+    if (getAssetsListRes?.items?.length === 1) {
+      const asset = getAssetsListRes?.items[0];
+      setIsLocked(asset?.isLocked);
+      setOriginalAssetId(asset?.id);
+      setFreeQuantity(asset?.freeQuantity / 1000);
+      setCurrentQueryCount(asset?.quantity / 1000);
     }
   }, []);
 
   useEffect(() => {
-    getApiQueryCountMonthlyTemp();
-  }, [getApiQueryCountMonthlyTemp]);
+    getAssetsListTemp();
+  }, [getAssetsListTemp]);
 
   const getBalance = useCallback(async () => {
     if (!isConnectedRef.current || !walletInfoRef.current) {
@@ -165,77 +173,87 @@ export default function Upgrade() {
     }
   }, [dispatch]);
 
-  const getApiQueryCountFreeTemp = useCallback(async () => {
-    const res = await getApiQueryCountFree();
-    if (res) {
-      dispatch(setFreeApiQueryCount(res));
-    }
-  }, [dispatch]);
+  useEffect(() => {
+    getOrgBalanceTemp();
+  }, [getOrgBalanceTemp]);
 
-  const getOrgUserAllTemp = useDebounceCallback(async () => {
-    const res = await getOrgUserAll();
-    console.log('getOrgUserAllTemp', res);
-    if (res.length > 0) {
-      dispatch(setOrgUserAll(res[0]));
-      getOrgBalanceTemp();
-      getApiQueryCountFreeTemp();
+  const getMerchandisesListTemp = useCallback(async () => {
+    const { items } = await getMerchandisesList({
+      type: 0,
+      category: 0,
+    });
+    console.log('getMerchandisesList items', items);
+    if (items?.length > 0) {
+      setMerchandisesItem(items[0]);
     }
-  }, [dispatch, getOrgBalanceTemp, getApiQueryCountFreeTemp]);
+  }, []);
 
   useEffect(() => {
-    getOrgUserAllTemp();
-  }, [getOrgUserAllTemp]);
+    getMerchandisesListTemp();
+  }, [getMerchandisesListTemp]);
 
-  useEffect(() => {
-    let tempAmount = 0;
-    if (currentQueryCount <= 100) {
-      tempAmount = 0;
-    } else {
-      console.log('freeApiQueryCount', freeApiQueryCount);
-      console.log(
-        'currentQueryCount',
-        currentQueryCount * 1000 - freeApiQueryCount
-      );
-      console.log('monthlyUnitPrice', regularData?.monthlyUnitPrice);
-      tempAmount = getQueryFee(
-        currentQueryCount * 1000 - freeApiQueryCount,
-        regularData?.monthlyUnitPrice
-      );
-      console.log('tempAmount', tempAmount);
-    }
-    setCurrentAmount(tempAmount);
-  }, [currentQueryCount, regularData?.monthlyUnitPrice, freeApiQueryCount]);
-
-  useEffect(() => {
-    setCurrentTotalAmount(currentAmount * currentMonth);
-  }, [currentAmount, currentMonth]);
-
-  const handlePreCreateOrder = useCallback(async () => {
-    const res = await getPendingBills();
-    if (res?.length > 0) {
-      messageApi.open({
-        type: 'warning',
-        content:
-          'There have pending bill, please await finish plan first, thank you',
-      });
+  const watchOrdersCostTemp = useCallback(async () => {
+    if (!merchandisesItem?.id || !currentQueryCount || isLocked) {
       return;
     }
-    const createOrderRes = await createOrder({
-      productId: regularData?.productId,
-      productNumber: Number(
-        calcProductNumber(
-          currentQueryCount,
-          freeApiQueryCount,
-          Number(regularData?.queryCount)
-        )
-      ),
-      periodMonths: currentMonth,
+    const params = {
+      originalAssetId: '',
+      merchandiseId: merchandisesItem?.id,
+      quantity: currentQueryCount * 1000,
+      replicas: 1,
+    };
+    if (originalAssetId) {
+      params.originalAssetId = originalAssetId;
+    }
+    const watchOrdersCostRes = await watchOrdersCost({
+      details: [params],
     });
-    if (createOrderRes?.length > 0) {
-      const { billingId, billingAmount } = createOrderRes[0];
+    console.log('watchOrdersCost', watchOrdersCostRes);
+    if (watchOrdersCostRes) {
+      setCurrentAmount(watchOrdersCostRes?.amount);
+      setCurrentDeductionAmount(watchOrdersCostRes?.deductionAmount);
+      setCurrentActualAmount(watchOrdersCostRes?.actualAmount);
+    }
+  }, [currentQueryCount, merchandisesItem?.id, originalAssetId, isLocked]);
+
+  useEffect(() => {
+    watchOrdersCostTemp();
+  }, [watchOrdersCostTemp]);
+
+  const handleRouteBack = useCallback(() => {
+    setCurrentQueryCount(100);
+    setIsLocked(true);
+    setOriginalAssetId('');
+    setCurrentAmount(0);
+    setCurrentDeductionAmount(0);
+    setCurrentActualAmount(0);
+    router.back();
+  }, [router]);
+
+  const handlePreCreateOrder = useCallback(async () => {
+    if (!merchandisesItem?.id || !currentQueryCount || isLocked) {
       return {
-        billingId,
-        billingAmount,
+        billingId: '',
+        billingAmount: 0,
+      };
+    }
+    const params = {
+      originalAssetId: '',
+      merchandiseId: merchandisesItem?.id,
+      quantity: currentQueryCount * 1000,
+      replicas: 1,
+    };
+    if (originalAssetId) {
+      params.originalAssetId = originalAssetId;
+    }
+    const newOrderItemRes = await order({
+      details: [params],
+    });
+    if (newOrderItemRes) {
+      const { id, actualAmount } = newOrderItemRes;
+      return {
+        billingId: id,
+        billingAmount: actualAmount,
       };
     } else {
       return {
@@ -243,21 +261,25 @@ export default function Upgrade() {
         billingAmount: 0,
       };
     }
-  }, [
-    currentQueryCount,
-    currentMonth,
-    regularData?.productId,
-    regularData?.queryCount,
-    freeApiQueryCount,
-    messageApi,
-  ]);
+  }, [merchandisesItem?.id, currentQueryCount, originalAssetId, isLocked]);
 
   const handleCreateOrder = useDebounceCallback(async () => {
     setLoading(true);
-    const { billingId = '', billingAmount } =
-      (await handlePreCreateOrder()) || {};
+    const { billingId, billingAmount } = await handlePreCreateOrder();
+    // if actualAmount = 0, customer need't to lock
+    if (billingAmount === 0) {
+      messageApi.open({
+        type: 'success',
+        content:
+          'Confirm purchase successfully, please wait for the confirmation of the transaction',
+        duration: 3,
+      });
+      setTimeout(() => {
+        handleRouteBack();
+      }, 4000);
+      return;
+    }
     try {
-      console.log('billingId, billingAmount', billingId, billingAmount);
       if (!billingId || !billingAmount) {
         messageApi.warning('Create order failed');
         return;
@@ -281,19 +303,22 @@ export default function Upgrade() {
         // refresh balance when Confirm monthly purchase success
         await getBalance();
         await getOrgBalanceTemp();
-        await pendingPayment({
-          billingId: billingId,
+        const payRes = await payOrder({
+          id: billingId,
+          paymentType: 1,
         });
-        setTimeout(() => {
-          router.back();
-        }, 4000);
+        if (payRes) {
+          setTimeout(() => {
+            handleRouteBack();
+          }, 4000);
+        }
       } else {
         messageApi.open({
           type: 'info',
           content: 'Confirm monthly purchase failed',
         });
-        await cancelPayment({
-          billingId: billingId,
+        await cancelOrder({
+          id: billingId,
         });
       }
       console.log('lockResult', lockResult);
@@ -304,13 +329,13 @@ export default function Upgrade() {
           error
         )}`,
       });
-      await cancelPayment({
-        billingId: billingId,
+      await cancelOrder({
+        id: billingId,
       });
     } finally {
       setLoading(false);
     }
-  }, [currentMonth]);
+  }, []);
 
   return (
     <div className='px-[16px] pb-[36px] sm:px-[40px]'>
@@ -319,10 +344,18 @@ export default function Upgrade() {
         <div>
           <LeftOutlined
             className='relative top-[-7px] mr-[16px] cursor-pointer align-middle text-sm'
-            onClick={() => router.back()}
+            onClick={handleRouteBack}
           />
-          <span className='text-3xl text-black'>Upgrade Plan</span>
+          <span className='text-3xl text-black'>Purchase</span>
         </div>
+        {isLocked && (
+          <Tag
+            color='processing'
+            className='mt-[10px] w-full truncate leading-10'
+          >
+            You have unfinished orders and temporarily cannot place more orders.
+          </Tag>
+        )}
       </div>
       <div className='mt-[24px]'>
         <Row gutter={24}>
@@ -350,7 +383,7 @@ export default function Upgrade() {
             </div>
             <Slider
               value={currentQueryCount}
-              min={100}
+              min={freeQuantity}
               max={500}
               step={10}
               onChange={(value) => setCurrentQueryCount(value)}
@@ -360,43 +393,12 @@ export default function Upgrade() {
               *First 100,000 is free, subsequent queries are chargeable at
               $4/100,000 queries
             </div>
+
             <Divider className='my-[35px]' />
             <div className='mb-[28px] text-xl font-medium text-black'>
               <Image
                 src='/assets/svg/step2.svg'
                 alt='step2'
-                width={24}
-                height={24}
-                className='relative top-[-2px] mr-[16px] inline-block align-middle'
-              />
-              Prepay for
-            </div>
-            <div>
-              <Button
-                type={currentMonth === 1 ? 'primary' : 'default'}
-                onClick={() => setCurrentMonth(1)}
-              >
-                1 Month
-              </Button>
-              <Button
-                type={currentMonth === 3 ? 'primary' : 'default'}
-                onClick={() => setCurrentMonth(3)}
-                className='mx-[10px]'
-              >
-                3 Month
-              </Button>
-              <Button
-                type={currentMonth === 6 ? 'primary' : 'default'}
-                onClick={() => setCurrentMonth(6)}
-              >
-                6 Month
-              </Button>
-            </div>
-            <Divider className='my-[35px]' />
-            <div className='mb-[28px] text-xl font-medium text-black'>
-              <Image
-                src='/assets/svg/step3.svg'
-                alt='step3'
                 width={24}
                 height={24}
                 className='relative top-[-2px] mr-[16px] inline-block align-middle'
@@ -453,7 +455,7 @@ export default function Upgrade() {
                 You will be able to withdraw your unlocked balance at any time
               </span>
             </Tag>
-            {currentTotalAmount > orgBalance?.balance && (
+            {currentActualAmount > orgBalance?.balance && (
               <Tag
                 icon={
                   <ExclamationCircleOutlined className='relative top-[-3px]' />
@@ -478,18 +480,18 @@ export default function Upgrade() {
               <div>
                 <div className='text-gray-80 text-sm'>Est. Monthly Cost*</div>
                 <div className='text-dark-normal'>
-                  {currentAmount} USDT/month
+                  {currentActualAmount} USDT/month
                 </div>
               </div>
-              {currentTotalAmount > orgBalance?.balance && (
+              {currentActualAmount > orgBalance?.balance && (
                 <Button type='default' disabled={true}>
                   Insufficient billing balance
                 </Button>
               )}
-              {currentTotalAmount <= orgBalance?.balance && (
+              {currentActualAmount <= orgBalance?.balance && (
                 <Button
                   type='primary'
-                  disabled={currentTotalAmount === 0}
+                  disabled={isLocked}
                   onClick={handleCreateOrder}
                   loading={loading}
                 >
@@ -521,22 +523,32 @@ export default function Upgrade() {
                 <div className='text-gray-80 text-sm'>Est. Queries</div>
                 <div className='text-dark-normal'>{currentQueryCount}K</div>
               </div>
-              <div className='flex justify-between'>
-                <div className='text-gray-80 text-sm'>Months</div>
-                <div className='text-dark-normal'>{currentMonth}</div>
-              </div>
               <Divider />
               <div className='flex justify-between'>
-                <div className='text-gray-80 text-sm'>Est. Monthly Cost</div>
+                <div className='text-gray-80 text-sm'>Month</div>
+                <div className='text-dark-normal'>1</div>
+              </div>
+              <div className='mt-[20px] flex justify-between'>
+                <div className='text-gray-80 text-sm'>Est. Price</div>
                 <div className='text-dark-normal'>
-                  {regularData?.monthlyUnitPrice} USDT/month
+                  {merchandisesItem?.price ?? '--'} USDT/Query
                 </div>
               </div>
               <Divider />
               <div className='flex justify-between'>
-                <div className='text-dark-normal'>Est. Total Cost</div>
+                <div className='text-gray-80 text-sm'>Amount</div>
+                <div className='text-dark-normal'>{currentAmount} USDT</div>
+              </div>
+              <div className='mt-[20px] flex justify-between'>
+                <div className='text-gray-80 text-sm'>DeductionAmount</div>
                 <div className='text-dark-normal'>
-                  {currentTotalAmount?.toFixed(2)} USDT
+                  {currentDeductionAmount} USDT
+                </div>
+              </div>
+              <div className='mt-[20px] flex justify-between'>
+                <div className='text-dark-normal'>ActualAmount</div>
+                <div className='text-dark-normal'>
+                  {currentActualAmount} USDT
                 </div>
               </div>
             </div>

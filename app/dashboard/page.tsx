@@ -171,7 +171,7 @@ export default function Dashboard() {
                 height={14}
                 className='mr-2 inline-block'
               />
-              Upgrade Plan
+              Purchase
             </Button>
           </div>
         </div>

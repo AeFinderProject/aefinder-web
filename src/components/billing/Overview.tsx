@@ -9,29 +9,19 @@ import { getRemainingDays, useDebounceCallback } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setApikeySummary } from '@/store/slices/appSlice';
-import { setFreeApiQueryCount, setOrgUserAll } from '@/store/slices/appSlice';
 import { setOrgBalance } from '@/store/slices/commonSlice';
 
 import { getSnapshots, getSummary } from '@/api/requestAPIKeys';
-import {
-  getApiQueryCountFree,
-  getBillingOverview,
-  getOrgBalance,
-  getOrgUserAll,
-} from '@/api/requestMarket';
+import { getOrgBalance } from '@/api/requestMarket';
 
 import { SnapshotsItemType } from '@/types/apikeyType';
-import { GetBillingOverviewResponse } from '@/types/marketType';
 
 export default function Overview() {
   const dispatch = useAppDispatch();
 
   const [snapshotsData, setSnapshotsData] = useState<SnapshotsItemType[]>([]);
-  const [billingOverview, setBillingOverview] =
-    useState<GetBillingOverviewResponse>();
 
   const apikeySummary = useAppSelector((state) => state.app.apikeySummary);
-  const regularData = useAppSelector((state) => state.app.regularData);
   const orgBalance = useAppSelector((state) => state.common.orgBalance);
 
   const config = {
@@ -63,17 +53,10 @@ export default function Overview() {
     setSnapshotsData(items);
   }, []);
 
-  const getBillingOverviewTemp = useCallback(async () => {
-    const res = await getBillingOverview();
-    console.log('getBillingOverviewRes', res);
-    setBillingOverview(res);
-  }, []);
-
   useEffect(() => {
     getSummaryTemp();
     getSnapshotsData();
-    getBillingOverviewTemp();
-  }, [getSummaryTemp, getSnapshotsData, getBillingOverviewTemp]);
+  }, [getSummaryTemp, getSnapshotsData]);
 
   const getOrgBalanceTemp = useCallback(async () => {
     const getOrgBalanceRes = await getOrgBalance();
@@ -83,26 +66,9 @@ export default function Overview() {
     }
   }, [dispatch]);
 
-  const getApiQueryCountFreeTemp = useCallback(async () => {
-    const res = await getApiQueryCountFree();
-    if (res) {
-      dispatch(setFreeApiQueryCount(res));
-    }
-  }, [dispatch]);
-
-  const getOrgUserAllTemp = useDebounceCallback(async () => {
-    const res = await getOrgUserAll();
-    console.log('getOrgUserAllTemp', res);
-    if (res.length > 0) {
-      dispatch(setOrgUserAll(res[0]));
-    }
-  }, [dispatch]);
-
   useEffect(() => {
-    getOrgUserAllTemp();
     getOrgBalanceTemp();
-    getApiQueryCountFreeTemp();
-  }, [getOrgUserAllTemp, getOrgBalanceTemp, getApiQueryCountFreeTemp]);
+  }, [getOrgBalanceTemp]);
 
   return (
     <div>
@@ -110,36 +76,21 @@ export default function Overview() {
         gutter={24}
         className='border-gray-E0 bg-gray-F5 mb-[30px] rounded-lg border p-[24px]'
       >
-        <Col sm={12} md={6}>
+        <Col sm={8} md={8}>
           <Statistic
             title='Remaining Balance'
             value={`${orgBalance?.balance} USDT`}
             valueStyle={{ fontSize: '16px', fontWeight: 500 }}
           />
-          <div className='text-gray-80 mt-[6px] text-sm'>
-            {`${orgBalance?.lockedBalance} USDT`} Locked
-          </div>
         </Col>
-        <Col sm={12} md={6}>
+        <Col sm={8} md={8}>
           <Statistic
-            title='Daily Cost Average'
-            value={`${billingOverview?.apiQueryDailyCostAverage ?? '--'} USDT`}
-            valueStyle={{ fontSize: '16px', fontWeight: 500 }}
-          />
-          <div className='text-gray-80 mt-[6px] text-sm'>
-            {`${billingOverview?.apiQueryLockedBalance ?? '--'} USDT`} Locked
-          </div>
-        </Col>
-        <Col sm={12} md={6} className='mt-[20px] sm:mt-[0px]'>
-          <Statistic
-            title='Monthly Cost Average'
-            value={`${
-              billingOverview?.apiQueryMonthlyCostAverage ?? '--'
-            } USDT`}
+            title='Locked'
+            value={`${orgBalance?.lockedBalance} USDT`}
             valueStyle={{ fontSize: '16px', fontWeight: 500 }}
           />
         </Col>
-        <Col sm={12} md={6} className='mt-[20px] sm:mt-[0px]'>
+        <Col sm={8} md={8} className='mt-[20px] sm:mt-[0px]'>
           <Statistic
             title='Renews in'
             value={`${getRemainingDays()} Days`}
@@ -160,7 +111,7 @@ export default function Overview() {
               valueStyle={{ fontSize: '16px', fontWeight: 500 }}
             />
             <div className='text-gray-80 relative top-[4px] text-xs'>
-              Est. {regularData?.monthlyUnitPrice} USDT/Month
+              Est. 123 USDT/Month
             </div>
           </div>
           <Slider

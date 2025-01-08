@@ -7,7 +7,7 @@ import {
   GetSummaryResponse,
 } from '@/types/apikeyType';
 import { CreateAppResponse, GetAppDetailResponse } from '@/types/appType';
-import { GetRegularResponse, GetUserAllResponse } from '@/types/marketType';
+import { GetUserAllResponse } from '@/types/marketType';
 import { GetSubscriptionResponse } from '@/types/subscriptionType';
 
 export interface AppSliceState {
@@ -21,7 +21,6 @@ export interface AppSliceState {
   defaultAeindexersList: AeIndexersItem[];
   defaultAPIList: ApiItem[];
   orgUserAll: GetUserAllResponse;
-  regularData: GetRegularResponse;
   freeApiQueryCount: number;
 }
 
@@ -40,11 +39,6 @@ const initialState: AppSliceState = {
   defaultAeindexersList: [],
   defaultAPIList: [],
   orgUserAll: {} as GetUserAllResponse,
-  regularData: {
-    productId: '',
-    queryCount: '0',
-    monthlyUnitPrice: 0.4,
-  },
   freeApiQueryCount: 0,
 };
 
@@ -82,9 +76,6 @@ export const appSlice = createAppSlice({
     setOrgUserAll: (state, action) => {
       state.orgUserAll = action.payload;
     },
-    setRegularData: (state, action) => {
-      state.regularData = action.payload;
-    },
     setFreeApiQueryCount: (state, action) => {
       state.freeApiQueryCount = action.payload;
     },
@@ -102,6 +93,5 @@ export const {
   setDefaultAeIndexersList,
   setDefaultAPIList,
   setOrgUserAll,
-  setRegularData,
   setFreeApiQueryCount,
 } = appSlice.actions;

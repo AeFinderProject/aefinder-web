@@ -7,16 +7,19 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
-import Invoices from '@/components/billing/Invoices';
+import OrderList from '@/components/billing/OrderList';
 import Overview from '@/components/billing/Overview';
 import TransactionHistory from '@/components/billing/TransactionHistory';
 
 export default function BillingManage() {
   const router = useRouter();
 
-  const [activeTabKey, setActiveTabKey] = useState('overview');
+  const [activeTabKey, setActiveTabKey] = useState(
+    localStorage.getItem('billingTabKey') || 'overview'
+  );
 
   const onTabChange = (key: string) => {
+    localStorage.setItem('billingTabKey', key);
     setActiveTabKey(key);
   };
 
@@ -27,9 +30,9 @@ export default function BillingManage() {
       children: <Overview />,
     },
     {
-      key: 'invoices',
-      label: 'Invoices',
-      children: <Invoices />,
+      key: 'order',
+      label: 'Order',
+      children: <OrderList />,
     },
     {
       key: 'transactionHistory',
@@ -57,7 +60,7 @@ export default function BillingManage() {
             }}
           >
             <PlusOutlined className='relative top-[-3px] mr-2 inline-block text-lg text-white' />
-            Upgrade
+            Purchase
           </Button>
           <Button
             type='primary'

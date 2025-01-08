@@ -17,7 +17,7 @@ import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setCurrentVersion } from '@/store/slices/appSlice';
 
-import { getPendingBills, getResourcesFull } from '@/api/requestMarket';
+import { getPendingBills } from '@/api/requestMarket';
 
 import { AppStatusType, CurrentTourStepEnum } from '@/types/appType';
 
@@ -29,7 +29,6 @@ type HeaderHandleProps = {
 };
 
 export default function HeaderHandle({
-  setDeployDrawerVisible,
   messageApi,
   isNeedRefresh,
   setIsNeedRefresh,
@@ -180,15 +179,16 @@ export default function HeaderHandle({
         });
         return;
       }
-      const getResourcesFullRes = await getResourcesFull({
-        appId: currentAppDetail?.appId,
-      });
-      if (getResourcesFullRes?.productId) {
-        setDeployDrawerVisible(true);
-      } else {
-        messageApi.info('Please update capacity first');
-        setIsShowUpdateCapacityModal(true);
-      }
+      // TODO ： isLocked: true
+      // const getResourcesFullRes = await getResourcesFull({
+      //   appId: currentAppDetail?.appId,
+      // });
+      // if (getResourcesFullRes?.productId) {
+      //   setDeployDrawerVisible(true);
+      // } else {
+      //   messageApi.info('Please update capacity first');
+      //   setIsShowUpdateCapacityModal(true);
+      // }
     } finally {
       setDeployLoading(false);
     }

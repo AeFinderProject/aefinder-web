@@ -1,5 +1,6 @@
 import type { TableColumnsType } from 'antd';
 import { Table } from 'antd';
+import dayjs from 'dayjs';
 import Image from 'next/image';
 import React, { useCallback, useEffect, useState } from 'react';
 
@@ -18,7 +19,6 @@ export default function TransactionHistory() {
   const [skipCount, setSkipCount] = useState(1);
   const [maxResultCount, setMaxResultCount] = useState(10);
   const [totalCountItems, setTotalCountItems] = useState(0);
-  const isMobile = window?.innerWidth < 640;
 
   const tableOnChange = useCallback(
     (page: number, pageSize: number) => {
@@ -62,6 +62,9 @@ export default function TransactionHistory() {
       title: 'Date',
       dataIndex: 'transactionDate',
       key: 'transactionDate',
+      render: (text: string) => (
+        <div>{dayjs(text).format('YYYY/MM/DD HH:mm:ss')}</div>
+      ),
     },
     {
       title: 'Description',
@@ -94,6 +97,7 @@ export default function TransactionHistory() {
       title: 'Payment Method',
       dataIndex: 'paymentMethod',
       key: 'paymentMethod',
+      render: (text: number) => <div>{text}</div>,
     },
   ];
 
@@ -124,7 +128,6 @@ export default function TransactionHistory() {
             columns={columns}
             dataSource={transactionHistoryList}
             className='w-full'
-            size={isMobile ? 'small' : 'middle'}
             scroll={{ x: 'max-content' }}
             pagination={{
               current: skipCount,
