@@ -15,6 +15,7 @@ import {
   handleErrorMessage,
   timesDecimals,
   useDebounceCallback,
+  useThrottleCallback,
 } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -106,7 +107,7 @@ export default function Upgrade() {
   const isMobile = window?.innerWidth < 640;
 
   const [loading, setLoading] = useState(false);
-  const [freeQuantity, setFreeQuantity] = useState<number>(100);
+  const [freeQuantity, setFreeQuantity] = useState<number>(100000);
   const [currentQueryCount, setCurrentQueryCount] = useState(100000);
   const [currentAmount, setCurrentAmount] = useState<number>(0);
   const [currentDeductionAmount, setCurrentDeductionAmount] =
@@ -213,7 +214,7 @@ export default function Upgrade() {
     getMerchandisesListTemp();
   }, [getMerchandisesListTemp]);
 
-  const watchOrdersCostTemp = useCallback(async () => {
+  const watchOrdersCostTemp = useThrottleCallback(async () => {
     if (!merchandisesItem?.id || !currentQueryCount || isLocked) {
       return;
     }
@@ -542,7 +543,7 @@ export default function Upgrade() {
             <div className='bg-gray-F5 rounded-lg p-[20px]'>
               <div className='mb-[20px] flex justify-between'>
                 <div className='text-gray-80 text-sm'>Est. Queries</div>
-                <div className='text-dark-normal'>{currentQueryCount}K</div>
+                <div className='text-dark-normal'>{currentQueryCount}</div>
               </div>
               <Divider />
               <div className='flex justify-between'>
