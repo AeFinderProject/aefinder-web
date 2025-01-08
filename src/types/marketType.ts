@@ -171,8 +171,6 @@ export type PendingBillsItem = {
   productType: number;
 };
 
-export type GetPendingBillsResponse = PendingBillsItem[];
-
 export type GetBillingOverviewResponse = {
   apiQueryLockedBalance: number;
   apiQueryDailyCostAverage: number;
@@ -309,7 +307,7 @@ export type GetAssetsListRequest = {
   appId?: string;
   isFree?: boolean;
   type?: number;
-  category: number;
+  category?: number;
   skipCount: number;
   maxResultCount: number;
 };

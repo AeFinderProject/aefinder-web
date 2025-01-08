@@ -28,7 +28,6 @@ import {
   GetOrdersListRequest,
   GetOrdersListResponse,
   GetOrgBalanceResponse,
-  GetPendingBillsResponse,
   GetTransactionHistoryRequest,
   GetTransactionHistoryResponse,
   NewOrderItemType,
@@ -147,15 +146,6 @@ export const getTransactionHistory = async (
     return res;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'getTransactionHistory error'));
-  }
-};
-
-export const getPendingBills = async (): Promise<GetPendingBillsResponse> => {
-  try {
-    const res = await request.market.getPendingBills();
-    return res;
-  } catch (error) {
-    throw new Error(handleErrorMessage(error, 'getPendingBills error'));
   }
 };
 

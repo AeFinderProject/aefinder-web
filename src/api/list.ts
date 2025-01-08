@@ -184,7 +184,6 @@ export const marketList = {
     baseConfig: { method: 'POST' },
   },
   getTransactionHistory: `${AeFinderHost}/api/organizations/transaction-history`,
-  getPendingBills: `${AeFinderHost}/api/market/pending/bills`,
   getBillingOverview: `${AeFinderHost}/api/market/billing/overview/api-query`,
   getMerchandisesList: `${AeFinderHost}/api/merchandises`,
   getOrdersList: `${AeFinderHost}/api/orders`,

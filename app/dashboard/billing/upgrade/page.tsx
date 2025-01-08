@@ -43,26 +43,47 @@ import { ApproveResponseType, GetBalanceResponseType } from '@/types/appType';
 import { MerchandisesItem } from '@/types/marketType';
 
 const marks: SliderSingleProps['marks'] = {
-  100: {
+  100000: {
     style: {
       fontSize: '12px',
       color: '#808080',
     },
-    label: <strong>100K</strong>,
+    label: <strong>100k</strong>,
   },
-  300: {
+  50000000: {
     style: {
       fontSize: '12px',
       color: '#808080',
     },
-    label: <strong>300K</strong>,
+    label: <strong>50,000k</strong>,
   },
-  500: {
+  100000000: {
     style: {
       fontSize: '12px',
       color: '#808080',
     },
-    label: <strong>500K</strong>,
+    label: <strong>100,000k</strong>,
+  },
+  150000000: {
+    style: {
+      fontSize: '12px',
+      color: '#808080',
+    },
+    label: <strong>150,000k</strong>,
+  },
+  200000000: {
+    style: {
+      fontSize: '12px',
+      color: '#808080',
+    },
+    label: <strong>200,000k</strong>,
+  },
+  250000000: {
+    style: {
+      fontSize: '12px',
+      color: '#808080',
+    },
+    label: <strong>250,000k</strong>,
   },
 };
 
@@ -86,7 +107,7 @@ export default function Upgrade() {
 
   const [loading, setLoading] = useState(false);
   const [freeQuantity, setFreeQuantity] = useState<number>(100);
-  const [currentQueryCount, setCurrentQueryCount] = useState(100);
+  const [currentQueryCount, setCurrentQueryCount] = useState(100000);
   const [currentAmount, setCurrentAmount] = useState<number>(0);
   const [currentDeductionAmount, setCurrentDeductionAmount] =
     useState<number>(0);
@@ -112,8 +133,8 @@ export default function Upgrade() {
       const asset = getAssetsListRes?.items[0];
       setIsLocked(asset?.isLocked);
       setOriginalAssetId(asset?.id);
-      setFreeQuantity(asset?.freeQuantity / 1000);
-      setCurrentQueryCount(asset?.quantity / 1000);
+      setFreeQuantity(asset?.freeQuantity);
+      setCurrentQueryCount(asset?.quantity);
     }
   }, []);
 
@@ -199,7 +220,7 @@ export default function Upgrade() {
     const params = {
       originalAssetId: '',
       merchandiseId: merchandisesItem?.id,
-      quantity: currentQueryCount * 1000,
+      quantity: currentQueryCount,
       replicas: 1,
     };
     if (originalAssetId) {
@@ -221,7 +242,7 @@ export default function Upgrade() {
   }, [watchOrdersCostTemp]);
 
   const handleRouteBack = useCallback(() => {
-    setCurrentQueryCount(100);
+    setCurrentQueryCount(100000);
     setIsLocked(true);
     setOriginalAssetId('');
     setCurrentAmount(0);
@@ -240,7 +261,7 @@ export default function Upgrade() {
     const params = {
       originalAssetId: '',
       merchandiseId: merchandisesItem?.id,
-      quantity: currentQueryCount * 1000,
+      quantity: currentQueryCount,
       replicas: 1,
     };
     if (originalAssetId) {
@@ -369,13 +390,13 @@ export default function Upgrade() {
                   height={24}
                   className='relative top-[-2px] mr-[16px] inline-block align-middle'
                 />
-                Estimated number of monthly queries
+                Estimated number of queries
               </div>
               <div>
-                <span className='text-dark-normal'>500,000</span>
+                <span className='text-dark-normal'>250,000k</span>
                 <span
                   className='text-blue-link ml-[16px] cursor-pointer'
-                  onClick={() => setCurrentQueryCount(500)}
+                  onClick={() => setCurrentQueryCount(250000000)}
                 >
                   Max
                 </span>
@@ -384,8 +405,8 @@ export default function Upgrade() {
             <Slider
               value={currentQueryCount}
               min={freeQuantity}
-              max={500}
-              step={10}
+              max={250000000}
+              step={10000}
               onChange={(value) => setCurrentQueryCount(value)}
               marks={marks}
             />

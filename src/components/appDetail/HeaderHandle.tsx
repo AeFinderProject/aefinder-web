@@ -17,9 +17,10 @@ import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setCurrentVersion } from '@/store/slices/appSlice';
 
-import { getPendingBills } from '@/api/requestMarket';
+import { getAssetsList } from '@/api/requestMarket';
 
 import { AppStatusType, CurrentTourStepEnum } from '@/types/appType';
+import { AssetsItem } from '@/types/marketType';
 
 type HeaderHandleProps = {
   readonly setDeployDrawerVisible: (visible: boolean) => void;
@@ -29,6 +30,7 @@ type HeaderHandleProps = {
 };
 
 export default function HeaderHandle({
+  setDeployDrawerVisible,
   messageApi,
   isNeedRefresh,
   setIsNeedRefresh,
@@ -54,6 +56,10 @@ export default function HeaderHandle({
     (state) => state.app
   );
   const currentTourStep = localStorage.getItem('currentTourStep');
+  const [processorAssetList, setProcessorAssetList] = useState<AssetsItem[]>(
+    []
+  );
+  const [storageAssetList, setStorageAssetList] = useState<AssetsItem[]>([]);
 
   const DeploySteps: TourProps['steps'] = [
     {
@@ -163,6 +169,30 @@ export default function HeaderHandle({
     },
   ];
 
+  const getAssetsListTemp = useCallback(async () => {
+    const getProcessorAssetListRes = await getAssetsList({
+      appId: currentAppDetail?.appId,
+      type: 1,
+      skipCount: 0,
+      maxResultCount: 100,
+    });
+    console.log('getProcessorAssetListRes', getProcessorAssetListRes);
+    setProcessorAssetList(getProcessorAssetListRes?.items);
+
+    const getStorageAssetListRes = await getAssetsList({
+      appId: currentAppDetail?.appId,
+      type: 2,
+      skipCount: 0,
+      maxResultCount: 100,
+    });
+    console.log('getStorageAssetListRes', getStorageAssetListRes);
+    setStorageAssetList(getStorageAssetListRes?.items);
+  }, [currentAppDetail?.appId]);
+
+  useEffect(() => {
+    getAssetsListTemp();
+  }, [getAssetsListTemp]);
+
   const handleClickDeploy = useDebounceCallback(async () => {
     // need to check the aeindexer has buy cpu and memory or not
     // if yes, then deploy the aeindexer and show the updateCapacity drawer
@@ -170,29 +200,17 @@ export default function HeaderHandle({
       setDeployLoading(true);
       handleDeployCloseTour();
       if (!currentAppDetail?.appId) return;
-      const res = await getPendingBills();
-      if (res?.length > 0) {
-        messageApi.open({
-          type: 'warning',
-          content:
-            'There have pending bill, please await finish plan first, thank you',
-        });
-        return;
+
+      if (processorAssetList.length && storageAssetList.length) {
+        setDeployDrawerVisible(true);
+      } else {
+        messageApi.info('Please update capacity first: Processor and Storage');
+        setIsShowUpdateCapacityModal(true);
       }
-      // TODO ： isLocked: true
-      // const getResourcesFullRes = await getResourcesFull({
-      //   appId: currentAppDetail?.appId,
-      // });
-      // if (getResourcesFullRes?.productId) {
-      //   setDeployDrawerVisible(true);
-      // } else {
-      //   messageApi.info('Please update capacity first');
-      //   setIsShowUpdateCapacityModal(true);
-      // }
     } finally {
       setDeployLoading(false);
     }
-  }, [currentAppDetail?.appId]);
+  }, [currentAppDetail?.appId, processorAssetList, storageAssetList]);
 
   return (
     <div className='border-gray-F0 flex h-[130px] items-center justify-between border-b pt-[14px]'>

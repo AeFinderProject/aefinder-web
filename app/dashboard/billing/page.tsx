@@ -145,110 +145,102 @@ export default function Billing() {
 
   return (
     <div className='overflow-hidden px-[16px] pb-[40px] sm:px-[40px]'>
-      {billingsList?.length === 0 && (
+      <div className='border-gray-F0 flex flex-wrap items-center justify-between border-b sm:h-[120px]'>
+        <div className='my-[20px] text-3xl text-black sm:my-[0px]'>Billing</div>
         <div>
-          <div className='border-gray-F0 flex flex-wrap items-center justify-between border-b sm:h-[120px]'>
-            <div className='my-[20px] text-3xl text-black sm:my-[0px]'>
-              Billing
-            </div>
-            <div>
-              <Button
-                type='primary'
-                className='h-[40px] w-[160px] text-sm'
-                onClick={() => {
-                  router.push('/dashboard/billing/notification');
-                }}
-              >
-                <Image
-                  src='/assets/svg/notifications.svg'
-                  alt='notification'
-                  width={16}
-                  height={16}
-                  className='mr-2 inline-block'
-                />
-                Notification
-              </Button>
-              <Button
-                type='primary'
-                className='ml-[10px] h-[40px] w-[148px] text-sm'
-                onClick={() => {
-                  router.push('/dashboard/billing/upgrade');
-                }}
-              >
-                <Image
-                  src='/assets/svg/shopping-cart.svg'
-                  alt='shopping'
-                  width={14}
-                  height={14}
-                  className='mr-2 inline-block'
-                />
-                Purchase
-              </Button>
-              <Button
-                type='primary'
-                className='my-[20px] ml-[0px] h-[40px] w-[148px] text-sm sm:my-[0px] sm:ml-[10px]'
-                onClick={() => {
-                  router.push('/dashboard/billing/manage');
-                }}
-              >
-                <Image
-                  src='/assets/svg/manage-accounts.svg'
-                  alt='manage'
-                  width={14}
-                  height={14}
-                  className='mr-2 inline-block'
-                />
-                Manage Billing
-              </Button>
-            </div>
-          </div>
-          <div className='flex flex-col items-center'>
+          <Button
+            type='primary'
+            className='h-[40px] w-[160px] text-sm'
+            onClick={() => {
+              router.push('/dashboard/billing/notification');
+            }}
+          >
             <Image
-              src='/assets/svg/billing-empty.svg'
-              alt='billing'
-              width={410}
-              height={292}
-              className='mt-[100px]'
+              src='/assets/svg/notifications.svg'
+              alt='notification'
+              width={16}
+              height={16}
+              className='mr-2 inline-block'
             />
-            <div className='text-dark-normal my-[22px] text-2xl'>
-              Account ready to query the network
-            </div>
-            <div className='text-gray-80'>
-              With a positive billing balance you are ready to query the
-              network.
-            </div>
-            <div className='text-gray-80 mb-[22px]'>
-              Create an API key to get started.
-            </div>
-            <Button
-              className='bg-gray-F5 mb-[22px] h-[40px] w-[148px] border-none font-medium'
-              onClick={() => router.push('/dashboard/apikey')}
-            >
-              Create API Key
-            </Button>
-            <div
-              className='text-blue-link cursor-pointer'
-              onClick={() =>
-                window.open(
-                  'https://docs.aefinder.io/docs/quick-start',
-                  '_blank'
-                )
-              }
-            >
-              View documentation
-              <Image
-                src='/assets/svg/right-arrow.svg'
-                alt='arrow'
-                width={24}
-                height={24}
-                className='relative top-[-1px] ml-[8px] inline-block'
-              />
-            </div>
+            Notification
+          </Button>
+          <Button
+            type='primary'
+            className='ml-[10px] h-[40px] w-[148px] text-sm'
+            onClick={() => {
+              router.push('/dashboard/billing/upgrade');
+            }}
+          >
+            <Image
+              src='/assets/svg/shopping-cart.svg'
+              alt='shopping'
+              width={14}
+              height={14}
+              className='mr-2 inline-block'
+            />
+            Purchase
+          </Button>
+          <Button
+            type='primary'
+            className='my-[20px] ml-[0px] h-[40px] w-[148px] text-sm sm:my-[0px] sm:ml-[10px]'
+            onClick={() => {
+              router.push('/dashboard/billing/manage');
+            }}
+          >
+            <Image
+              src='/assets/svg/manage-accounts.svg'
+              alt='manage'
+              width={14}
+              height={14}
+              className='mr-2 inline-block'
+            />
+            Manage Billing
+          </Button>
+        </div>
+      </div>
+      {billingsList?.length === 0 && (
+        <div className='flex flex-col items-center'>
+          <Image
+            src='/assets/svg/billing-empty.svg'
+            alt='billing'
+            width={410}
+            height={292}
+            className='mt-[100px]'
+          />
+          <div className='text-dark-normal my-[22px] text-2xl'>
+            Account ready to query the network
+          </div>
+          <div className='text-gray-80'>
+            With a positive billing balance you are ready to query the network.
+          </div>
+          <div className='text-gray-80 mb-[22px]'>
+            Create an API key to get started.
+          </div>
+          <Button
+            className='bg-gray-F5 mb-[22px] h-[40px] w-[148px] border-none font-medium'
+            onClick={() => router.push('/dashboard/apikey')}
+          >
+            Create API Key
+          </Button>
+          <div
+            className='text-blue-link cursor-pointer'
+            onClick={() =>
+              window.open('https://docs.aefinder.io/docs/quick-start', '_blank')
+            }
+          >
+            View documentation
+            <Image
+              src='/assets/svg/right-arrow.svg'
+              alt='arrow'
+              width={24}
+              height={24}
+              className='relative top-[-1px] ml-[8px] inline-block'
+            />
           </div>
         </div>
       )}
       {billingsList?.length > 0 && (
-        <div className='mt-[4px]'>
+        <div className='mt-[16px]'>
           <Table
             rowKey='id'
             columns={columns}
