@@ -162,7 +162,7 @@ export default function Dashboard() {
               onClick={() => {
                 router.push('/dashboard/billing/upgrade');
               }}
-              className='ml-[40px] hidden h-[40px] w-[148px] text-sm sm:inline-block'
+              className='ml-[20px] hidden h-[40px] w-[148px] text-sm sm:inline-block'
             >
               <Image
                 src='/assets/svg/shopping-cart.svg'

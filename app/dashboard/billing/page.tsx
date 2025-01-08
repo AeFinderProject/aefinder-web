@@ -1,7 +1,8 @@
 'use client';
 
 import type { TableColumnsType } from 'antd';
-import { Button, Table } from 'antd';
+import { Button, Table, Tag } from 'antd';
+import dayjs from 'dayjs';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -69,6 +70,9 @@ export default function Billing() {
       title: 'Begin Time',
       dataIndex: 'beginTime',
       key: 'beginTime',
+      render: (text: string) => (
+        <div>{dayjs(text).format('YYYY/MM/DD HH:mm:ss')}</div>
+      ),
     },
     {
       title: 'End Time',
@@ -85,13 +89,15 @@ export default function Billing() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (text: number) => <div>{text}</div>,
-    },
-    {
-      title: 'Merchandises Details',
-      dataIndex: 'details',
-      key: 'details',
-      render: () => <div>todo : details Drawer </div>,
+      render: (text: number) => (
+        <div>
+          {text === 0 && <Tag color='volcano'>Unpaid</Tag>}
+          {text === 1 && <Tag color='processing'>PaymentPending</Tag>}
+          {text === 2 && <Tag color='success'>PaymentConfirmed</Tag>}
+          {text === 3 && <Tag color='orange'>Canceled</Tag>}
+          {text === 4 && <Tag color='red'>PaymentFailed</Tag>}
+        </div>
+      ),
     },
     {
       title: 'RefundAmount',
@@ -129,17 +135,35 @@ export default function Billing() {
       title: 'CreateTime',
       dataIndex: 'createTime',
       key: 'createTime',
+      render: (text: string) => (
+        <div>{dayjs(text).format('YYYY/MM/DD HH:mm:ss')}</div>
+      ),
     },
     {
       title: 'PaymentTime',
       dataIndex: 'paymentTime',
       key: 'paymentTime',
+      render: (text: string) => (
+        <div>{dayjs(text).format('YYYY/MM/DD HH:mm:ss')}</div>
+      ),
     },
     {
-      title: 'Billing Detail',
-      dataIndex: 'action',
-      key: 'action',
-      render: () => <div>todo : Action Drawer </div>,
+      title: 'Billing Details',
+      dataIndex: 'id',
+      key: 'id',
+      render: (text: string) => (
+        console.log(text),
+        (
+          <div
+            className='text-blue-link cursor-pointer'
+            onClick={() =>
+              router.push(`/dashboard/billing/billingDetail?billingId=${text}`)
+            }
+          >
+            Details
+          </div>
+        )
+      ),
     },
   ];
 

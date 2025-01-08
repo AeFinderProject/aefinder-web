@@ -24,7 +24,7 @@ export default function DeactivatedModal({
     // if (pendingBills?.length === 0) {
     //   setIsShowUpdateCapacityModal(true);
     // }
-    setIsShowUpdateCapacityModal(true);
+    setIsShowUpdateCapacityModal(false);
   }, [setIsShowDeactivatedModal, setIsShowUpdateCapacityModal]);
 
   return (

@@ -4,7 +4,6 @@ import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import type { CollapseProps } from 'antd';
 import { Button, Col, Collapse, Divider, Drawer, InputNumber, Row } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -13,6 +12,7 @@ import {
   isValidJSON,
   timesDecimals,
   useDebounceCallback,
+  useThrottleCallback,
 } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -23,12 +23,13 @@ import {
   getOrgBalance,
   order,
   payOrder,
+  watchOrdersCost,
 } from '@/api/requestMarket';
 import { getAssetsList, getMerchandisesList } from '@/api/requestMarket';
 import { AeFinderContractAddress } from '@/constant';
 
 import { ApproveResponseType } from '@/types/appType';
-import { AssetsItem, MerchandisesItem } from '@/types/marketType';
+import { MerchandisesItem } from '@/types/marketType';
 
 type DeployDrawerProps = {
   readonly isShowUpdateCapacityModal: boolean;
@@ -53,10 +54,12 @@ export default function UpdateCapacityDrawer({
     (state) => state.app.currentAppDetail
   );
 
+  // default original processor '' to distinct with current processor
+  const [originalCapacityType, setOriginalCapacityType] = useState('');
   const [currentCapacityType, setCurrentCapacityType] = useState('Small');
-  const [currentStorageNum, setCurrentStorageNum] = useState<number | null>(
-    null
-  );
+  // default original storage num 0 to distinct with current storage num
+  const [originalStorageNum, setOriginalStorageNum] = useState<number>(0);
+  const [currentStorageNum, setCurrentStorageNum] = useState<number>(1);
 
   const [processMerchandisesList, setProcessMerchandisesList] = useState<
     MerchandisesItem[]
@@ -64,29 +67,29 @@ export default function UpdateCapacityDrawer({
   const [storageMerchandisesList, setStorageMerchandisesList] = useState<
     MerchandisesItem[]
   >([]);
-  const [processorAssetList, setProcessorAssetList] = useState<AssetsItem[]>(
-    []
-  );
-  const [storageAssetList, setStorageAssetList] = useState<AssetsItem[]>([]);
 
-  const [isProcessLocked, setIsProcessLocked] = useState<boolean>(true);
-  const [isStorageLocked, setIsStorageLocked] = useState<boolean>(true);
+  const [isProcessLocked, setIsProcessLocked] = useState<boolean>(false);
+  const [isStorageLocked, setIsStorageLocked] = useState<boolean>(false);
   const [processOriginalAssetId, setProcessOriginalAssetId] =
     useState<string>();
   const [storageOriginalAssetId, setStorageOriginalAssetId] =
     useState<string>();
 
-  const [currentAmount, setCurrentAmount] = useState<number>(0);
-  const [currentDeductionAmount, setCurrentDeductionAmount] =
+  const [currentProcessAmount, setCurrentProcessAmount] = useState<number>(0);
+  const [currentProcessDeductionAmount, setCurrentProcessDeductionAmount] =
     useState<number>(0);
-  const [currentActualAmount, setCurrentActualAmount] = useState<number>(0);
-
-  // todo  delete start
-  console.log(storageMerchandisesList, processorAssetList, storageAssetList);
-  setCurrentAmount(0);
-  setCurrentDeductionAmount(0);
-  setCurrentActualAmount(0);
-  // todo  delete end
+  const [currentProcessActualAmount, setCurrentProcessActualAmount] =
+    useState<number>(0);
+  const [currentStorageAmount, setCurrentStorageAmount] = useState<number>(0);
+  const [currentStorageDeductionAmount, setCurrentStorageDeductionAmount] =
+    useState<number>(0);
+  const [currentStorageActualAmount, setCurrentStorageActualAmount] =
+    useState<number>(0);
+  const [currentTotalAmount, setCurrentTotalAmount] = useState<number>(0);
+  const [currentTotalDeductionAmount, setCurrentTotalDeductionAmount] =
+    useState<number>(0);
+  const [currentTotalActualAmount, setCurrentTotalActualAmount] =
+    useState<number>(0);
 
   const getMerchandisesListTemp = useCallback(async () => {
     const { items } = await getMerchandisesList({
@@ -114,12 +117,15 @@ export default function UpdateCapacityDrawer({
       maxResultCount: 100,
     });
     console.log('getProcessorAssetListRes', getProcessorAssetListRes);
-    setProcessorAssetList(getProcessorAssetListRes?.items);
+    if (getProcessorAssetListRes?.items?.length === 2) {
+      setIsProcessLocked(true);
+    }
     if (getProcessorAssetListRes?.items?.length === 1) {
       const asset = getProcessorAssetListRes?.items[0];
       setIsProcessLocked(asset?.isLocked);
       setProcessOriginalAssetId(asset?.id);
       setCurrentCapacityType(asset?.merchandise?.name);
+      setOriginalCapacityType(asset?.merchandise?.name);
     }
 
     const getStorageAssetListRes = await getAssetsList({
@@ -129,13 +135,16 @@ export default function UpdateCapacityDrawer({
       maxResultCount: 100,
     });
     console.log('getStorageAssetListRes', getStorageAssetListRes);
-    setStorageAssetList(getStorageAssetListRes?.items);
+    if (getStorageAssetListRes?.items?.length === 2) {
+      setIsStorageLocked(true);
+    }
     if (getStorageAssetListRes?.items?.length === 1) {
       const asset = getStorageAssetListRes?.items[0];
       setIsStorageLocked(asset?.isLocked);
       setStorageOriginalAssetId(asset?.id);
-      if (asset?.quantity) {
-        setCurrentStorageNum(asset?.quantity);
+      if (asset?.replicas) {
+        setCurrentStorageNum(asset?.replicas);
+        setOriginalStorageNum(asset?.replicas);
       }
     }
     // eslint-disable-next-line
@@ -157,30 +166,20 @@ export default function UpdateCapacityDrawer({
     getOrgBalanceTemp();
   }, [getOrgBalanceTemp]);
 
-  const onChange: CollapseProps['onChange'] = (key) => {
-    console.log(key);
-    setIsShowCapacityCollapse((pre) => !pre);
-  };
-
-  const handleClose = useCallback(() => {
-    setIsShowUpdateCapacityModal(false);
-  }, [setIsShowUpdateCapacityModal]);
-
-  const handlePreCreateOrder = useCallback(async () => {
-    if (
-      !processOriginalAssetId ||
-      isProcessLocked ||
-      !storageOriginalAssetId ||
-      isStorageLocked
-    ) {
-      return {
-        billingId: '',
-        billingAmount: 0,
-      };
-    }
+  const watchOrdersCostTemp = useThrottleCallback(async () => {
+    console.log('processMerchandisesList', processMerchandisesList);
     const currentProcessMerchandise = processMerchandisesList.find(
-      (item) => item.specification === currentCapacityType
+      (item) => item.name === currentCapacityType
     );
+    console.log(currentProcessMerchandise?.id, storageMerchandisesList[0]?.id);
+    if (!currentProcessMerchandise?.id || !storageMerchandisesList[0]?.id) {
+      return;
+    }
+    if (!currentCapacityType || !currentStorageNum) {
+      messageApi.warning('Please select the capacity and storage capacity');
+      return;
+    }
+
     const processorParams = {
       originalAssetId: '',
       merchandiseId: currentProcessMerchandise?.id || '',
@@ -191,14 +190,117 @@ export default function UpdateCapacityDrawer({
       processorParams.originalAssetId = processOriginalAssetId;
     }
 
-    const details = [];
-
-    if (!isProcessLocked) {
-      details.push(processorParams);
+    const storageParams = {
+      originalAssetId: '',
+      merchandiseId: storageMerchandisesList[0]?.id || '',
+      quantity: 1,
+      replicas: currentStorageNum,
+    };
+    if (storageOriginalAssetId) {
+      storageParams.originalAssetId = storageOriginalAssetId;
     }
 
+    const watchOrdersCostRes = await watchOrdersCost({
+      details: [processorParams, storageParams],
+    });
+    console.log('watchOrdersCost', watchOrdersCostRes);
+    if (watchOrdersCostRes) {
+      // step 1: set total amount
+      setCurrentTotalAmount(watchOrdersCostRes?.amount);
+      setCurrentTotalDeductionAmount(watchOrdersCostRes?.deductionAmount);
+      setCurrentTotalActualAmount(watchOrdersCostRes?.actualAmount);
+      // step 2: set processor or storage amount
+      watchOrdersCostRes?.details?.map((item) => {
+        if (item?.merchandise?.type === 1) {
+          setCurrentProcessAmount(item?.amount);
+          setCurrentProcessDeductionAmount(item?.deductionAmount);
+          setCurrentProcessActualAmount(item?.actualAmount);
+        } else if (item?.merchandise?.type === 2) {
+          setCurrentStorageAmount(item?.amount);
+          setCurrentStorageDeductionAmount(item?.deductionAmount);
+          setCurrentStorageActualAmount(item?.actualAmount);
+        }
+      });
+    }
+  }, [
+    processMerchandisesList,
+    storageMerchandisesList,
+    currentCapacityType,
+    currentStorageNum,
+    processOriginalAssetId,
+    storageOriginalAssetId,
+    currentAppDetail?.appId,
+  ]);
+
+  useEffect(() => {
+    watchOrdersCostTemp();
+  }, [watchOrdersCostTemp]);
+
+  const onChange: CollapseProps['onChange'] = (key) => {
+    console.log(key);
+    setIsShowCapacityCollapse((pre) => !pre);
+  };
+
+  const handleClose = useCallback(() => {
+    setIsShowUpdateCapacityModal(false);
+  }, [setIsShowUpdateCapacityModal]);
+
+  const handlePreCreateOrder = useCallback(async () => {
+    const currentProcessMerchandise = processMerchandisesList.find(
+      (item) => item.name === currentCapacityType
+    );
+    if (!currentProcessMerchandise?.id || !storageMerchandisesList[0]?.id) {
+      return {
+        billingId: '',
+        billingAmount: 0,
+      };
+    }
+    if (!currentCapacityType || !currentStorageNum) {
+      messageApi.warning('Please select the capacity and storage capacity');
+      return {
+        billingId: '',
+        billingAmount: 0,
+      };
+    }
+
+    const processorParams = {
+      originalAssetId: '',
+      merchandiseId: currentProcessMerchandise?.id || '',
+      quantity: 1,
+      replicas: 1,
+    };
+    if (processOriginalAssetId) {
+      processorParams.originalAssetId = processOriginalAssetId;
+    }
+
+    const storageParams = {
+      originalAssetId: '',
+      merchandiseId: storageMerchandisesList[0]?.id || '',
+      quantity: 1,
+      replicas: currentStorageNum,
+    };
+    if (storageOriginalAssetId) {
+      storageParams.originalAssetId = storageOriginalAssetId;
+    }
+
+    const details = [];
+    // to create order: need no isLocked and the value changed
+    if (!isProcessLocked && currentCapacityType !== originalCapacityType) {
+      details.push(processorParams);
+    }
+    if (!isStorageLocked && currentStorageNum !== originalStorageNum) {
+      details.push(storageParams);
+    }
+
+    // const extraData: Record<string, any>  = {};
+    // extraData['RelateAppId'] = currentAppDetail?.appId;
+    // const extraData = new Map<string, any>();
+    // extraData.set('RelateAppId', currentAppDetail?.appId);
     const newOrderItemRes = await order({
-      details: [processorParams],
+      details: details,
+      extraData: {
+        RelateAppId: currentAppDetail?.appId,
+      },
     });
     if (newOrderItemRes) {
       const { id, actualAmount } = newOrderItemRes;
@@ -206,24 +308,40 @@ export default function UpdateCapacityDrawer({
         billingId: id,
         billingAmount: actualAmount,
       };
-    } else {
-      return {
-        billingId: '',
-        billingAmount: 0,
-      };
     }
+    // finally return empty value
+    return {
+      billingId: '',
+      billingAmount: 0,
+    };
   }, [
     currentCapacityType,
+    currentStorageNum,
     isProcessLocked,
     isStorageLocked,
     processMerchandisesList,
+    storageMerchandisesList,
     processOriginalAssetId,
     storageOriginalAssetId,
+    originalCapacityType,
+    originalStorageNum,
+    messageApi,
+    currentAppDetail?.appId,
   ]);
 
   const handleSave = useDebounceCallback(async () => {
     setLoading(true);
     const { billingId, billingAmount } = await handlePreCreateOrder();
+    if (billingAmount === 0) {
+      messageApi.open({
+        type: 'success',
+        content:
+          'Confirm purchase processor and storage successfully, please wait for the confirmation of the transaction',
+        duration: 3,
+      });
+      handleClose();
+      return;
+    }
     try {
       console.log('billingId, billingAmount', billingId, billingAmount);
       if (!billingId || !billingAmount) {
@@ -252,6 +370,7 @@ export default function UpdateCapacityDrawer({
         getOrgBalanceTemp();
         await payOrder({
           id: billingId,
+          paymentType: 1,
         });
         handleClose();
       } else {
@@ -362,22 +481,16 @@ export default function UpdateCapacityDrawer({
           placeholder='Please input the storage capacity'
           className='w-full'
           value={currentStorageNum}
-          onChange={(value) => setCurrentStorageNum(value)}
+          onChange={(value) => value && setCurrentStorageNum(value)}
           min={1}
           max={1000000}
           addonAfter='GB'
           disabled={isStorageLocked}
         />
       </div>
-      {currentActualAmount > orgBalance?.balance && (
+      {currentTotalActualAmount > orgBalance?.balance && (
         <div className='border-gray-E0 mb-[24px] flex items-center justify-between rounded-lg border px-[9px] py-[12px]'>
-          <Image
-            src='/assets/svg/close-filled.svg'
-            alt='user'
-            width={16}
-            height={16}
-            className='mr-[8px]'
-          />
+          <div></div>
           <div className='text-sm'>
             You currently do not have enough balance to create the AeIndexer. To
             proceed,
@@ -393,19 +506,6 @@ export default function UpdateCapacityDrawer({
         </div>
       )}
       <div className='bg-gray-F5 rounded-lg p-[20px]'>
-        <div className='mb-[20px] flex items-center justify-between'>
-          <span className='text-gray-80 text-sm'>Capacity Cost*</span>
-          <span className='text-dark-normal'>
-            {/* {currentResourceBillPlan?.monthlyUnitPrice} USDT/month */}
-          </span>
-        </div>
-        <div className='flex items-center justify-between'>
-          <span className='text-gray-80 text-sm'>First Month Cost*</span>
-          <span className='text-dark-normal'>
-            {/* {currentResourceBillPlan?.firstMonthCost?.toFixed(2)} USDT */}
-          </span>
-        </div>
-        <Divider className='my-[20px]' />
         <div className='flex items-center justify-between'>
           <span className='text-gray-80 text-sm'>Billing Balance</span>
           <span className='text-dark-normal'>{orgBalance?.balance} USDT</span>
@@ -418,16 +518,54 @@ export default function UpdateCapacityDrawer({
         </div>
         <Divider className='my-[20px]' />
         <div className='flex justify-between'>
-          <div className='text-gray-80 text-sm'>Amount</div>
-          <div className='text-dark-normal'>{currentAmount} USDT</div>
+          <div className='text-gray-80 text-sm'>Process Amount</div>
+          <div className='text-dark-normal'>{currentProcessAmount} USDT</div>
         </div>
         <div className='mt-[20px] flex justify-between'>
-          <div className='text-gray-80 text-sm'>DeductionAmount</div>
-          <div className='text-dark-normal'>{currentDeductionAmount} USDT</div>
+          <div className='text-gray-80 text-sm'>Process DeductionAmount</div>
+          <div className='text-dark-normal'>
+            {currentProcessDeductionAmount} USDT
+          </div>
         </div>
         <div className='mt-[20px] flex justify-between'>
-          <div className='text-dark-normal'>ActualAmount</div>
-          <div className='text-dark-normal'>{currentActualAmount} USDT</div>
+          <div className='text-dark-normal'>Process ActualAmount</div>
+          <div className='text-dark-normal'>
+            {currentProcessActualAmount} USDT
+          </div>
+        </div>
+        <Divider className='my-[20px]' />
+        <div className='flex justify-between'>
+          <div className='text-gray-80 text-sm'>Storage Amount</div>
+          <div className='text-dark-normal'>{currentStorageAmount} USDT</div>
+        </div>
+        <div className='mt-[20px] flex justify-between'>
+          <div className='text-gray-80 text-sm'>Storage DeductionAmount</div>
+          <div className='text-dark-normal'>
+            {currentStorageDeductionAmount} USDT
+          </div>
+        </div>
+        <div className='mt-[20px] flex justify-between'>
+          <div className='text-dark-normal'>Storage ActualAmount</div>
+          <div className='text-dark-normal'>
+            {currentStorageActualAmount} USDT
+          </div>
+        </div>
+        <Divider className='my-[20px]' />
+        <div className='flex justify-between'>
+          <div className='text-gray-80 text-sm'>Total Amount</div>
+          <div className='text-dark-normal'>{currentTotalAmount} USDT</div>
+        </div>
+        <div className='mt-[20px] flex justify-between'>
+          <div className='text-gray-80 text-sm'>Total DeductionAmount</div>
+          <div className='text-dark-normal'>
+            {currentTotalDeductionAmount} USDT
+          </div>
+        </div>
+        <div className='mt-[20px] flex justify-between'>
+          <div className='text-dark-normal'>Total ActualAmount</div>
+          <div className='text-dark-normal'>
+            {currentTotalActualAmount} USDT
+          </div>
         </div>
       </div>
       <div className='text-gray-80 mt-[24px] text-sm'>
@@ -441,7 +579,10 @@ export default function UpdateCapacityDrawer({
         size='large'
         onClick={handleSave}
         loading={loading}
-        // disabled={displayDepositAmount() > 0}
+        disabled={
+          originalCapacityType === currentCapacityType &&
+          originalStorageNum === currentStorageNum
+        }
       >
         Save
       </Button>

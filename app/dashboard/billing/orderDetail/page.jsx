@@ -1,7 +1,7 @@
 'use client';
 
 import { LeftOutlined } from '@ant-design/icons';
-import { Col, Row, Tag } from 'antd';
+import { Col, Divider, Row, Tag } from 'antd';
 import dayjs from 'dayjs';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
@@ -153,6 +153,7 @@ export default function OrderDetail() {
           currentOrderDetail?.details?.map((item, index) => {
             return (
               <div key={index}>
+                <Divider className='my-[24px]' />
                 {item?.originalAsset?.id && (
                   <div>
                     <div className='text-dark-normal mb-[12px] mt-[24px] text-xl'>

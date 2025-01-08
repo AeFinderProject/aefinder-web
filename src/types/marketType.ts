@@ -293,8 +293,8 @@ export type WatchOrdersCostItem = {
 
 export type WatchOrdersCostRequest = {
   details: WatchOrdersCostItem[];
-  extendedData?: {
-    appId?: string;
+  extraData?: {
+    RelateAppId: string;
   };
 };
 
@@ -353,12 +353,18 @@ export type BillingDetailsItem = {
   paidAmount: number;
 };
 
+export enum BillingType {
+  APIQuery = 0,
+  Processor = 1,
+  Storage = 2,
+}
+
 export type BillingItem = {
   id: string;
   organizationId: string;
   beginTime: string;
   endTime: string;
-  type: number;
+  type: BillingType;
   details: BillingDetailsItem[];
   refundAmount: number;
   paidAmount: number;
