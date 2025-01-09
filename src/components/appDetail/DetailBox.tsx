@@ -4,6 +4,8 @@ import dayjs from 'dayjs';
 
 import Copy from '@/components/Copy';
 
+import { useAppSelector } from '@/store/hooks';
+
 import { CreateAppResponse } from '@/types/appType';
 
 type DetailBoxProps = {
@@ -11,6 +13,8 @@ type DetailBoxProps = {
 };
 
 export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
+  const { processorAssetListSlice } = useAppSelector((state) => state.app);
+
   return (
     <div className='bg-gray-F5 mt-[30px] flex w-full items-start justify-start rounded-md px-[20px] py-[30px]'>
       <Row gutter={24} className='w-full'>
@@ -29,6 +33,13 @@ export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
               label='Created'
               content={dayjs(currentAppDetail?.createTime).format('YYYY-MM-DD')}
             />
+            {processorAssetListSlice?.length === 1 && (
+              <Copy
+                className='ml-[32px]'
+                label='AeIndexer capacity'
+                content={processorAssetListSlice[0]?.merchandise?.name}
+              />
+            )}
           </div>
           {currentAppDetail?.description && (
             <Copy

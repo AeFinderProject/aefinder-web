@@ -200,6 +200,15 @@ export default function UpdateCapacityDrawer({
       storageParams.originalAssetId = storageOriginalAssetId;
     }
 
+    const details = [];
+    if (originalCapacityType !== currentCapacityType) {
+      details.push(processorParams);
+    }
+
+    if (originalStorageNum !== currentStorageNum) {
+      details.push(storageParams);
+    }
+
     const watchOrdersCostRes = await watchOrdersCost({
       details: [processorParams, storageParams],
     });
@@ -227,6 +236,8 @@ export default function UpdateCapacityDrawer({
     storageMerchandisesList,
     currentCapacityType,
     currentStorageNum,
+    originalCapacityType,
+    originalStorageNum,
     processOriginalAssetId,
     storageOriginalAssetId,
     currentAppDetail?.appId,
@@ -292,10 +303,6 @@ export default function UpdateCapacityDrawer({
       details.push(storageParams);
     }
 
-    // const extraData: Record<string, any>  = {};
-    // extraData['RelateAppId'] = currentAppDetail?.appId;
-    // const extraData = new Map<string, any>();
-    // extraData.set('RelateAppId', currentAppDetail?.appId);
     const newOrderItemRes = await order({
       details: details,
       extraData: {
@@ -481,7 +488,13 @@ export default function UpdateCapacityDrawer({
           placeholder='Please input the storage capacity'
           className='w-full'
           value={currentStorageNum}
-          onChange={(value) => value && setCurrentStorageNum(value)}
+          onChange={(value) => {
+            if (value && Number.isInteger(value) && value > 0) {
+              setCurrentStorageNum(value);
+            } else if (value === null) {
+              setCurrentStorageNum(1);
+            }
+          }}
           min={1}
           max={1000000}
           addonAfter='GB'
@@ -516,66 +529,82 @@ export default function UpdateCapacityDrawer({
             {orgBalance?.lockedBalance} USDT
           </span>
         </div>
-        <Divider className='my-[20px]' />
-        <div className='flex justify-between'>
-          <div className='text-gray-80 text-sm'>Process Amount</div>
-          <div className='text-dark-normal'>{currentProcessAmount} USDT</div>
-        </div>
-        <div className='mt-[20px] flex justify-between'>
-          <div className='text-gray-80 text-sm'>Process DeductionAmount</div>
-          <div className='text-dark-normal'>
-            {currentProcessDeductionAmount} USDT
+        {originalCapacityType !== currentCapacityType && (
+          <div>
+            <Divider className='my-[20px]' />
+            <div className='flex justify-between'>
+              <div className='text-gray-80 text-sm'>Processor Amount</div>
+              <div className='text-dark-normal'>
+                {currentProcessAmount} USDT
+              </div>
+            </div>
+            <div className='mt-[20px] flex justify-between'>
+              <div className='text-gray-80 text-sm'>
+                Processor Deduction Amount
+              </div>
+              <div className='text-dark-normal'>
+                {currentProcessDeductionAmount} USDT
+              </div>
+            </div>
+            <div className='mt-[20px] flex justify-between'>
+              <div className='text-dark-normal'>Processor Actual Amount</div>
+              <div className='text-dark-normal'>
+                {currentProcessActualAmount} USDT
+              </div>
+            </div>
           </div>
-        </div>
-        <div className='mt-[20px] flex justify-between'>
-          <div className='text-dark-normal'>Process ActualAmount</div>
-          <div className='text-dark-normal'>
-            {currentProcessActualAmount} USDT
+        )}
+        {originalStorageNum !== currentStorageNum && (
+          <div>
+            <Divider className='my-[20px]' />
+            <div className='flex justify-between'>
+              <div className='text-gray-80 text-sm'>Storage Amount</div>
+              <div className='text-dark-normal'>
+                {currentStorageAmount} USDT
+              </div>
+            </div>
+            <div className='mt-[20px] flex justify-between'>
+              <div className='text-gray-80 text-sm'>
+                Storage Deduction Amount
+              </div>
+              <div className='text-dark-normal'>
+                {currentStorageDeductionAmount} USDT
+              </div>
+            </div>
+            <div className='mt-[20px] flex justify-between'>
+              <div className='text-dark-normal'>Storage Actual Amount</div>
+              <div className='text-dark-normal'>
+                {currentStorageActualAmount} USDT
+              </div>
+            </div>
           </div>
-        </div>
-        <Divider className='my-[20px]' />
-        <div className='flex justify-between'>
-          <div className='text-gray-80 text-sm'>Storage Amount</div>
-          <div className='text-dark-normal'>{currentStorageAmount} USDT</div>
-        </div>
-        <div className='mt-[20px] flex justify-between'>
-          <div className='text-gray-80 text-sm'>Storage DeductionAmount</div>
-          <div className='text-dark-normal'>
-            {currentStorageDeductionAmount} USDT
+        )}
+        {(originalCapacityType !== currentCapacityType ||
+          originalStorageNum !== currentStorageNum) && (
+          <div>
+            <Divider className='my-[20px]' />
+            <div className='flex justify-between'>
+              <div className='text-gray-80 text-sm'>Total Amount</div>
+              <div className='text-dark-normal'>{currentTotalAmount} USDT</div>
+            </div>
+            <div className='mt-[20px] flex justify-between'>
+              <div className='text-gray-80 text-sm'>Total Deduction Amount</div>
+              <div className='text-dark-normal'>
+                {currentTotalDeductionAmount} USDT
+              </div>
+            </div>
+            <div className='mt-[20px] flex justify-between'>
+              <div className='text-dark-normal'>Total Actual Amount</div>
+              <div className='text-dark-normal'>
+                {currentTotalActualAmount} USDT
+              </div>
+            </div>
           </div>
-        </div>
-        <div className='mt-[20px] flex justify-between'>
-          <div className='text-dark-normal'>Storage ActualAmount</div>
-          <div className='text-dark-normal'>
-            {currentStorageActualAmount} USDT
-          </div>
-        </div>
-        <Divider className='my-[20px]' />
-        <div className='flex justify-between'>
-          <div className='text-gray-80 text-sm'>Total Amount</div>
-          <div className='text-dark-normal'>{currentTotalAmount} USDT</div>
-        </div>
-        <div className='mt-[20px] flex justify-between'>
-          <div className='text-gray-80 text-sm'>Total DeductionAmount</div>
-          <div className='text-dark-normal'>
-            {currentTotalDeductionAmount} USDT
-          </div>
-        </div>
-        <div className='mt-[20px] flex justify-between'>
-          <div className='text-dark-normal'>Total ActualAmount</div>
-          <div className='text-dark-normal'>
-            {currentTotalActualAmount} USDT
-          </div>
-        </div>
+        )}
       </div>
-      <div className='text-gray-80 mt-[24px] text-sm'>
-        *This amount will remain locked in your Billing Balance and be charged
-        at the end of the month.
-      </div>
-      <Divider className='my-[24px]' />
       <Button
         type='primary'
-        className='w-full'
+        className='mt-[24px] w-full'
         size='large'
         onClick={handleSave}
         loading={loading}
@@ -586,6 +615,15 @@ export default function UpdateCapacityDrawer({
       >
         Save
       </Button>
+      <Divider className='my-[24px]' />
+      <div className='text-gray-80 mt-[24px] text-sm'>
+        Processor Amount = (The remaining days of the current month) * 24 *
+        price
+      </div>
+      <div className='text-gray-80 mt-[10px] text-sm'>
+        *This amount will remain locked in your Billing Balance and be charged
+        at the end of the month.
+      </div>
     </Drawer>
   );
 }

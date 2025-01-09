@@ -7,7 +7,7 @@ import {
   GetSummaryResponse,
 } from '@/types/apikeyType';
 import { CreateAppResponse, GetAppDetailResponse } from '@/types/appType';
-import { GetUserAllResponse } from '@/types/marketType';
+import { AssetsItem, GetUserAllResponse } from '@/types/marketType';
 import { GetSubscriptionResponse } from '@/types/subscriptionType';
 
 export interface AppSliceState {
@@ -22,6 +22,7 @@ export interface AppSliceState {
   defaultAPIList: ApiItem[];
   orgUserAll: GetUserAllResponse;
   freeApiQueryCount: number;
+  processorAssetListSlice: AssetsItem[];
 }
 
 const initialState: AppSliceState = {
@@ -40,6 +41,7 @@ const initialState: AppSliceState = {
   defaultAPIList: [],
   orgUserAll: {} as GetUserAllResponse,
   freeApiQueryCount: 0,
+  processorAssetListSlice: [],
 };
 
 export const appSlice = createAppSlice({
@@ -79,6 +81,9 @@ export const appSlice = createAppSlice({
     setFreeApiQueryCount: (state, action) => {
       state.freeApiQueryCount = action.payload;
     },
+    setProcessorAssetListSlice: (state, action) => {
+      state.processorAssetListSlice = action.payload;
+    },
   },
 });
 
@@ -94,4 +99,5 @@ export const {
   setDefaultAPIList,
   setOrgUserAll,
   setFreeApiQueryCount,
+  setProcessorAssetListSlice,
 } = appSlice.actions;

@@ -15,7 +15,10 @@ import UpdateCapacityDrawer from '@/components/appDetail/UpdateCapacityDrawer';
 import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setCurrentVersion } from '@/store/slices/appSlice';
+import {
+  setCurrentVersion,
+  setProcessorAssetListSlice,
+} from '@/store/slices/appSlice';
 
 import { getAssetsList } from '@/api/requestMarket';
 
@@ -178,6 +181,7 @@ export default function HeaderHandle({
     });
     console.log('getProcessorAssetListRes', getProcessorAssetListRes);
     setProcessorAssetList(getProcessorAssetListRes?.items);
+    dispatch(setProcessorAssetListSlice(getProcessorAssetListRes?.items));
 
     const getStorageAssetListRes = await getAssetsList({
       appId: currentAppDetail?.appId,
@@ -187,7 +191,8 @@ export default function HeaderHandle({
     });
     console.log('getStorageAssetListRes', getStorageAssetListRes);
     setStorageAssetList(getStorageAssetListRes?.items);
-  }, [currentAppDetail?.appId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentAppDetail?.appId, isShowUpdateCapacityModal, dispatch]);
 
   useEffect(() => {
     getAssetsListTemp();

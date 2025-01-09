@@ -21,9 +21,6 @@ export default function DeactivatedModal({
 
   const handleShowUpdateCapacity = useCallback(() => {
     setIsShowDeactivatedModal(false);
-    // if (pendingBills?.length === 0) {
-    //   setIsShowUpdateCapacityModal(true);
-    // }
     setIsShowUpdateCapacityModal(false);
   }, [setIsShowDeactivatedModal, setIsShowUpdateCapacityModal]);
 
@@ -44,16 +41,12 @@ export default function DeactivatedModal({
         className='mt-[24px]'
       />
       <div className='text-dark-normal my-[16px] text-xl font-medium'>
-        {/* {pendingBills?.length === 0
-          ? 'AeIndexer Deactivated'
-          : 'Await Pending Bill Finish'} */}
+        AeIndexer Deactivated
       </div>
       <div className='text-gray-80'>
-        {/* {pendingBills?.length === 0
-          ? `Your AeIndexer is currently deactivated due to insufficient balance. To
-            reactivate your AeIndexer and continue enjoying our services, please add
-            funds to your Billing Balance.`
-          : 'There have pending bill, please await finish plan first, thank you'} */}
+        Your AeIndexer is currently deactivated due to insufficient balance. To
+        reactivate your AeIndexer and continue enjoying our services, please add
+        funds to your Billing Balance.
       </div>
       <div className='mt-[24px] flex justify-between'>
         <Button className='w-[48%]' onClick={handleClose} size='large'>
@@ -65,7 +58,7 @@ export default function DeactivatedModal({
           size='large'
           type='primary'
         >
-          {/* {pendingBills?.length === 0 ? 'Update Capacity' : 'Confirm Await'} */}
+          Update Capacity
         </Button>
       </div>
     </Modal>

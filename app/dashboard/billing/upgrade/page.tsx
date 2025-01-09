@@ -3,8 +3,7 @@
 import { TWalletInfo } from '@aelf-web-login/wallet-adapter-base';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { ExclamationCircleOutlined, LeftOutlined } from '@ant-design/icons';
-import type { SliderSingleProps } from 'antd';
-import { Button, Col, Divider, message, Row, Slider, Tag } from 'antd';
+import { Button, Col, Divider, InputNumber, message, Row, Tag } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -17,6 +16,8 @@ import {
   useDebounceCallback,
   useThrottleCallback,
 } from '@/lib/utils';
+
+import QuerySlider from '@/components/billing/QuerySlider';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
@@ -42,51 +43,6 @@ import {
 
 import { ApproveResponseType, GetBalanceResponseType } from '@/types/appType';
 import { MerchandisesItem } from '@/types/marketType';
-
-const marks: SliderSingleProps['marks'] = {
-  100000: {
-    style: {
-      fontSize: '12px',
-      color: '#808080',
-    },
-    label: <strong>100k</strong>,
-  },
-  50000000: {
-    style: {
-      fontSize: '12px',
-      color: '#808080',
-    },
-    label: <strong>50,000k</strong>,
-  },
-  100000000: {
-    style: {
-      fontSize: '12px',
-      color: '#808080',
-    },
-    label: <strong>100,000k</strong>,
-  },
-  150000000: {
-    style: {
-      fontSize: '12px',
-      color: '#808080',
-    },
-    label: <strong>150,000k</strong>,
-  },
-  200000000: {
-    style: {
-      fontSize: '12px',
-      color: '#808080',
-    },
-    label: <strong>200,000k</strong>,
-  },
-  250000000: {
-    style: {
-      fontSize: '12px',
-      color: '#808080',
-    },
-    label: <strong>250,000k</strong>,
-  },
-};
 
 export default function Upgrade() {
   const dispatch = useAppDispatch();
@@ -394,22 +350,37 @@ export default function Upgrade() {
                 Estimated number of queries
               </div>
               <div>
-                <span className='text-dark-normal'>250,000k</span>
-                <span
-                  className='text-blue-link ml-[16px] cursor-pointer'
-                  onClick={() => setCurrentQueryCount(250000000)}
-                >
-                  Max
+                <span className='text-dark-normal'>
+                  <InputNumber
+                    placeholder='Please input the query count'
+                    value={currentQueryCount}
+                    onChange={(value) => {
+                      if (value && Number.isInteger(value) && value > 0) {
+                        setCurrentQueryCount(value);
+                      } else if (value === null || value < freeQuantity) {
+                        setCurrentQueryCount(freeQuantity);
+                      }
+                    }}
+                    min={freeQuantity}
+                    max={250000000}
+                    addonAfter={
+                      <span
+                        className='text-blue-link cursor-pointer'
+                        onClick={() => setCurrentQueryCount(250000000)}
+                      >
+                        Max
+                      </span>
+                    }
+                    disabled={isLocked}
+                  />
                 </span>
               </div>
             </div>
-            <Slider
-              value={currentQueryCount}
-              min={freeQuantity}
-              max={250000000}
-              step={10000}
-              onChange={(value) => setCurrentQueryCount(value)}
-              marks={marks}
+            <QuerySlider
+              currentQueryCount={currentQueryCount}
+              setCurrentQueryCount={setCurrentQueryCount}
+              freeQuantity={freeQuantity}
+              isLocked={isLocked}
             />
             <div className='text-gray-80 mt-[20px] text-sm'>
               *First 100,000 is free, subsequent queries are chargeable at

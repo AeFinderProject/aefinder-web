@@ -1,4 +1,4 @@
-import { Progress, Tag } from 'antd';
+import { Progress } from 'antd';
 import { useEffect, useState } from 'react';
 
 import { useThrottleCallback } from '@/lib/utils';
@@ -10,8 +10,7 @@ import { getFullPodUsage } from '@/api/requestMarket';
 import { FullPodUsageItem } from '@/types/marketType';
 
 export default function Capacity() {
-  // const [resources, setResources] = useState<ResourcesLevelItem>();
-  const [podUsage, setPodUsage] = useState<FullPodUsageItem>();
+  const [podUsage, setPodUsage] = useState<FullPodUsageItem[]>();
   console.log('podUsage', podUsage);
 
   const currentAppDetail = useAppSelector(
@@ -28,50 +27,54 @@ export default function Capacity() {
       maxResultCount: 50,
     });
     if (res?.length > 0) {
-      setPodUsage(res?.[0]);
+      setPodUsage(res);
     }
   }, [currentAppDetail?.appId, currentVersion]);
 
   useEffect(() => {
     getFullPodUsageTemp();
-  }, [getFullPodUsageTemp, currentAppDetail?.appId, currentVersion]);
+  }, [getFullPodUsageTemp]);
 
   return (
     <div>
-      <div className='flex items-center justify-between'>
-        <div>
-          AeIndexer Capacity
-          <Tag color='processing' className='ml-[8px]'>
-            {/* {resources?.levelName} */}
-          </Tag>
-        </div>
-        <div className='text-gray-80 text-xs'>
-          {/* Est. {resources?.monthlyUnitPrice} USDT/Month */}
-        </div>
-      </div>
-      <div className='mt-[14px] flex items-center justify-between gap-[14px]'>
-        <div className='border-gray-E0 flex-1 rounded-lg border p-[24px]'>
-          <div className='text-gray-80'>CPU</div>
-          <div className='text-dark-normal mb-[6px] mt-[8px] font-medium'>
-            {podUsage?.cpuUsage || '--'} / {podUsage?.limitCpu || '--'}
-          </div>
-          <Progress percent={20} showInfo={false} />
-        </div>
-        <div className='border-gray-E0 flex-1 rounded-lg border p-[24px]'>
-          <div className='text-gray-80'>RAM</div>
-          <div className='text-dark-normal mb-[6px] mt-[8px] font-medium'>
-            {podUsage?.memoryUsage || '--'} / {podUsage?.limitMemory || '--'}MB
-          </div>
-          <Progress percent={45} showInfo={false} />
-        </div>
-        <div className='border-gray-E0 flex-1 rounded-lg border p-[24px]'>
-          <div className='text-gray-80'>Disk</div>
-          <div className='text-dark-normal mb-[6px] mt-[8px] font-medium'>
-            3.1 / 10GB
-          </div>
-          <Progress percent={31} showInfo={false} />
-        </div>
-      </div>
+      {(!podUsage || podUsage?.length === 0) && (
+        <div className='text-gray-80 text-center'>No Data</div>
+      )}
+      {podUsage &&
+        podUsage?.length > 0 &&
+        podUsage?.map((item, index) => {
+          return (
+            <div key={index}>
+              <div className='flex items-center justify-between'>
+                <div>AeIndexer Capacity</div>
+                <div className='text-gray-80 text-xs'>{item?.currentState}</div>
+              </div>
+              <div className='mt-[14px] flex items-center justify-between gap-[14px]'>
+                <div className='border-gray-E0 flex-1 rounded-lg border p-[24px]'>
+                  <div className='text-gray-80'>CPU</div>
+                  <div className='text-dark-normal mb-[6px] mt-[8px] font-medium'>
+                    {item?.cpuUsage || '--'} / {item?.limitCpu || '--'}
+                  </div>
+                  <Progress percent={20} showInfo={false} />
+                </div>
+                <div className='border-gray-E0 flex-1 rounded-lg border p-[24px]'>
+                  <div className='text-gray-80'>RAM</div>
+                  <div className='text-dark-normal mb-[6px] mt-[8px] font-medium'>
+                    {item?.memoryUsage || '--'} / {item?.limitMemory || '--'}MB
+                  </div>
+                  <Progress percent={45} showInfo={false} />
+                </div>
+                <div className='border-gray-E0 flex-1 rounded-lg border p-[24px]'>
+                  <div className='text-gray-80'>Disk</div>
+                  <div className='text-dark-normal mb-[6px] mt-[8px] font-medium'>
+                    -- / -- GB
+                  </div>
+                  <Progress percent={31} showInfo={false} />
+                </div>
+              </div>
+            </div>
+          );
+        })}
     </div>
   );
 }
