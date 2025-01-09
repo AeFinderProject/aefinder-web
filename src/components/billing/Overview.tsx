@@ -21,6 +21,9 @@ export default function Overview() {
 
   const [snapshotsData, setSnapshotsData] = useState<SnapshotsItemType[]>([]);
 
+  const apiMerchandisesItem = useAppSelector(
+    (state) => state.app.apiMerchandisesItem
+  );
   const apikeySummary = useAppSelector((state) => state.app.apikeySummary);
   const orgBalance = useAppSelector((state) => state.common.orgBalance);
 
@@ -111,7 +114,10 @@ export default function Overview() {
               valueStyle={{ fontSize: '16px', fontWeight: 500 }}
             />
             <div className='text-gray-80 relative top-[4px] text-xs'>
-              Est. 123 USDT/Month
+              {apiMerchandisesItem?.price}
+              <span className='text-gray-80 ml-[4px] mr-[12px] font-medium'>
+                USDT/Query
+              </span>
             </div>
           </div>
           <Slider

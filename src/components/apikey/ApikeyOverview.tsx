@@ -23,6 +23,7 @@ import {
   setDefaultAeIndexersList,
   setDefaultAPIList,
 } from '@/store/slices/appSlice';
+import { setApiMerchandisesItem } from '@/store/slices/appSlice';
 
 import { queryAuthToken } from '@/api/apiUtils';
 import {
@@ -32,6 +33,7 @@ import {
   getAPIList,
   getAPISnapshots,
 } from '@/api/requestAPIKeys';
+import { getMerchandisesList } from '@/api/requestMarket';
 
 import {
   AeIndexersItem,
@@ -54,6 +56,9 @@ export default function ApikeyOverview() {
   const [selectApiTypeItem, setSelectApiTypeItem] = useState<ApiItem>();
   const [snapshotsData, setSnapshotsData] = useState<SnapshotsItemType[]>([]);
 
+  const apiMerchandisesItem = useAppSelector(
+    (state) => state.app.apiMerchandisesItem
+  );
   const apikeyDetail = useAppSelector((state) => state.app.apikeyDetail);
   const defaultAeindexersList = useAppSelector(
     (state) => state.app.defaultAeindexersList
@@ -181,6 +186,21 @@ export default function ApikeyOverview() {
     currentApiType,
     currentTime,
   ]);
+
+  const getMerchandisesListTemp = useCallback(async () => {
+    const { items } = await getMerchandisesList({
+      type: 0,
+      category: 0,
+    });
+    console.log('getMerchandisesList items', items);
+    if (items?.length > 0) {
+      dispatch(setApiMerchandisesItem(items[0]));
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    getMerchandisesListTemp();
+  }, [getMerchandisesListTemp]);
 
   const handleAppIdChange = (value: string) => {
     setCurrentAppId(value);
@@ -336,7 +356,15 @@ export default function ApikeyOverview() {
                 </Tooltip>
               </div>
               <div className='text-dark-normal font-medium'>
-                $ 123
+                {currentAppId === '' &&
+                  currentApiType === '' &&
+                  apikeyDetail?.totalQuery * apiMerchandisesItem?.price}
+                {currentAppId !== '' &&
+                  selectAppIdItem?.totalQuery &&
+                  selectAppIdItem?.totalQuery * apiMerchandisesItem?.price}
+                {currentApiType !== '' &&
+                  selectApiTypeItem?.totalQuery &&
+                  selectApiTypeItem?.totalQuery * apiMerchandisesItem?.price}
                 <span className='text-gray-80 ml-[4px] font-medium'>USDT</span>
               </div>
             </div>
@@ -359,7 +387,7 @@ export default function ApikeyOverview() {
                 </Tooltip>
               </div>
               <div className='text-dark-normal font-medium'>
-                123
+                {apiMerchandisesItem?.price}
                 <span className='text-gray-80 ml-[4px] mr-[12px] font-medium'>
                   USDT
                 </span>
@@ -419,7 +447,7 @@ export default function ApikeyOverview() {
                     </Col>
                     <Col span={5} className='text-gray-80'>
                       <div className='font-medium'>
-                        $ 123
+                        {apiMerchandisesItem?.price * item.totalQuery}
                         <span className='text-gray-80 ml-[4px] font-medium'>
                           USDT
                         </span>
@@ -471,7 +499,7 @@ export default function ApikeyOverview() {
                     </Col>
                     <Col span={5} className='text-gray-80'>
                       <div className='font-medium'>
-                        $ 123
+                        {apiMerchandisesItem?.price * item.totalQuery}
                         <span className='text-gray-80 ml-[4px] font-medium'>
                           USDT
                         </span>
