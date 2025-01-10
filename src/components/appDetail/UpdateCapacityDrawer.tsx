@@ -12,7 +12,6 @@ import {
   isValidJSON,
   timesDecimals,
   useDebounceCallback,
-  useThrottleCallback,
 } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -166,7 +165,7 @@ export default function UpdateCapacityDrawer({
     getOrgBalanceTemp();
   }, [getOrgBalanceTemp]);
 
-  const watchOrdersCostTemp = useThrottleCallback(async () => {
+  const watchOrdersCostTemp = useDebounceCallback(async () => {
     console.log('processMerchandisesList', processMerchandisesList);
     const currentProcessMerchandise = processMerchandisesList.find(
       (item) => item.name === currentCapacityType
@@ -210,7 +209,7 @@ export default function UpdateCapacityDrawer({
     }
 
     const watchOrdersCostRes = await watchOrdersCost({
-      details: [processorParams, storageParams],
+      details: details,
     });
     console.log('watchOrdersCost', watchOrdersCostRes);
     if (watchOrdersCostRes) {
