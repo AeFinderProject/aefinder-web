@@ -156,7 +156,7 @@ export default function UpdateCapacityDrawer({
   const getOrgBalanceTemp = useDebounceCallback(async () => {
     const getOrgBalanceRes = await getOrgBalance();
     console.log('getOrgBalance', getOrgBalanceRes);
-    if (getOrgBalanceRes?.balance) {
+    if (getOrgBalanceRes?.balance !== null) {
       dispatch(setOrgBalance(getOrgBalanceRes));
     }
   }, [getOrgBalance]);

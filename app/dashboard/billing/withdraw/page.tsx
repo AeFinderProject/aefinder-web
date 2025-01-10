@@ -107,7 +107,7 @@ export default function Withdraw() {
   const getOrgBalanceTemp = useThrottleCallback(async () => {
     const getOrgBalanceRes = await getOrgBalance();
     console.log('getOrgBalance', getOrgBalanceRes);
-    if (getOrgBalanceRes?.balance) {
+    if (getOrgBalanceRes?.balance !== null) {
       dispatch(setOrgBalance(getOrgBalanceRes));
     }
   }, [getOrgBalance]);

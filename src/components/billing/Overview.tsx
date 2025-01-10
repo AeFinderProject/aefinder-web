@@ -64,7 +64,7 @@ export default function Overview() {
   const getOrgBalanceTemp = useCallback(async () => {
     const getOrgBalanceRes = await getOrgBalance();
     console.log('getOrgBalance', getOrgBalanceRes);
-    if (getOrgBalanceRes?.balance) {
+    if (getOrgBalanceRes?.balance !== null) {
       dispatch(setOrgBalance(getOrgBalanceRes));
     }
   }, [dispatch]);
