@@ -30,6 +30,8 @@ type HeaderHandleProps = {
   readonly messageApi: MessageInstance;
   readonly isNeedRefresh: boolean;
   readonly setIsNeedRefresh: (isNeedRefresh: boolean) => void;
+  readonly isShowUpdateCapacityModal: boolean;
+  readonly setIsShowUpdateCapacityModal: (visible: boolean) => void;
 };
 
 export default function HeaderHandle({
@@ -37,6 +39,8 @@ export default function HeaderHandle({
   messageApi,
   isNeedRefresh,
   setIsNeedRefresh,
+  isShowUpdateCapacityModal,
+  setIsShowUpdateCapacityModal,
 }: HeaderHandleProps) {
   const dispatch = useAppDispatch();
   const DeployRef = useRef<GetRef<typeof Button>>(null);
@@ -47,8 +51,6 @@ export default function HeaderHandle({
   const username = useAppSelector((state) => state.common.username);
   const [editAppDrawerVisible, setEditAppDrawerVisible] = useState(false);
   const [updateDeployDrawerVisible, setUpdateDeployDrawerVisible] =
-    useState(false);
-  const [isShowUpdateCapacityModal, setIsShowUpdateCapacityModal] =
     useState(false);
   const [isShowDeleteAeIndexModal, setIsShowDeleteAeIndexModal] =
     useState(false);
@@ -153,7 +155,7 @@ export default function HeaderHandle({
       return;
     }
     setIsShowUpdateCapacityModal(true);
-  }, [currentAppDetail?.isLocked, messageApi]);
+  }, [currentAppDetail?.isLocked, messageApi, setIsShowUpdateCapacityModal]);
 
   const dropdownItems: MenuProps['items'] = [
     {

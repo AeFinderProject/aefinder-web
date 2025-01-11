@@ -37,6 +37,8 @@ export default function AppDetail() {
 
   const [openPlaygroundTour, setOpenPlaygroundTour] = useState(false);
   const [deployDrawerVisible, setDeployDrawerVisible] = useState(false);
+  const [isShowUpdateCapacityModal, setIsShowUpdateCapacityModal] =
+    useState(false);
   // currentTable default playground -> click change logs
   const [currentTable, setCurrentTable] = useState<string>(
     localStorage.getItem('currentTab') ?? 'playground'
@@ -109,7 +111,7 @@ export default function AppDetail() {
         dispatch(setCurrentVersion(res.versions?.currentVersion));
       }
     }
-  }, [dispatch, deployDrawerVisible, appId]);
+  }, [dispatch, deployDrawerVisible, appId, isShowUpdateCapacityModal]);
 
   useEffect(() => {
     getAppDetailTemp();
@@ -166,6 +168,8 @@ export default function AppDetail() {
         messageApi={messageApi}
         isNeedRefresh={isNeedRefresh}
         setIsNeedRefresh={setIsNeedRefresh}
+        isShowUpdateCapacityModal={isShowUpdateCapacityModal}
+        setIsShowUpdateCapacityModal={setIsShowUpdateCapacityModal}
       />
       <DetailBox currentAppDetail={currentAppDetail} />
       {currentAppDetail.status === AppStatusType.Deployed && (
