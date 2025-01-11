@@ -151,7 +151,7 @@ export default function HeaderHandle({
 
   const handleClickUpdateCapacity = useCallback(() => {
     if (currentAppDetail?.isLocked) {
-      messageApi.warning('You have unfinished orders, Please wait.');
+      messageApi.warning('You have unfinished order, Please wait.');
       return;
     }
     setIsShowUpdateCapacityModal(true);
@@ -217,7 +217,7 @@ export default function HeaderHandle({
       if (!currentAppDetail?.appId) return;
 
       if (currentAppDetail?.isLocked) {
-        messageApi.warning('You have unfinished orders, Please wait.');
+        messageApi.warning('You have unfinished order, Please wait.');
         return;
       }
 
