@@ -610,7 +610,7 @@ export default function UpdateCapacityDrawer({
         type='primary'
         className={clsx(
           'mt-[24px] w-full',
-          currentAppDetail?.isLock && 'text-sm'
+          currentAppDetail?.isLocked && 'text-sm'
         )}
         size='large'
         onClick={handleSave}
@@ -618,10 +618,10 @@ export default function UpdateCapacityDrawer({
         disabled={
           (originalCapacityType === currentCapacityType &&
             originalStorageNum === currentStorageNum) ||
-          currentAppDetail?.isLock
+          currentAppDetail?.isLocked
         }
       >
-        {currentAppDetail?.isLock
+        {currentAppDetail?.isLocked
           ? 'You have unfinished orders, Please wait.'
           : 'Save'}
       </Button>

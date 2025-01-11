@@ -18,7 +18,7 @@ export interface CreateAppResponse {
   status: number; // 0: UnDeployed, 1: Deployed  2: Deactivated
   createTime: number;
   updateTime: number;
-  isLock: boolean;
+  isLocked: boolean;
 }
 
 export type ModifyAppRequest = {

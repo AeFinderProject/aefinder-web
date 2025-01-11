@@ -147,13 +147,21 @@ export default function HeaderHandle({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTourStep]);
 
+  const handleClickUpdateCapacity = useCallback(() => {
+    if (currentAppDetail?.isLocked) {
+      messageApi.warning('You have unfinished orders, Please wait.');
+      return;
+    }
+    setIsShowUpdateCapacityModal(true);
+  }, [currentAppDetail?.isLocked, messageApi]);
+
   const dropdownItems: MenuProps['items'] = [
     {
       key: '1',
       label: (
         <Button
           className='text-blue-link w-full'
-          onClick={() => setIsShowUpdateCapacityModal(true)}
+          onClick={() => handleClickUpdateCapacity()}
         >
           Update capacity
         </Button>
@@ -206,10 +214,15 @@ export default function HeaderHandle({
       handleDeployCloseTour();
       if (!currentAppDetail?.appId) return;
 
+      if (currentAppDetail?.isLocked) {
+        messageApi.warning('You have unfinished orders, Please wait.');
+        return;
+      }
+
       if (
         processorAssetList.length &&
         storageAssetList.length &&
-        !currentAppDetail?.isLock
+        !currentAppDetail?.isLocked
       ) {
         setDeployDrawerVisible(true);
       } else {
@@ -221,7 +234,7 @@ export default function HeaderHandle({
     }
   }, [
     currentAppDetail?.appId,
-    currentAppDetail?.isLock,
+    currentAppDetail?.isLocked,
     processorAssetList,
     storageAssetList,
   ]);
