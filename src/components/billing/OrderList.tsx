@@ -178,7 +178,9 @@ export default function OrderList() {
                 <Button>Cancel</Button>
               </Popconfirm>
             )}
-            {record?.status !== 1 && record?.status !== 4 && <div>Done</div>}
+            {record?.status !== 1 && record?.status !== 4 && (
+              <Button disabled>Cancel</Button>
+            )}
           </div>
         )
       ),

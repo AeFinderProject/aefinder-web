@@ -83,7 +83,14 @@ export default function Billing() {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      render: (text: number) => <div>{BillingEnum[text]}</div>,
+      render: (text: number) => {
+        return (
+          <div>
+            {text === 0 && <Tag color='success'>{BillingEnum[text]}</Tag>}
+            {text === 1 && <Tag color='processing'>{BillingEnum[text]}</Tag>}
+          </div>
+        );
+      },
     },
     {
       title: 'Status',

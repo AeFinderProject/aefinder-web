@@ -6,7 +6,11 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { useDebounceCallback, useThrottleCallback } from '@/lib/utils';
+import {
+  calcTotalPrice,
+  useDebounceCallback,
+  useThrottleCallback,
+} from '@/lib/utils';
 
 import CreateApiKeyModal from '@/components/apikey/CreateApiKeyModal';
 
@@ -97,7 +101,7 @@ export default function Apikey() {
       key: 'periodCost',
       render: (text) => (
         <span>
-          {(apiMerchandisesItem?.price || 0) * text}
+          {calcTotalPrice(text, apiMerchandisesItem?.price || 0)}
           <span className='ml-[4px]'>USDT</span>
         </span>
       ),
@@ -122,7 +126,7 @@ export default function Apikey() {
       key: 'totalQueryFee',
       render: (text) => (
         <span>
-          {(apiMerchandisesItem?.price || 0) * text}
+          {calcTotalPrice(text, apiMerchandisesItem?.price || 0)}
           <span className='ml-[4px]'>USDT</span>
         </span>
       ),

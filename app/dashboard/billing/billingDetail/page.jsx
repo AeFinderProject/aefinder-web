@@ -9,12 +9,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import { useDebounceCallback } from '@/lib/utils';
 
-import Copy from '@/components/Copy';
-
 import { queryAuthToken } from '@/api/apiUtils';
 import { getBillingsDetail } from '@/api/requestMarket';
 
-import { BillingType } from '@/types/marketType';
+import { BillingEnum } from '@/types/marketType';
 
 export default function BillingDetail() {
   const router = useRouter();
@@ -102,6 +100,21 @@ export default function BillingDetail() {
           </Row>
           <Row gutter={24} className='mt-[24px]'>
             <Col xs={12} md={6}>
+              <div className='text-gray-80 mb-[10px] text-xs'>Type</div>
+              <div>
+                {currentBillingDetail?.type === 0 && (
+                  <Tag color='success'>
+                    {BillingEnum[currentBillingDetail?.type]}
+                  </Tag>
+                )}
+                {currentBillingDetail?.type === 1 && (
+                  <Tag color='processing'>
+                    {BillingEnum[currentBillingDetail?.type]}
+                  </Tag>
+                )}
+              </div>
+            </Col>
+            <Col xs={12} md={6}>
               <div className='text-gray-80 mb-[10px] text-xs'>Status</div>
               <div>
                 {currentBillingDetail?.status === 0 && (
@@ -116,14 +129,6 @@ export default function BillingDetail() {
                 {currentBillingDetail?.status === 3 && (
                   <Tag color='red'>PaymentFailed</Tag>
                 )}
-              </div>
-            </Col>
-            <Col xs={12} md={6}>
-              <div className='text-gray-80 mb-[10px] text-xs'>Type</div>
-              <div>
-                <Tag color='processing'>
-                  {BillingType[currentBillingDetail?.type]}
-                </Tag>
               </div>
             </Col>
             <Col xs={12} md={6}>
@@ -153,89 +158,67 @@ export default function BillingDetail() {
             return (
               <div
                 key={index}
-                className='border-gray-F5 my-[24px] rounded-lg border p-[24px]'
+                className='border-gray-F5 hover:bg-gray-F7 my-[24px] rounded-lg border p-[12px]'
               >
-                {item?.asset?.id && (
-                  <div>
-                    <div className='bg-gray-F5 w-full rounded-lg p-[24px]'>
-                      <Row gutter={24}>
-                        <Col xs={12} md={6}>
-                          <Copy
-                            label='Billing Id'
-                            content={item?.asset?.id}
-                            isShowCopy={true}
-                            showLittle={true}
-                          />
-                        </Col>
-                        <Col xs={12} md={6}>
+                <div>
+                  <div className='text-dark-normal mb-[12px] text-xl'>
+                    Billing Item - {index + 1}
+                  </div>
+                  <div className='bg-gray-F5 w-full  rounded-lg p-[24px]'>
+                    <Row gutter={24}>
+                      <Col xs={12} md={6} className='my-[12px]'>
+                        <div className='text-gray-80 mb-[10px] text-xs'>
+                          Merchandise Name
+                        </div>
+                        {item?.merchandise?.name || '--'}
+                      </Col>
+                      <Col xs={12} md={6} className='my-[12px]'>
+                        <div className='text-gray-80 mb-[10px] text-xs'>
+                          Specification
+                        </div>
+                        {item?.merchandise?.specification || '--'}
+                      </Col>
+                      <Col xs={12} md={6} className='my-[12px]'>
+                        <div className='text-gray-80 mb-[10px] text-xs'>
+                          Quantity
+                        </div>
+                        {item?.quantity || '--'}
+                      </Col>
+                      <Col xs={12} md={6} className='my-[12px]'>
+                        <div className='text-gray-80 mb-[10px] text-xs'>
+                          Replicas
+                        </div>
+                        {item?.replicas || '--'}
+                      </Col>
+                      <Col xs={12} md={6} className='my-[12px]'>
+                        <div className='text-gray-80 mb-[10px] text-xs'>
+                          RefundAmount
+                        </div>
+                        {String(item?.refundAmount)} USDT
+                      </Col>
+                      <Col xs={12} md={6} className='my-[12px]'>
+                        <div className='text-gray-80 mb-[10px] text-xs'>
+                          PaidAmount
+                        </div>
+                        {String(item?.paidAmount)} USDT
+                      </Col>
+                      <Col xs={12} md={6} className='my-[12px]'>
+                        <div className='text-gray-80 mb-[10px] text-xs'>
+                          Price
+                        </div>
+                        {item?.merchandise?.price || '--'} USDT/
+                        {String(item?.merchandise?.unit)}
+                      </Col>
+                      {item?.asset?.appId && (
+                        <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            PaidAmount
-                          </div>
-                          {String(item?.asset?.paidAmount)} USDT
-                        </Col>
-                        <Col xs={12} md={6}>
-                          <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
-                            FreeQuantity
-                          </div>
-                          {item?.asset?.freeQuantity || '--'}
-                        </Col>
-                        <Col xs={12} md={6}>
-                          <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
-                            Quantity
-                          </div>
-                          {item?.asset?.quantity || '--'}
-                        </Col>
-                      </Row>
-                      <Row gutter={24} className='mt-[24px]'>
-                        <Col xs={12} md={6}>
-                          <div className='text-gray-80 mb-[10px] text-xs'>
-                            FreeReplicas
-                          </div>
-                          {item?.asset?.freeReplicas || '--'}
-                        </Col>
-                        <Col xs={12} md={6}>
-                          <div className='text-gray-80 mb-[10px] text-xs'>
-                            Replicas
-                          </div>
-                          {item?.asset?.replicas || '--'}
-                        </Col>
-                        <Col xs={12} md={6}>
-                          <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
                             AeIndexer
                           </div>
-                          {item?.asset?.appId || '--'}
+                          {item?.asset?.appId}
                         </Col>
-                        <Col xs={12} md={6}>
-                          <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
-                            isLocked
-                          </div>
-                          {String(item?.asset?.isLocked)}
-                        </Col>
-                      </Row>
-                      <Row gutter={24} className='mt-[24px]'>
-                        <Col xs={12} md={6}>
-                          <div className='text-gray-80 mb-[10px] text-xs'>
-                            Status
-                          </div>
-                          <div>
-                            {item?.asset?.status === 0 && (
-                              <Tag color='volcano'>Unpaid</Tag>
-                            )}
-                            {item?.asset?.status === 1 && (
-                              <Tag color='processing'>PaymentPending</Tag>
-                            )}
-                            {item?.asset?.status === 2 && (
-                              <Tag color='success'>PaymentConfirmed</Tag>
-                            )}
-                            {item?.asset?.status === 3 && (
-                              <Tag color='orange'>Canceled</Tag>
-                            )}
-                            {item?.asset?.status === 4 && (
-                              <Tag color='red'>PaymentFailed</Tag>
-                            )}
-                          </div>
-                        </Col>
-                        <Col xs={12} md={6}>
+                      )}
+                      {item?.asset?.createTime && (
+                        <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
                             createTime
                           </div>
@@ -243,82 +226,27 @@ export default function BillingDetail() {
                             'YYYY/MM/DD HH:mm:ss'
                           )}
                         </Col>
-                        <Col xs={12} md={6}>
-                          <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
+                      )}
+                      {item?.asset?.startTime && (
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
                             StartTime
                           </div>
                           {dayjs(item?.asset?.startTime).format(
                             'YYYY/MM/DD HH:mm:ss'
                           )}
                         </Col>
-                        <Col xs={12} md={6}>
-                          <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
+                      )}
+                      {item?.asset?.endTime && (
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
                             EndTime
                           </div>
                           {dayjs(item?.asset?.endTime).format(
                             'YYYY/MM/DD HH:mm:ss'
                           )}
                         </Col>
-                      </Row>
-                    </div>
-                  </div>
-                )}
-                <div>
-                  <div className='text-dark-normal mb-[12px] mt-[24px] text-xl'>
-                    Billing Item Detail - {index + 1}
-                  </div>
-                  <div className='bg-gray-F5 w-full  rounded-lg p-[24px]'>
-                    <Row gutter={24}>
-                      <Col xs={12} md={6}>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
-                          Merchandise Name
-                        </div>
-                        {item?.merchandise?.name || '--'}
-                      </Col>
-                      <Col xs={12} md={6}>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
-                          specification
-                        </div>
-                        {item?.merchandise?.specification || '--'}
-                      </Col>
-                      <Col xs={12} md={6}>
-                        <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
-                          Quantity
-                        </div>
-                        {item?.quantity || '--'}
-                      </Col>
-                      <Col xs={12} md={6}>
-                        <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
-                          Replicas
-                        </div>
-                        {item?.replicas || '--'}
-                      </Col>
-                    </Row>
-                    <Row gutter={24} className='mt-[24px]'>
-                      <Col xs={12} md={6}>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
-                          RefundAmount
-                        </div>
-                        {String(item?.refundAmount)} USDT
-                      </Col>
-                      <Col xs={12} md={6}>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
-                          PaidAmount
-                        </div>
-                        {String(item?.paidAmount)} USDT
-                      </Col>
-                      <Col xs={12} md={6}>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
-                          Price
-                        </div>
-                        {item?.merchandise?.price || '--'} USDT
-                      </Col>
-                      <Col xs={12} md={6}>
-                        <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
-                          Unit
-                        </div>
-                        {String(item?.merchandise?.unit)}
-                      </Col>
+                      )}
                     </Row>
                   </div>
                 </div>

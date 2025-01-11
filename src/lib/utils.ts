@@ -352,3 +352,13 @@ export function calcProductNumber(
     .minus(feeCountBignumber)
     .dividedBy(productQueryCountBignumber);
 }
+
+export function calcTotalPrice(queryCount: number, price: number) {
+  if (!queryCount || !price) {
+    return 0;
+  }
+
+  const queryCountBignumber = BigNumber(queryCount);
+  const priceBignumber = BigNumber(price);
+  return queryCountBignumber.times(priceBignumber).toString();
+}

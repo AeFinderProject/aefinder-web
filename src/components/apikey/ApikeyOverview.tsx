@@ -16,7 +16,7 @@ import Image from 'next/image';
 import React, { useCallback, useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { useDebounceCallback } from '@/lib/utils';
+import { calcTotalPrice, useDebounceCallback } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
@@ -358,13 +358,22 @@ export default function ApikeyOverview() {
               <div className='text-dark-normal font-medium'>
                 {currentAppId === '' &&
                   currentApiType === '' &&
-                  apikeyDetail?.totalQuery * apiMerchandisesItem?.price}
+                  calcTotalPrice(
+                    apikeyDetail?.totalQuery,
+                    apiMerchandisesItem?.price
+                  )}
                 {currentAppId !== '' &&
                   selectAppIdItem?.totalQuery &&
-                  selectAppIdItem?.totalQuery * apiMerchandisesItem?.price}
+                  calcTotalPrice(
+                    selectAppIdItem?.totalQuery,
+                    apiMerchandisesItem?.price
+                  )}
                 {currentApiType !== '' &&
                   selectApiTypeItem?.totalQuery &&
-                  selectApiTypeItem?.totalQuery * apiMerchandisesItem?.price}
+                  calcTotalPrice(
+                    selectApiTypeItem?.totalQuery,
+                    apiMerchandisesItem?.price
+                  )}
                 <span className='text-gray-80 ml-[4px] font-medium'>USDT</span>
               </div>
             </div>
@@ -447,7 +456,10 @@ export default function ApikeyOverview() {
                     </Col>
                     <Col span={5} className='text-gray-80'>
                       <div className='font-medium'>
-                        {apiMerchandisesItem?.price * item.totalQuery}
+                        {calcTotalPrice(
+                          item.totalQuery,
+                          apiMerchandisesItem?.price
+                        )}
                         <span className='text-gray-80 ml-[4px] font-medium'>
                           USDT
                         </span>
@@ -499,7 +511,10 @@ export default function ApikeyOverview() {
                     </Col>
                     <Col span={5} className='text-gray-80'>
                       <div className='font-medium'>
-                        {apiMerchandisesItem?.price * item.totalQuery}
+                        {calcTotalPrice(
+                          item.totalQuery,
+                          apiMerchandisesItem?.price
+                        )}
                         <span className='text-gray-80 ml-[4px] font-medium'>
                           USDT
                         </span>
