@@ -67,7 +67,7 @@ export default function BillingDetail() {
       </div>
       <div>
         <div className='text-dark-normal mb-[12px] mt-[24px] text-xl font-medium'>
-          Order overview
+          Billing overview
         </div>
         <div className='bg-gray-F5 w-full rounded-lg p-[24px]'>
           <Row gutter={24}>
@@ -157,9 +157,6 @@ export default function BillingDetail() {
               >
                 {item?.asset?.id && (
                   <div>
-                    <div className='text-dark-normal mb-[12px] text-xl'>
-                      Asset - {index + 1}
-                    </div>
                     <div className='bg-gray-F5 w-full rounded-lg p-[24px]'>
                       <Row gutter={24}>
                         <Col xs={12} md={6}>
@@ -268,7 +265,7 @@ export default function BillingDetail() {
                 )}
                 <div>
                   <div className='text-dark-normal mb-[12px] mt-[24px] text-xl'>
-                    Billing - {index + 1}
+                    Billing Item Detail - {index + 1}
                   </div>
                   <div className='bg-gray-F5 w-full  rounded-lg p-[24px]'>
                     <Row gutter={24}>

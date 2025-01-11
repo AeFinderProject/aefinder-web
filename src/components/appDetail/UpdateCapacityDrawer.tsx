@@ -123,8 +123,8 @@ export default function UpdateCapacityDrawer({
       const asset = getProcessorAssetListRes?.items[0];
       setIsProcessLocked(asset?.isLocked);
       setProcessOriginalAssetId(asset?.id);
-      setCurrentCapacityType(asset?.merchandise?.name);
-      setOriginalCapacityType(asset?.merchandise?.name);
+      setCurrentCapacityType(asset?.merchandise?.specification);
+      setOriginalCapacityType(asset?.merchandise?.specification);
     }
 
     const getStorageAssetListRes = await getAssetsList({
@@ -168,7 +168,7 @@ export default function UpdateCapacityDrawer({
   const watchOrdersCostTemp = useDebounceCallback(async () => {
     console.log('processMerchandisesList', processMerchandisesList);
     const currentProcessMerchandise = processMerchandisesList.find(
-      (item) => item.name === currentCapacityType
+      (item) => item.specification === currentCapacityType
     );
     console.log(currentProcessMerchandise?.id, storageMerchandisesList[0]?.id);
     if (!currentProcessMerchandise?.id || !storageMerchandisesList[0]?.id) {
@@ -257,7 +257,7 @@ export default function UpdateCapacityDrawer({
 
   const handlePreCreateOrder = useCallback(async () => {
     const currentProcessMerchandise = processMerchandisesList.find(
-      (item) => item.name === currentCapacityType
+      (item) => item.specification === currentCapacityType
     );
     if (!currentProcessMerchandise?.id || !storageMerchandisesList[0]?.id) {
       return {
@@ -430,19 +430,19 @@ export default function UpdateCapacityDrawer({
             return (
               <Row gutter={24} key={item?.id} className='mt-[10px]'>
                 <Col span={5} className='text-gray-80 text-sm'>
-                  {item?.name}
+                  {item?.specification}
                 </Col>
                 <Col span={6} className='text-gray-80 text-sm'>
                   {item?.price}
                 </Col>
                 <Col span={7} className='text-gray-80 text-sm'>
-                  {isValidJSON(item?.specification)
-                    ? JSON.parse(item?.specification)?.cpu
+                  {isValidJSON(item?.description)
+                    ? JSON.parse(item?.description)?.cpu
                     : '--'}
                 </Col>
                 <Col span={6} className='text-gray-80 text-sm'>
-                  {isValidJSON(item?.specification)
-                    ? JSON.parse(item?.specification)?.memory
+                  {isValidJSON(item?.description)
+                    ? JSON.parse(item?.description)?.memory
                     : '--'}
                 </Col>
               </Row>
@@ -469,12 +469,16 @@ export default function UpdateCapacityDrawer({
           return (
             <Button
               key={item?.id}
-              type={currentCapacityType === item.name ? 'primary' : 'default'}
+              type={
+                currentCapacityType === item.specification
+                  ? 'primary'
+                  : 'default'
+              }
               className='w-[30%]'
-              onClick={() => setCurrentCapacityType(item.name)}
+              onClick={() => setCurrentCapacityType(item.specification)}
               disabled={isProcessLocked}
             >
-              {item.name}
+              {item.specification}
             </Button>
           );
         })}
