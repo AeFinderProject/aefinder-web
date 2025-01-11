@@ -192,12 +192,6 @@ export default function BillingDetail() {
                       </Col>
                       <Col xs={12} md={6} className='my-[12px]'>
                         <div className='text-gray-80 mb-[10px] text-xs'>
-                          RefundAmount
-                        </div>
-                        {String(item?.refundAmount)} USDT
-                      </Col>
-                      <Col xs={12} md={6} className='my-[12px]'>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
                           PaidAmount
                         </div>
                         {String(item?.paidAmount)} USDT
