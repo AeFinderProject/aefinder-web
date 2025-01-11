@@ -15,9 +15,10 @@ export interface CreateAppResponse {
   imageUrl: string;
   description: string;
   sourceCodeUrl: string;
-  status: number; // 0: UnDeployed, 1: Deployed
+  status: number; // 0: UnDeployed, 1: Deployed  2: Deactivated
   createTime: number;
   updateTime: number;
+  isLock: boolean;
 }
 
 export type ModifyAppRequest = {

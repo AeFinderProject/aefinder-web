@@ -1,5 +1,5 @@
 import type { TableColumnsType } from 'antd';
-import { Table, Tag } from 'antd';
+import { Button, message, Popconfirm, Table, Tag } from 'antd';
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -9,12 +9,13 @@ import { useDebounceCallback } from '@/lib/utils';
 
 import Copy from '@/components/Copy';
 
-import { getOrdersList } from '@/api/requestMarket';
+import { cancelOrder, getOrdersList } from '@/api/requestMarket';
 
 import { NewOrderItemType } from '@/types/marketType';
 
 export default function OrderList() {
   const router = useRouter();
+  const [messageApi, contextHolder] = message.useMessage();
 
   const [orderList, setOrderList] = useState<NewOrderItemType[]>([]);
   const [skipCount, setSkipCount] = useState(1);
@@ -48,6 +49,16 @@ export default function OrderList() {
   useEffect(() => {
     getOrdersListTemp();
   }, [getOrdersListTemp]);
+
+  const handleCancelOrder = useDebounceCallback(async (orderId: string) => {
+    const cancelRes = await cancelOrder({
+      id: orderId,
+    });
+    if (cancelRes) {
+      messageApi.success('Cancel order successfully');
+      getOrdersListTemp();
+    }
+  }, []);
 
   const columns: TableColumnsType = [
     {
@@ -149,6 +160,30 @@ export default function OrderList() {
       ),
     },
     {
+      title: 'CancelOrder',
+      dataIndex: '',
+      key: 'cancelOrder',
+      render: (record) => (
+        console.log(record),
+        (
+          <div>
+            {(record?.status === 0 || record?.status === 4) && (
+              <Popconfirm
+                placement='top'
+                title='Are you sure to delete this order?'
+                okText='Yes'
+                cancelText='No'
+                onConfirm={() => handleCancelOrder(record?.id)}
+              >
+                <Button>Cancel</Button>
+              </Popconfirm>
+            )}
+            {record?.status !== 1 && record?.status !== 4 && <div>Done</div>}
+          </div>
+        )
+      ),
+    },
+    {
       title: 'View Details',
       dataIndex: 'id',
       key: 'id',
@@ -170,6 +205,7 @@ export default function OrderList() {
 
   return (
     <div>
+      {contextHolder}
       {orderList.length === 0 && (
         <div className='flex flex-col items-center justify-center'>
           <Image

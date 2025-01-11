@@ -4,6 +4,7 @@ import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import type { CollapseProps } from 'antd';
 import { Button, Col, Collapse, Divider, Drawer, InputNumber, Row } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
+import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -607,16 +608,22 @@ export default function UpdateCapacityDrawer({
       </div>
       <Button
         type='primary'
-        className='mt-[24px] w-full'
+        className={clsx(
+          'mt-[24px] w-full',
+          currentAppDetail?.isLock && 'text-sm'
+        )}
         size='large'
         onClick={handleSave}
         loading={loading}
         disabled={
-          originalCapacityType === currentCapacityType &&
-          originalStorageNum === currentStorageNum
+          (originalCapacityType === currentCapacityType &&
+            originalStorageNum === currentStorageNum) ||
+          currentAppDetail?.isLock
         }
       >
-        Save
+        {currentAppDetail?.isLock
+          ? 'You have unfinished orders, Please wait.'
+          : 'Save'}
       </Button>
       <Divider className='my-[24px]' />
       <div className='text-gray-80 mt-[24px] text-sm'>

@@ -51,7 +51,6 @@ export type RegisterRequest = {
   userName: string;
   password: string;
   email: string;
-  organizationName: string;
 };
 
 export type ResendRequest = {

@@ -206,7 +206,11 @@ export default function HeaderHandle({
       handleDeployCloseTour();
       if (!currentAppDetail?.appId) return;
 
-      if (processorAssetList.length && storageAssetList.length) {
+      if (
+        processorAssetList.length &&
+        storageAssetList.length &&
+        !currentAppDetail?.isLock
+      ) {
         setDeployDrawerVisible(true);
       } else {
         messageApi.info('Please update capacity first: Processor and Storage');
@@ -215,7 +219,12 @@ export default function HeaderHandle({
     } finally {
       setDeployLoading(false);
     }
-  }, [currentAppDetail?.appId, processorAssetList, storageAssetList]);
+  }, [
+    currentAppDetail?.appId,
+    currentAppDetail?.isLock,
+    processorAssetList,
+    storageAssetList,
+  ]);
 
   return (
     <div className='border-gray-F0 flex h-[130px] items-center justify-between border-b pt-[14px]'>

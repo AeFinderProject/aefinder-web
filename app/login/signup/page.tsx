@@ -33,7 +33,7 @@ export default function Signup() {
 
   const checkoutFormValue = useCallback(() => {
     const values = form.getFieldsValue();
-    const { username, password, repeatPassword, organization } = values;
+    const { username, password, repeatPassword } = values;
     const normalRegex = /^[a-zA-Z0-9\-_]*$/;
     if (!normalRegex.test(username)) {
       messageApi.open({
@@ -59,13 +59,6 @@ export default function Signup() {
           'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
       });
       return;
-    }
-    if (!normalRegex.test(organization)) {
-      messageApi.open({
-        type: 'warning',
-        content: 'organization format is incorrect',
-      });
-      return false;
     }
     return true;
   }, [form, messageApi]);
@@ -94,11 +87,10 @@ export default function Signup() {
     setLoading(true);
     try {
       const values = form.getFieldsValue();
-      const { username, password, email, organization } = values;
+      const { username, password, email } = values;
 
       const res = await register({
         userName: username,
-        organizationName: organization,
         password: password,
         email: email,
       });
@@ -154,22 +146,6 @@ export default function Signup() {
               >
                 <Input
                   placeholder='User name'
-                  className='rounded-md'
-                  maxLength={50}
-                />
-              </FormItem>
-              <FormItem
-                name='organization'
-                label='Organization name'
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please input your organization name!',
-                  },
-                ]}
-              >
-                <Input
-                  placeholder='Organization name'
                   className='rounded-md'
                   maxLength={50}
                 />
