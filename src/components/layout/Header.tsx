@@ -2,6 +2,7 @@
 
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { DownOutlined, LoadingOutlined, UpOutlined } from '@ant-design/icons';
+import { message } from 'antd';
 import clsx from 'clsx';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -34,21 +35,30 @@ export default function Header() {
   const [address, setAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const isLoginPathname = pathname?.startsWith('/login');
+  const [messageApi, contextHolder] = message.useMessage();
 
-  const { disConnectWallet, walletInfo, isConnected } = useConnectWallet();
+  const { walletInfo } = useConnectWallet();
 
   const getUsersInfoTemp = useThrottleCallback(async () => {
     await queryAuthToken();
     const res = await getUsersInfo();
     console.log('userInfo', res);
-    if (res?.walletAddress) {
-      setAddress(res?.walletAddress);
-    } else {
+
+    if (!walletInfo?.address) {
+      messageApi.warning('Please bind wallet first');
       router.push('/login/bindwallet');
+      return;
+    }
+
+    if (res?.walletAddress === walletInfo?.address) {
+      setAddress(res?.walletAddress);
+    } else if (res?.walletAddress !== walletInfo?.address) {
+      messageApi.warning('Please use the bind wallet address to login');
+      router.push('/login');
     }
     dispatch(setUsername(res?.userName));
     dispatch(setUserInfo(res));
-  }, [dispatch, router]);
+  }, [dispatch, router, walletInfo?.address, messageApi]);
 
   const getSummaryTemp = useThrottleCallback(async () => {
     const res = await getSummary();
@@ -78,12 +88,9 @@ export default function Header() {
   }, []);
 
   const handleLogout = useCallback(async () => {
-    if (isConnected) {
-      await disConnectWallet();
-    }
     setAddress('');
     router.push('/login');
-  }, [router, disConnectWallet, isConnected]);
+  }, [router]);
 
   const handleResetPassword = useCallback(() => {
     router.push('/reset-password');
@@ -98,6 +105,7 @@ export default function Header() {
 
   return (
     <header className='border-gray-E0 m-h-[72px] flex w-full items-center justify-between border-b px-[16px] py-[24px] sm:px-[40px] lg:h-[72px]'>
+      {contextHolder}
       <Image
         src='/assets/svg/aefinder-logo.svg'
         alt='logo'

@@ -25,7 +25,7 @@ export default function LogIn() {
   const currentTourStep = localStorage.getItem('currentTourStep');
   const [loading, setLoading] = useState(false);
 
-  const { walletInfo, isConnected } = useConnectWallet();
+  const { walletInfo, isConnected, disConnectWallet } = useConnectWallet();
 
   const walletInfoRef = useRef<TWalletInfo>();
   walletInfoRef.current = walletInfo;
@@ -45,7 +45,11 @@ export default function LogIn() {
       resetLocalJWT();
       initialTourValues();
     }
-  }, [pathname, initialTourValues]);
+    if (walletInfoRef.current) {
+      disConnectWallet();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, initialTourValues, walletInfoRef.current, disConnectWallet]);
 
   const loginSuccessActive = useCallback(() => {
     messageApi.open({
