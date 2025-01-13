@@ -16,13 +16,14 @@ import Image from 'next/image';
 import React, { useCallback, useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { useDebounceCallback } from '@/lib/utils';
+import { calcTotalPrice, useDebounceCallback } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   setDefaultAeIndexersList,
   setDefaultAPIList,
 } from '@/store/slices/appSlice';
+import { setApiMerchandisesItem } from '@/store/slices/appSlice';
 
 import { queryAuthToken } from '@/api/apiUtils';
 import {
@@ -32,6 +33,7 @@ import {
   getAPIList,
   getAPISnapshots,
 } from '@/api/requestAPIKeys';
+import { getMerchandisesList } from '@/api/requestMarket';
 
 import {
   AeIndexersItem,
@@ -54,6 +56,9 @@ export default function ApikeyOverview() {
   const [selectApiTypeItem, setSelectApiTypeItem] = useState<ApiItem>();
   const [snapshotsData, setSnapshotsData] = useState<SnapshotsItemType[]>([]);
 
+  const apiMerchandisesItem = useAppSelector(
+    (state) => state.app.apiMerchandisesItem
+  );
   const apikeyDetail = useAppSelector((state) => state.app.apikeyDetail);
   const defaultAeindexersList = useAppSelector(
     (state) => state.app.defaultAeindexersList
@@ -75,18 +80,13 @@ export default function ApikeyOverview() {
     },
   ];
 
-  // const data = [
-  //   { time: '1991', query: 3 },
-  //   { time: '1992', query: 4 },
-  //   { time: '1993', query: 3.5 },
-  //   { time: '1994', query: 5 },
-  //   { time: '1995', query: 4.9 },
-  //   { time: '1996', query: 6 },
-  // ];
   const config = {
     data: snapshotsData,
     xField: 'time',
     yField: 'query',
+    padding: 'auto',
+    forceFit: true,
+    smooth: true,
   };
 
   const getAeindexersListTemp = useCallback(async () => {
@@ -187,6 +187,21 @@ export default function ApikeyOverview() {
     currentTime,
   ]);
 
+  const getMerchandisesListTemp = useCallback(async () => {
+    const { items } = await getMerchandisesList({
+      type: 0,
+      category: 0,
+    });
+    console.log('getMerchandisesList items', items);
+    if (items?.length > 0) {
+      dispatch(setApiMerchandisesItem(items[0]));
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    getMerchandisesListTemp();
+  }, [getMerchandisesListTemp]);
+
   const handleAppIdChange = (value: string) => {
     setCurrentAppId(value);
     setCurrentApiType('');
@@ -226,9 +241,9 @@ export default function ApikeyOverview() {
           <div className='text-gray-80 my-[22px] text-center'>
             Your API has not been used yet. Your API key can be used to query
             Subgraphs.
-            <div className='text-blue-link mt-[4px] cursor-pointer'>
+            {/* <div className='text-blue-link mt-[4px] cursor-pointer'>
               Learn more
-            </div>
+            </div> */}
           </div>
           <div className='border-gray-E0 flex h-[70px] w-[356px] items-center justify-between rounded-md border p-[12px]'>
             <div>
@@ -341,7 +356,24 @@ export default function ApikeyOverview() {
                 </Tooltip>
               </div>
               <div className='text-dark-normal font-medium'>
-                $230.00
+                {currentAppId === '' &&
+                  currentApiType === '' &&
+                  calcTotalPrice(
+                    apikeyDetail?.totalQuery,
+                    apiMerchandisesItem?.price
+                  )}
+                {currentAppId !== '' &&
+                  selectAppIdItem?.totalQuery &&
+                  calcTotalPrice(
+                    selectAppIdItem?.totalQuery,
+                    apiMerchandisesItem?.price
+                  )}
+                {currentApiType !== '' &&
+                  selectApiTypeItem?.totalQuery &&
+                  calcTotalPrice(
+                    selectApiTypeItem?.totalQuery,
+                    apiMerchandisesItem?.price
+                  )}
                 <span className='text-gray-80 ml-[4px] font-medium'>USDT</span>
               </div>
             </div>
@@ -364,7 +396,7 @@ export default function ApikeyOverview() {
                 </Tooltip>
               </div>
               <div className='text-dark-normal font-medium'>
-                0.000191
+                {apiMerchandisesItem?.price}
                 <span className='text-gray-80 ml-[4px] mr-[12px] font-medium'>
                   USDT
                 </span>
@@ -380,7 +412,7 @@ export default function ApikeyOverview() {
           )}
           <div className='mt-[40px]'>
             <div className='text-dark-normal mb-[8px] text-2xl font-medium'>
-              Authorised AeIndexers
+              Auth AeIndexers
             </div>
             <div className='text-gray-80'>
               Only the AeIndexers in this list will be able to use this API key.
@@ -423,7 +455,15 @@ export default function ApikeyOverview() {
                       {item.totalQuery}
                     </Col>
                     <Col span={5} className='text-gray-80'>
-                      0.000574
+                      <div className='font-medium'>
+                        {calcTotalPrice(
+                          item.totalQuery,
+                          apiMerchandisesItem?.price
+                        )}
+                        <span className='text-gray-80 ml-[4px] font-medium'>
+                          USDT
+                        </span>
+                      </div>
                     </Col>
                     <Col span={5} className='text-gray-80'>
                       {dayjs(item.lastQueryTime).format('YYYY/MM/DD HH:mm:ss')}
@@ -470,7 +510,15 @@ export default function ApikeyOverview() {
                       {item.totalQuery}
                     </Col>
                     <Col span={5} className='text-gray-80'>
-                      0.000574
+                      <div className='font-medium'>
+                        {calcTotalPrice(
+                          item.totalQuery,
+                          apiMerchandisesItem?.price
+                        )}
+                        <span className='text-gray-80 ml-[4px] font-medium'>
+                          USDT
+                        </span>
+                      </div>
                     </Col>
                     <Col span={5} className='text-gray-80'>
                       {dayjs(item.lastQueryTime).format('YYYY/MM/DD HH:mm:ss')}

@@ -1,30 +1,183 @@
 'use client';
 
-import { Button, Tag } from 'antd';
+import type { TableColumnsType } from 'antd';
+import { Button, Table, Tag } from 'antd';
+import dayjs from 'dayjs';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+
+import { useThrottleCallback } from '@/lib/utils';
+
+import Copy from '@/components/Copy';
+
+import { useAppDispatch } from '@/store/hooks';
+
+import { getBillingsList } from '@/api/requestMarket';
+
+import { BillingEnum, BillingItem } from '@/types/marketType';
+
 export default function Billing() {
-  // const [haveUpgrade, setHaveUpgrade] = useState(true);
-  const haveUpgrade = true;
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
-  return (
-    <div className='px-[16px] pb-[40px] sm:px-[40px]'>
-      <div className='border-gray-F0 flex h-[120px] items-center justify-between border-b'>
-        <div className='flex items-center'>
-          <div className='text-3xl text-black'>Billing</div>
-          {!haveUpgrade && (
-            <Tag color='#9DCBFF' className='ml-[16px]'>
-              Free Trial
-            </Tag>
-          )}
-          {haveUpgrade && (
-            <Tag color='#9DCBFF' className='ml-[16px]'>
-              Paid Plan
-            </Tag>
-          )}
+  const [billingsList, setBillingsList] = useState<BillingItem[]>([]);
+  const [skipCount, setSkipCount] = useState(1);
+  const [maxResultCount, setMaxResultCount] = useState(10);
+  const [totalCountItems, setTotalCountItems] = useState(0);
+
+  const getBillingsListTemp = useThrottleCallback(async () => {
+    const { items, totalCount } = await getBillingsList({
+      sortType: 1,
+      skipCount: (skipCount - 1) * maxResultCount,
+      maxResultCount: maxResultCount,
+    });
+    console.log('getBillingsListTemp items', items);
+    setBillingsList(items);
+    setTotalCountItems(totalCount);
+  }, [dispatch]);
+
+  useEffect(() => {
+    getBillingsListTemp();
+  }, [getBillingsListTemp]);
+
+  const tableOnChange = useCallback(
+    (page: number, pageSize: number) => {
+      if (page !== skipCount) {
+        setSkipCount(page);
+      }
+      if (maxResultCount !== pageSize) {
+        // pageSize change and skipCount need init 1
+        setSkipCount(1);
+        setMaxResultCount(pageSize);
+      }
+    },
+    [skipCount, maxResultCount]
+  );
+
+  const columns: TableColumnsType = [
+    {
+      title: 'Billing ID',
+      dataIndex: 'id',
+      key: 'id',
+      render: (text: string) => (
+        <div>
+          <Copy label='' content={text} isShowCopy={true} showLittle={true} />
         </div>
+      ),
+    },
+    {
+      title: 'Begin Time',
+      dataIndex: 'beginTime',
+      key: 'beginTime',
+      render: (text: string) => (
+        <div>{dayjs(text).format('YYYY/MM/DD HH:mm:ss')}</div>
+      ),
+    },
+    {
+      title: 'End Time',
+      dataIndex: 'endTime',
+      key: 'endTime',
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+      render: (text: number) => {
+        return (
+          <div>
+            {text === 0 && <Tag color='success'>{BillingEnum[text]}</Tag>}
+            {text === 1 && <Tag color='processing'>{BillingEnum[text]}</Tag>}
+          </div>
+        );
+      },
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (text: number) => (
+        <div>
+          {text === 0 && <Tag color='volcano'>Unpaid</Tag>}
+          {text === 1 && <Tag color='processing'>PaymentPending</Tag>}
+          {text === 2 && <Tag color='success'>PaymentConfirmed</Tag>}
+          {text === 3 && <Tag color='orange'>Canceled</Tag>}
+          {text === 4 && <Tag color='red'>PaymentFailed</Tag>}
+        </div>
+      ),
+    },
+    {
+      title: 'RefundAmount',
+      dataIndex: 'refundAmount',
+      key: 'refundAmount',
+      render: (text: number) => (
+        <div>
+          {text}
+          <span className='ml-[4px] text-sm'>USDT</span>
+        </div>
+      ),
+    },
+    {
+      title: 'PaidAmount',
+      dataIndex: 'paidAmount',
+      key: 'paidAmount',
+      render: (text: number) => (
+        <div>
+          {text}
+          <span className='ml-[4px] text-sm'>USDT</span>
+        </div>
+      ),
+    },
+    {
+      title: 'TransactionId',
+      dataIndex: 'transactionId',
+      key: 'transactionId',
+      render: (text: string) => (
+        <div>
+          <Copy label='' content={text} isShowCopy={true} showLittle={true} />
+        </div>
+      ),
+    },
+    {
+      title: 'CreateTime',
+      dataIndex: 'createTime',
+      key: 'createTime',
+      render: (text: string) => (
+        <div>{dayjs(text).format('YYYY/MM/DD HH:mm:ss')}</div>
+      ),
+    },
+    {
+      title: 'PaymentTime',
+      dataIndex: 'paymentTime',
+      key: 'paymentTime',
+      render: (text: string) => (
+        <div>{dayjs(text).format('YYYY/MM/DD HH:mm:ss')}</div>
+      ),
+    },
+    {
+      title: 'Billing Details',
+      dataIndex: 'id',
+      key: 'id',
+      render: (text: string) => (
+        console.log(text),
+        (
+          <div
+            className='text-blue-link cursor-pointer'
+            onClick={() =>
+              router.push(`/dashboard/billing/billingDetail?billingId=${text}`)
+            }
+          >
+            Details
+          </div>
+        )
+      ),
+    },
+  ];
+
+  return (
+    <div className='overflow-hidden px-[16px] pb-[40px] sm:px-[40px]'>
+      <div className='border-gray-F0 flex flex-wrap items-center justify-between border-b sm:h-[120px]'>
+        <div className='my-[20px] text-3xl text-black sm:my-[0px]'>Billing</div>
         <div>
           <Button
             type='primary'
@@ -42,83 +195,102 @@ export default function Billing() {
             />
             Notification
           </Button>
-          {!haveUpgrade && (
-            <Button
-              type='primary'
-              className='ml-[10px] h-[40px] w-[148px] text-sm'
-              onClick={() => {
-                router.push('/dashboard/billing/upgrade');
-              }}
-            >
-              <Image
-                src='/assets/svg/shopping-cart.svg'
-                alt='shopping'
-                width={14}
-                height={14}
-                className='mr-2 inline-block'
-              />
-              Upgrade Plan
-            </Button>
-          )}
-          {haveUpgrade && (
-            <Button
-              type='primary'
-              className='ml-[10px] h-[40px] w-[148px] text-sm'
-              onClick={() => {
-                router.push('/dashboard/billing/manage');
-              }}
-            >
-              <Image
-                src='/assets/svg/manage-accounts.svg'
-                alt='manage'
-                width={14}
-                height={14}
-                className='mr-2 inline-block'
-              />
-              Manage Plan
-            </Button>
-          )}
+          <Button
+            type='primary'
+            className='mx-[10px] h-[40px] w-[148px] text-sm'
+            onClick={() => {
+              router.push('/dashboard/billing/upgrade');
+            }}
+          >
+            <Image
+              src='/assets/svg/shopping-cart.svg'
+              alt='shopping'
+              width={14}
+              height={14}
+              className='mr-2 inline-block'
+            />
+            Purchase
+          </Button>
+          <Button
+            type='primary'
+            className='my-[10px] h-[40px] w-[148px] text-sm sm:my-[0px]'
+            onClick={() => {
+              router.push('/dashboard/billing/manage');
+            }}
+          >
+            <Image
+              src='/assets/svg/manage-accounts.svg'
+              alt='manage'
+              width={14}
+              height={14}
+              className='mr-2 inline-block'
+            />
+            Manage Billing
+          </Button>
         </div>
       </div>
-      <div className='flex flex-col items-center'>
-        <Image
-          src='/assets/svg/billing-empty.svg'
-          alt='billing'
-          width={410}
-          height={292}
-          className='mt-[100px]'
-        />
-        <div className='text-dark-normal my-[22px] text-2xl'>
-          Account ready to query the network
-        </div>
-        <div className='text-gray-80'>
-          With a positive billing balance you are ready to query the network.
-        </div>
-        <div className='text-gray-80 mb-[22px]'>
-          Create an API key to get started.
-        </div>
-        <Button
-          className='bg-gray-F5 mb-[22px] h-[40px] w-[148px] border-none font-medium'
-          onClick={() => router.push('/dashboard/apikey')}
-        >
-          Create API Key
-        </Button>
-        <div
-          className='text-blue-link cursor-pointer'
-          onClick={() =>
-            window.open('https://docs.aefinder.io/docs/quick-start', '_blank')
-          }
-        >
-          View documentation
+      {billingsList?.length === 0 && (
+        <div className='flex flex-col items-center'>
           <Image
-            src='/assets/svg/right-arrow.svg'
-            alt='arrow'
-            width={24}
-            height={24}
-            className='relative top-[-1px] ml-[8px] inline-block'
+            src='/assets/svg/billing-empty.svg'
+            alt='billing'
+            width={410}
+            height={292}
+            className='mt-[100px]'
+          />
+          <div className='text-dark-normal my-[22px] text-2xl'>
+            Account ready to query the network
+          </div>
+          <div className='text-gray-80'>
+            With a positive billing balance you are ready to query the network.
+          </div>
+          <div className='text-gray-80 mb-[22px]'>
+            Create an API key to get started.
+          </div>
+          <Button
+            className='bg-gray-F5 mb-[22px] h-[40px] w-[148px] border-none font-medium'
+            onClick={() => router.push('/dashboard/apikey')}
+          >
+            Create API Key
+          </Button>
+          <div
+            className='text-blue-link cursor-pointer'
+            onClick={() =>
+              window.open('https://docs.aefinder.io/docs/quick-start', '_blank')
+            }
+          >
+            View documentation
+            <Image
+              src='/assets/svg/right-arrow.svg'
+              alt='arrow'
+              width={24}
+              height={24}
+              className='relative top-[-1px] ml-[8px] inline-block'
+            />
+          </div>
+        </div>
+      )}
+      {billingsList?.length > 0 && (
+        <div className='mt-[16px]'>
+          <Table
+            rowKey='id'
+            columns={columns}
+            dataSource={billingsList}
+            className='w-full'
+            scroll={{ x: 'max-content' }}
+            pagination={{
+              current: skipCount,
+              pageSize: maxResultCount,
+              total: totalCountItems,
+              onChange: tableOnChange,
+              showSizeChanger: true,
+              showTitle: true,
+              showTotal: (total) => `Total ${total} Billings`,
+              pageSizeOptions: ['10', '20', '50'],
+            }}
           />
         </div>
-      </div>
+      )}
     </div>
   );
 }

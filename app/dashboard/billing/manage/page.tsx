@@ -2,20 +2,24 @@
 
 import { LeftOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import type { TabsProps } from 'antd';
-import { Button, Tabs, Tag } from 'antd';
+import { Button, Tabs } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
-import Invoices from '@/components/billing/Invoices';
+import OrderList from '@/components/billing/OrderList';
 import Overview from '@/components/billing/Overview';
 import TransactionHistory from '@/components/billing/TransactionHistory';
 
 export default function BillingManage() {
-  const [activeTabKey, setActiveTabKey] = useState('overview');
   const router = useRouter();
 
+  const [activeTabKey, setActiveTabKey] = useState(
+    localStorage.getItem('billingTabKey') || 'overview'
+  );
+
   const onTabChange = (key: string) => {
+    localStorage.setItem('billingTabKey', key);
     setActiveTabKey(key);
   };
 
@@ -26,9 +30,9 @@ export default function BillingManage() {
       children: <Overview />,
     },
     {
-      key: 'invoices',
-      label: 'Invoices',
-      children: <Invoices />,
+      key: 'order',
+      label: 'Order',
+      children: <OrderList />,
     },
     {
       key: 'transactionHistory',
@@ -39,16 +43,13 @@ export default function BillingManage() {
 
   return (
     <div className='px-[16px] pb-[40px] sm:px-[40px]'>
-      <div className='flex h-[120px] items-center justify-between'>
-        <div className='flex items-center'>
+      <div className='flex flex-wrap items-center justify-between sm:h-[120px]'>
+        <div className='my-[20px] flex items-center sm:my-[0px]'>
           <LeftOutlined
             className='relative top-[-2px] mr-[16px] cursor-pointer align-middle text-sm'
             onClick={() => router.back()}
           />
           <div className='text-3xl text-black'>Billing</div>
-          <Tag color='#9DCBFF' className='ml-[16px]'>
-            Paid Plan
-          </Tag>
         </div>
         <div>
           <Button
@@ -59,11 +60,11 @@ export default function BillingManage() {
             }}
           >
             <PlusOutlined className='relative top-[-3px] mr-2 inline-block text-lg text-white' />
-            Upgrade
+            Purchase
           </Button>
           <Button
             type='primary'
-            className='ml-[10px] h-[40px] w-[148px] text-sm'
+            className='mx-[10px] h-[40px] w-[148px] text-sm'
             onClick={() => {
               router.push('/dashboard/billing/deposit');
             }}
@@ -79,7 +80,7 @@ export default function BillingManage() {
           </Button>
           <Button
             type='primary'
-            className='ml-[10px] h-[40px] w-[148px] text-sm'
+            className='my-[10px] h-[40px] w-[148px] text-sm sm:my-[0px]'
             onClick={() => {
               router.push('/dashboard/billing/withdraw');
             }}

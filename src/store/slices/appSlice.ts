@@ -7,6 +7,11 @@ import {
   GetSummaryResponse,
 } from '@/types/apikeyType';
 import { CreateAppResponse, GetAppDetailResponse } from '@/types/appType';
+import {
+  AssetsItem,
+  GetUserAllResponse,
+  MerchandisesItem,
+} from '@/types/marketType';
 import { GetSubscriptionResponse } from '@/types/subscriptionType';
 
 export interface AppSliceState {
@@ -19,6 +24,10 @@ export interface AppSliceState {
   apikeyDetail: ApikeyItemType;
   defaultAeindexersList: AeIndexersItem[];
   defaultAPIList: ApiItem[];
+  orgUserAll: GetUserAllResponse;
+  freeApiQueryCount: number;
+  processorAssetListSlice: AssetsItem[];
+  apiMerchandisesItem: MerchandisesItem;
 }
 
 const initialState: AppSliceState = {
@@ -35,6 +44,10 @@ const initialState: AppSliceState = {
   apikeyDetail: {} as ApikeyItemType,
   defaultAeindexersList: [],
   defaultAPIList: [],
+  orgUserAll: {} as GetUserAllResponse,
+  freeApiQueryCount: 0,
+  processorAssetListSlice: [],
+  apiMerchandisesItem: {} as MerchandisesItem,
 };
 
 export const appSlice = createAppSlice({
@@ -68,6 +81,18 @@ export const appSlice = createAppSlice({
     setDefaultAPIList: (state, action) => {
       state.defaultAPIList = action.payload;
     },
+    setOrgUserAll: (state, action) => {
+      state.orgUserAll = action.payload;
+    },
+    setFreeApiQueryCount: (state, action) => {
+      state.freeApiQueryCount = action.payload;
+    },
+    setProcessorAssetListSlice: (state, action) => {
+      state.processorAssetListSlice = action.payload;
+    },
+    setApiMerchandisesItem: (state, action) => {
+      state.apiMerchandisesItem = action.payload;
+    },
   },
 });
 
@@ -81,4 +106,8 @@ export const {
   setApikeyDetail,
   setDefaultAeIndexersList,
   setDefaultAPIList,
+  setOrgUserAll,
+  setFreeApiQueryCount,
+  setProcessorAssetListSlice,
+  setApiMerchandisesItem,
 } = appSlice.actions;

@@ -1,16 +1,16 @@
 'use client';
 // eslint-disable-next-line
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
+
+import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
+import { TWalletInfo } from '@aelf-web-login/wallet-adapter-base';
 
 import { Button, Divider, Form, Input, message } from 'antd';
 
 import { useDebounceCallback } from '@/lib/utils';
 import { queryAuthApi, resetLocalJWT } from '@/api/apiUtils';
-
-import { useAppDispatch } from '@/store/hooks';
-import { setUsername } from '@/store/slices/commonSlice';
 
 import { CurrentTourStepEnum } from '@/types/appType';
 
@@ -19,13 +19,18 @@ import LogInButton from '@/components/wallet/LoginButton';
 export default function LogIn() {
   const [form] = Form.useForm();
   const FormItem = Form.Item;
-  const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
   const [messageApi, contextHolder] = message.useMessage();
   const currentTourStep = localStorage.getItem('currentTourStep');
   const [loading, setLoading] = useState(false);
-  const [guestLoading, setGuestLoading] = useState(false);
+
+  const { walletInfo, isConnected } = useConnectWallet();
+
+  const walletInfoRef = useRef<TWalletInfo>();
+  walletInfoRef.current = walletInfo;
+  const isConnectedRef = useRef<boolean>();
+  isConnectedRef.current = isConnected;
 
   const initialTourValues = useCallback(() => {
     // check first isTourDashboard isTourCreateApp isTourHaveCreateApp
@@ -38,7 +43,6 @@ export default function LogIn() {
     // clear localStorage jwt
     if (pathname === '/login') {
       resetLocalJWT();
-      sessionStorage.setItem('isGuest', 'false');
       initialTourValues();
     }
   }, [pathname, initialTourValues]);
@@ -48,12 +52,15 @@ export default function LogIn() {
       type: 'success',
       content: 'login success',
     });
-    router.push('/dashboard');
+    if (isConnectedRef.current && walletInfoRef.current?.address) {
+      router.push('/dashboard');
+    } else {
+      router.push('/login/bindwallet');
+    }
   }, [router, messageApi]);
 
   const handleLogin = useDebounceCallback(async () => {
     setLoading(true);
-    sessionStorage.setItem('isGuest', 'false');
     try {
       const res = await queryAuthApi({
         username: form.getFieldValue('username'),
@@ -71,19 +78,6 @@ export default function LogIn() {
       setLoading(false);
     }
   }, [setLoading]);
-
-  const handleGuestLogin = useDebounceCallback(async () => {
-    setGuestLoading(true);
-    // if Guest Login, set isGuest to true
-    sessionStorage.setItem('isGuest', 'true');
-    await queryAuthApi({
-      username: 'Guest',
-      password: 'Guest',
-    });
-    dispatch(setUsername('Guest'));
-    setGuestLoading(false);
-    router.push('/dashboard');
-  }, [setGuestLoading]);
 
   return (
     <div className='flex w-full flex-col items-center justify-center pb-10 text-center'>
@@ -133,14 +127,7 @@ export default function LogIn() {
             </FormItem>
             <Divider style={{ color: '#808080', fontSize: '12px' }}>OR</Divider>
             <FormItem>
-              <LogInButton className='mx-auto h-[48px] w-full md:mr-[2%] md:w-[48%]' />
-              <Button
-                className='mx-auto h-[48px] w-full md:w-[48%]'
-                onClick={handleGuestLogin}
-                loading={guestLoading}
-              >
-                Continue as Guest
-              </Button>
+              <LogInButton className='mx-auto h-[48px] w-full' />
             </FormItem>
             <div className='mb-[16px]'>
               Don’t have an account yet?

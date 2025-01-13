@@ -1,74 +1,67 @@
 'use client';
 
-import {
-  TWalletInfo,
-  WalletTypeEnum,
-} from '@aelf-web-login/wallet-adapter-base';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { DownOutlined, LoadingOutlined, UpOutlined } from '@ant-design/icons';
-import { message } from 'antd';
 import clsx from 'clsx';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
-import { openWithBlank } from '@/lib/utils';
+import { openWithBlank, useThrottleCallback } from '@/lib/utils';
 
 import Copy from '@/components/Copy';
 import PrimaryLink from '@/components/links/PrimaryLink';
 import UnstyledLink from '@/components/links/UnstyledLink';
-import { useGetWalletSignParams } from '@/components/wallet/getWalletSignParams';
+import Bindwallet from '@/components/wallet/BindWallet';
 import LogInButton from '@/components/wallet/LoginButton';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setUsername } from '@/store/slices/commonSlice';
+import { setApikeySummary } from '@/store/slices/appSlice';
+import { setUserInfo, setUsername } from '@/store/slices/commonSlice';
 
-import { bindWallet, getUsersInfo } from '@/api/requestApp';
+import { queryAuthToken } from '@/api/apiUtils';
+import { getSummary } from '@/api/requestAPIKeys';
+import { getUsersInfo } from '@/api/requestApp';
 import { CHAIN_ID } from '@/constant';
 
-let retry = 50;
-
 export default function Header() {
+  const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
   const [isShowBox, setIsShowBox] = useState(false);
   const { username } = useAppSelector((state) => state.common);
   const [address, setAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const isLoginPathname = pathname === '/login' || pathname === '/login/signup';
+  const isLoginPathname = pathname?.startsWith('/login');
 
-  const {
-    disConnectWallet,
-    connectWallet,
-    walletInfo,
-    walletType,
-    isConnected,
-  } = useConnectWallet();
-  const [messageApi, contextHolder] = message.useMessage();
-  const dispatch = useAppDispatch();
-  const { getReqParams } = useGetWalletSignParams();
+  const { disConnectWallet, walletInfo, isConnected } = useConnectWallet();
 
-  const walletInfoRef = useRef<TWalletInfo>();
-  walletInfoRef.current = walletInfo;
-  const walletTypeRef = useRef<WalletTypeEnum>();
-  walletTypeRef.current = walletType;
-  const isConnectedRef = useRef<boolean>();
-  isConnectedRef.current = isConnected;
-
-  const getUsersInfoTemp = useCallback(async () => {
-    if (pathname !== '/' && !isLoginPathname) {
-      const res = await getUsersInfo();
-      if (res?.walletAddress) {
-        setAddress(res?.walletAddress);
-      }
-      dispatch(setUsername(res?.userName));
+  const getUsersInfoTemp = useThrottleCallback(async () => {
+    await queryAuthToken();
+    const res = await getUsersInfo();
+    console.log('userInfo', res);
+    if (res?.walletAddress) {
+      setAddress(res?.walletAddress);
+    } else {
+      router.push('/login/bindwallet');
     }
-  }, [dispatch, pathname, isLoginPathname]);
+    dispatch(setUsername(res?.userName));
+    dispatch(setUserInfo(res));
+  }, [dispatch, router]);
+
+  const getSummaryTemp = useThrottleCallback(async () => {
+    const res = await getSummary();
+    console.log('res', res);
+    dispatch(setApikeySummary(res));
+  }, [dispatch]);
 
   useEffect(() => {
-    getUsersInfoTemp();
-  }, [getUsersInfoTemp, pathname]);
+    if (pathname !== '/' && !isLoginPathname) {
+      getUsersInfoTemp();
+      getSummaryTemp();
+    }
+  }, [getUsersInfoTemp, getSummaryTemp, pathname, isLoginPathname]);
 
   useEffect(() => {
     const logoutContainer = document?.getElementById('logout-container');
@@ -85,12 +78,12 @@ export default function Header() {
   }, []);
 
   const handleLogout = useCallback(async () => {
-    if (isConnectedRef.current) {
+    if (isConnected) {
       await disConnectWallet();
     }
     setAddress('');
     router.push('/login');
-  }, [router, disConnectWallet]);
+  }, [router, disConnectWallet, isConnected]);
 
   const handleResetPassword = useCallback(() => {
     router.push('/reset-password');
@@ -103,89 +96,15 @@ export default function Header() {
     }, 100);
   }, [router]);
 
-  const handleBindSignInWallet = useCallback(async () => {
-    // wait for wallet connect complete and can get walletInfo data
-    if (
-      !walletInfoRef.current ||
-      !walletTypeRef.current ||
-      !isConnectedRef.current
-    ) {
-      setTimeout(() => {
-        if (retry <= 0) return;
-        retry--;
-        handleBindSignInWallet();
-      }, 100);
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const reqParams = await getReqParams({
-        walletInfoRef: walletInfoRef.current,
-        walletTypeRef: walletTypeRef.current,
-        isConnectedRef: isConnectedRef.current,
-      });
-
-      if (!reqParams) {
-        messageApi.open({
-          type: 'error',
-          content: 'Login sign wallet error',
-        });
-      }
-      if (reqParams?.address) {
-        const res = await bindWallet({
-          timestamp: reqParams.timestamp,
-          signatureVal: reqParams.signature ?? '',
-          chainId: reqParams.chain_id,
-          caHash: reqParams.ca_hash,
-          publicKey: reqParams.publickey,
-          address: reqParams.address,
-        });
-        if (res?.walletAddress) {
-          setAddress(res?.walletAddress);
-          messageApi.open({
-            type: 'success',
-            content: 'Bind sign wallet success',
-          });
-        }
-      }
-    } catch (error) {
-      console.log('error', error);
-      if (isConnectedRef.current) {
-        await disConnectWallet();
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  }, [getReqParams, messageApi, disConnectWallet]);
-
-  const connectWalletFirst = useCallback(async () => {
-    let res;
-    if (!walletInfoRef.current || !walletTypeRef.current) {
-      try {
-        res = await connectWallet();
-        // eslint-disable-next-line
-      } catch (error: any) {
-        messageApi.open({
-          type: 'error',
-          content: `${error?.message}` || 'connectWallet error',
-        });
-      }
-    }
-    if (res?.address || walletInfoRef.current?.address)
-      handleBindSignInWallet();
-  }, [connectWallet, handleBindSignInWallet, messageApi]);
-
   return (
-    <header className='border-gray-E0 flex h-[72px] w-full items-center justify-between border-b px-[16px] py-[24px] sm:px-[40px]'>
-      {contextHolder}
+    <header className='border-gray-E0 m-h-[72px] flex w-full items-center justify-between border-b px-[16px] py-[24px] sm:px-[40px] lg:h-[72px]'>
       <Image
         src='/assets/svg/aefinder-logo.svg'
         alt='logo'
         width={150}
         height={24}
         onClick={handleLinkToHome}
-        className='cursor-pointer'
+        className='mb:mr-[0px] mr-[30px] cursor-pointer'
         style={{ width: '150px', height: '24px' }}
       />
       {isLoginPathname && (
@@ -235,7 +154,7 @@ export default function Header() {
             Docs
           </Link>
           <div
-            className='border-gray-E0 relative inline-block min-h-10 min-w-[240px] cursor-pointer rounded border pl-[20px] pr-[30px] text-center leading-[40px]'
+            className='border-gray-E0 mb:my-[0px] relative my-[10px] inline-block min-h-10 min-w-[180px] cursor-pointer rounded border pl-[20px] pr-[30px] text-center leading-[40px] sm:min-w-[240px]'
             onClick={() => {
               setTimeout(() => {
                 setIsShowBox(!isShowBox);
@@ -263,12 +182,23 @@ export default function Header() {
                 !isShowBox && 'hidden'
               )}
             >
-              {/* <UpOutlined className='border-b-none text-gray-F0 absolute hidden bg-white text-xs sm:right-[105px] sm:top-[-12px] sm:block' /> */}
               <PrimaryLink
                 href='/dashboard'
                 className='hover:bg-gray-F5 w-full border-none px-[16px] sm:hidden'
               >
                 My Dashboard
+              </PrimaryLink>
+              <PrimaryLink
+                href='/dashboard/billing'
+                className='hover:bg-gray-F5 w-full border-none px-[16px] sm:hidden'
+              >
+                Billing
+              </PrimaryLink>
+              <PrimaryLink
+                href='/dashboard/apikey'
+                className='hover:bg-gray-F5 w-full border-none px-[16px] sm:hidden'
+              >
+                Api Key
               </PrimaryLink>
               <div className='hover:bg-gray-F5 border-gray-F0 w-full border-b border-t px-[16px] text-left sm:hidden'>
                 <UnstyledLink
@@ -280,19 +210,21 @@ export default function Header() {
               </div>
               <div>
                 {!address && (
-                  <div
-                    className='hover:bg-gray-F5 text-nowrap border-none pl-[10px] pr-[16px] text-left'
-                    onClick={connectWalletFirst}
+                  <Bindwallet
+                    setIsLoading={setIsLoading}
+                    setAddress={setAddress}
                   >
-                    <Image
-                      src='/assets/svg/wallet-black.svg'
-                      alt='wallet-black'
-                      width={24}
-                      height={24}
-                      className='mr-2 inline-block align-middle'
-                    />
-                    Bind sign in wallet
-                  </div>
+                    <div className='hover:bg-gray-F5 text-nowrap border-none pl-[10px] pr-[16px] text-left'>
+                      <Image
+                        src='/assets/svg/wallet-black.svg'
+                        alt='wallet-black'
+                        width={24}
+                        height={24}
+                        className='mr-2 inline-block align-middle'
+                      />
+                      Bind sign in wallet
+                    </div>
+                  </Bindwallet>
                 )}
                 {address && (
                   <div

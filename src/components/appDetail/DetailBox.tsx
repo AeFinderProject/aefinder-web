@@ -1,7 +1,10 @@
+'use client';
 import { Col, Row } from 'antd';
 import dayjs from 'dayjs';
 
 import Copy from '@/components/Copy';
+
+import { useAppSelector } from '@/store/hooks';
 
 import { CreateAppResponse } from '@/types/appType';
 
@@ -10,10 +13,12 @@ type DetailBoxProps = {
 };
 
 export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
+  const { processorAssetListSlice } = useAppSelector((state) => state.app);
+
   return (
     <div className='bg-gray-F5 mt-[30px] flex w-full items-start justify-start rounded-md px-[20px] py-[30px]'>
       <Row gutter={24} className='w-full'>
-        <Col sm={24} md={12} className='min-w-[340px]'>
+        <Col sm={24} md={14} className='min-w-[340px]'>
           <div className='text-block mb-[24px] text-xl font-medium'>
             {currentAppDetail?.appName}
           </div>
@@ -28,11 +33,13 @@ export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
               label='Created'
               content={dayjs(currentAppDetail?.createTime).format('YYYY-MM-DD')}
             />
-            <Copy
-              className='ml-[32px]'
-              label='AeIndexer capacity'
-              content='Large'
-            />
+            {processorAssetListSlice?.length === 1 && (
+              <Copy
+                className='ml-[32px]'
+                label='AeIndexer capacity'
+                content={processorAssetListSlice[0]?.merchandise?.name}
+              />
+            )}
           </div>
           {currentAppDetail?.description && (
             <Copy
@@ -42,7 +49,7 @@ export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
             />
           )}
         </Col>
-        <Col sm={24} md={12} className='flex flex-col'>
+        <Col sm={24} md={10} className='flex flex-col'>
           <Copy
             label='AppID'
             content={currentAppDetail?.appId}

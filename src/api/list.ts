@@ -31,6 +31,19 @@ export const AuthList = {
     target: `${AeFinderHost}/api/users/bind/wallet`,
     baseConfig: { method: 'POST' },
   },
+  register: {
+    target: `${AeFinderHost}/api/users/register`,
+    baseConfig: { method: 'POST' },
+  },
+  checkRegisterEmail: `${AeFinderHost}/api/users/register/pending`,
+  resend: {
+    target: `${AeFinderHost}/api/users/register/resend`,
+    baseConfig: { method: 'POST' },
+  },
+  emailVerification: {
+    target: `${AeFinderHost}/api/users/register/confirm`,
+    baseConfig: { method: 'POST' },
+  },
 };
 
 export const appApiList = {
@@ -136,7 +149,69 @@ export const apiKeyList = {
     target: `${AeFinderHost}/api/api-keys`,
     baseConfig: { method: 'PUT' },
   },
-  getAeIndexerMyList: `${AeFinderHost}/api/apps/search?keyword=aaaa`,
+  getAeIndexerMyList: `${AeFinderHost}/api/apps/search`,
+};
+
+export const marketList = {
+  getOrgBalance: `${AeFinderHost}/api/organizations/balance`,
+  resourceBillPlan: {
+    target: `${AeFinderHost}/api/market/calculate/resource-bill-plan`,
+    baseConfig: { method: 'POST' },
+  },
+  createOrder: {
+    target: `${AeFinderHost}/api/market/create/order`,
+    baseConfig: { method: 'POST' },
+  },
+  getFullPodUsage: `${AeFinderHost}/api/apps/resources/full-pod/usage`,
+  bindOrganization: {
+    target: `${AeFinderHost}/api/users/bind/organization`,
+    baseConfig: { method: 'POST' },
+  },
+  emailSendCode: {
+    target: `${AeFinderHost}/api/email/send-code`,
+    baseConfig: { method: 'POST' },
+  },
+  setNotification: {
+    target: `${AeFinderHost}/api/email/set-notification`,
+    baseConfig: { method: 'POST' },
+  },
+  appDeployObliterate: {
+    target: `${AeFinderHost}/api/app-deploy/obliterate`,
+    baseConfig: { method: 'POST' },
+  },
+  destroyPending: {
+    target: `${AeFinderHost}/api/app-deploy/destroy-pending`,
+    baseConfig: { method: 'POST' },
+  },
+  getTransactionHistory: `${AeFinderHost}/api/organizations/transaction-history`,
+  getBillingOverview: `${AeFinderHost}/api/market/billing/overview/api-query`,
+  getMerchandisesList: `${AeFinderHost}/api/merchandises`,
+  getOrdersList: `${AeFinderHost}/api/orders`,
+  getOrdersDetail: `${AeFinderHost}/api/orders`,
+  watchOrdersCost: {
+    target: `${AeFinderHost}/api/orders/cost`,
+    baseConfig: { method: 'POST' },
+  },
+  order: {
+    target: `${AeFinderHost}/api/orders`,
+    baseConfig: { method: 'POST' },
+  },
+  pay: {
+    target: `${AeFinderHost}/api/orders`,
+    baseConfig: { method: 'POST' },
+  },
+  cancel: {
+    target: `${AeFinderHost}/api/orders`,
+    baseConfig: { method: 'POST' },
+  },
+  getAssetsList: `${AeFinderHost}/api/assets`,
+  getAssetsRelate: {
+    target: `${AeFinderHost}/api/assets/relate`,
+    baseConfig: { method: 'POST' },
+  },
+  getBillingsList: `${AeFinderHost}/api/billings`,
+  getBillingsDetail: `${AeFinderHost}/api/billings`,
+  getIsCustomApp: `${AeFinderHost}/api/app-deploy/iscustomapp`,
 };
 
 /**
@@ -148,6 +223,7 @@ export const EXPAND_APIS = {
   app: appApiList,
   subscription: SubscriptionsApiList,
   apikey: apiKeyList,
+  market: marketList,
 };
 
 export type EXPAND_REQ_TYPES = {

@@ -12,7 +12,9 @@ import {
 } from 'antd';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
+import { useDebounceCallback } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setApikeyDetail } from '@/store/slices/appSlice';
@@ -22,16 +24,12 @@ import {
   addAuthorisedDomain,
   deleteAuthorisedAeIndexer,
   deleteAuthorisedDomain,
+  getAeIndexerMyList,
   getApiKeyDetail,
   setAuthorisedApis,
 } from '@/api/requestAPIKeys';
 
-import {
-  AeIndexersItem,
-  ApiItem,
-  ApiType,
-  AuthorisedAeIndexers,
-} from '@/types/apikeyType';
+import { ApiType, AuthorisedAeIndexers } from '@/types/apikeyType';
 
 const Option = Select.Option;
 
@@ -40,7 +38,9 @@ export default function Security() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
   const [messageApi, contextHolder] = message.useMessage();
+  const isMobile = window?.innerWidth < 640;
 
+  const [loading, setLoading] = useState(false);
   const [isShowAddAeIndexerModal, setIsShowAddAeIndexerModal] = useState(false);
   const [isShowAddDomainModal, setIsShowAddDomainModal] = useState(false);
   const [isShowEditAPIModal, setIsShowEditAPIModal] = useState(false);
@@ -48,14 +48,12 @@ export default function Security() {
   const [currentAppId, setCurrentAppId] = useState(null);
   const [currentDomain, setCurrentDomain] = useState<string>('');
   const [currentApi, setCurrentApi] = useState<(0 | 1 | 2)[]>([]);
+  const [currentMyAeindexersList, setCurrentMyAeindexersList] = useState<
+    AuthorisedAeIndexers[]
+  >([]);
 
   const apikeyDetail = useAppSelector((state) => state.app.apikeyDetail);
-  const defaultAeindexersList = useAppSelector(
-    (state) => state.app.defaultAeindexersList
-  );
-  const defaultAPIList = useAppSelector((state) => state.app.defaultAPIList);
-  console.log(apikeyDetail);
-  console.log('defaultAeindexersList', defaultAeindexersList);
+  console.log('apikeyDetail', apikeyDetail);
 
   const getApiKeyDetailTemp = useCallback(async () => {
     if (!id) {
@@ -65,6 +63,25 @@ export default function Security() {
     console.log('res', res);
     dispatch(setApikeyDetail(res));
   }, [dispatch, id]);
+
+  const getCurrentMyAeindexersListTemp = useCallback(
+    async (keyword: string) => {
+      const { items } = await getAeIndexerMyList({ keyword });
+      setCurrentMyAeindexersList(items);
+    },
+    []
+  );
+
+  useEffect(() => {
+    getCurrentMyAeindexersListTemp('');
+  }, [getCurrentMyAeindexersListTemp, isShowAddAeIndexerModal]);
+
+  const handleAeIndexerSearch = useDebounceCallback(
+    (keyword: string) => {
+      getCurrentMyAeindexersListTemp(keyword);
+    },
+    [getCurrentMyAeindexersListTemp]
+  );
 
   const handleDeleteAeIndexer = useCallback(
     async (appId: string) => {
@@ -76,7 +93,7 @@ export default function Security() {
         messageApi.success('Delete Authorise AeIndexers successfully');
         setTimeout(() => {
           getApiKeyDetailTemp();
-        }, 500);
+        }, 1000);
       }
     },
     [messageApi, getApiKeyDetailTemp, apikeyDetail?.id]
@@ -92,7 +109,7 @@ export default function Security() {
         messageApi.success('Delete Authorise Domain successfully');
         setTimeout(() => {
           getApiKeyDetailTemp();
-        }, 500);
+        }, 1000);
       }
     },
     [messageApi, getApiKeyDetailTemp, apikeyDetail?.id]
@@ -112,12 +129,12 @@ export default function Security() {
         tempAipArray.splice(index, 1);
       }
       console.log('tempAipArray', tempAipArray);
-      console.log('defaultAPIList', defaultAPIList);
-      defaultAPIList.forEach((item) => {
+      const tempList = [0, 1, 2];
+      tempList.forEach((item) => {
         if (
-          tempAipArray.findIndex((currentItem) => currentItem === item.api) > -1
+          tempAipArray.findIndex((currentItem) => currentItem === item) > -1
         ) {
-          apis[item.api] = true;
+          apis[item] = true;
         }
       });
       console.log('apis', apis);
@@ -138,19 +155,19 @@ export default function Security() {
       getApiKeyDetailTemp,
       apikeyDetail?.id,
       apikeyDetail?.authorisedApis,
-      defaultAPIList,
     ]
   );
 
   const handleCancel = useCallback(() => {
     setCurrentAppId(null);
     setCurrentDomain('');
+    setLoading(false);
     setIsShowAddAeIndexerModal(false);
     setIsShowAddDomainModal(false);
     setIsShowEditAPIModal(false);
   }, []);
 
-  const handleAuthAeIndexers = useCallback(async () => {
+  const handleAuthAeIndexers = useDebounceCallback(async () => {
     // step 1 check value, step2 check if copy, step3 addAuthorisedAeIndexer
     if (!currentAppId) {
       messageApi.info('Please select AeIndexers!');
@@ -164,17 +181,22 @@ export default function Security() {
       messageApi.warning('This AeIndexers had been added');
       return;
     }
-    const res = await addAuthorisedAeIndexer({
-      id: apikeyDetail?.id,
-      appIds: [currentAppId],
-    });
-    if (res) {
-      messageApi.success('Authorise AeIndexers successfully');
-      setTimeout(() => {
-        setIsShowAddAeIndexerModal(false);
-        setCurrentAppId(null);
-        getApiKeyDetailTemp();
-      }, 1000);
+    try {
+      setLoading(true);
+      const res = await addAuthorisedAeIndexer({
+        id: apikeyDetail?.id,
+        appIds: [currentAppId],
+      });
+      if (res) {
+        messageApi.success('Authorise AeIndexers successfully');
+        setTimeout(() => {
+          setIsShowAddAeIndexerModal(false);
+          setCurrentAppId(null);
+          getApiKeyDetailTemp();
+        }, 1000);
+      }
+    } finally {
+      setLoading(false);
     }
   }, [
     messageApi,
@@ -184,7 +206,7 @@ export default function Security() {
     apikeyDetail?.authorisedAeIndexers,
   ]);
 
-  const handleAuthDomain = useCallback(async () => {
+  const handleAuthDomain = useDebounceCallback(async () => {
     const urlPattern =
       /^((https?:\/\/)?(\*\.|[\w.-]+\.)+)([a-z]{2,6})(\/[\w.-]*)*\/?$/i;
     const isValidUrl = urlPattern.test(currentDomain);
@@ -198,17 +220,22 @@ export default function Security() {
       messageApi.warning('This domain had been added');
       return;
     }
-    const res = await addAuthorisedDomain({
-      id: apikeyDetail?.id,
-      domains: [currentDomain],
-    });
-    if (res) {
-      messageApi.success('Authorise Domain successfully');
-      setTimeout(() => {
-        setIsShowAddDomainModal(false);
-        setCurrentDomain('');
-        getApiKeyDetailTemp();
-      }, 1000);
+    try {
+      setLoading(true);
+      const res = await addAuthorisedDomain({
+        id: apikeyDetail?.id,
+        domains: [currentDomain],
+      });
+      if (res) {
+        messageApi.success('Authorise Domain successfully');
+        setTimeout(() => {
+          setIsShowAddDomainModal(false);
+          setCurrentDomain('');
+          getApiKeyDetailTemp();
+        }, 1000);
+      }
+    } finally {
+      setLoading(false);
     }
   }, [
     messageApi,
@@ -218,39 +245,38 @@ export default function Security() {
     apikeyDetail?.authorisedDomains,
   ]);
 
-  const handleAuthAPI = useCallback(async () => {
+  const handleAuthAPI = useDebounceCallback(async () => {
     // pre apis obj
     const apis: { [key: number]: boolean } = {
-      0: false,
-      1: false,
-      2: false,
+      0: apikeyDetail?.authorisedApis.findIndex((item) => item === 0) > -1,
+      1: apikeyDetail?.authorisedApis.findIndex((item) => item === 1) > -1,
+      2: apikeyDetail?.authorisedApis.findIndex((item) => item === 2) > -1,
     };
-    defaultAPIList.forEach((item) => {
-      if (
-        currentApi.findIndex((currentItem) => currentItem === item.api) > -1
-      ) {
-        apis[item.api] = true;
+    const tempList = [0, 1, 2];
+    tempList.forEach((item) => {
+      if (currentApi.findIndex((currentItem) => currentItem === item) > -1) {
+        apis[item] = true;
       }
     });
     console.log('apis', apis);
-    const res = await setAuthorisedApis({
-      id: apikeyDetail?.id,
-      apis: apis,
-    });
-    if (res) {
-      messageApi.success('Authorise API successfully');
-      setTimeout(() => {
-        setIsShowEditAPIModal(false);
-        getApiKeyDetailTemp();
-      }, 1000);
+    try {
+      setLoading(true);
+      const res = await setAuthorisedApis({
+        id: apikeyDetail?.id,
+        apis: apis,
+      });
+      if (res) {
+        messageApi.success('Authorise API successfully');
+        setTimeout(() => {
+          setCurrentApi([]);
+          setIsShowEditAPIModal(false);
+          getApiKeyDetailTemp();
+        }, 1000);
+      }
+    } finally {
+      setLoading(false);
     }
-  }, [
-    messageApi,
-    getApiKeyDetailTemp,
-    apikeyDetail?.id,
-    currentApi,
-    defaultAPIList,
-  ]);
+  }, [messageApi, getApiKeyDetailTemp, apikeyDetail?.id, currentApi]);
 
   const onCheckBoxChange: GetProp<typeof Checkbox.Group, 'onChange'> = (
     checkedValues
@@ -270,7 +296,7 @@ export default function Security() {
             To limit usage, restrict to specific Subgraphs. Only authorized
             AeIndexers will be able to use the Test Key.
           </div>
-          <div className='border-gray-E0 rounded-lg border px-[24px] pb-[12px] pt-[32px]'>
+          <div className='border-gray-E0 rounded-lg border px-[4px] pb-[12px] pt-[32px] sm:px-[24px]'>
             {apikeyDetail?.authorisedAeIndexers?.length === 0 && (
               <div className='text-center'>
                 <div className='text-gray-80 mb-[8px] text-xs'>
@@ -280,7 +306,7 @@ export default function Security() {
                   className='bg-gray-F5 text-dark-normal text-sm'
                   onClick={() => setIsShowAddAeIndexerModal(true)}
                 >
-                  Restrict to a AeIndexer
+                  {isMobile ? 'Add Restrict' : 'Restrict to a AeIndexer'}
                 </Button>
               </div>
             )}
@@ -328,7 +354,7 @@ export default function Security() {
               size='large'
               onClick={() => setIsShowAddAeIndexerModal(true)}
             >
-              Add Authorized AeIndexers
+              Auth AeIndexers
             </Button>
           )}
         </Col>
@@ -340,7 +366,7 @@ export default function Security() {
             To limit usage, restrict to specific domains. Only authorized
             domains will be able to use the Test Key.
           </div>
-          <div className='border-gray-E0 rounded-lg border px-[24px] pb-[12px] pt-[32px]'>
+          <div className='border-gray-E0 rounded-lg border px-[4px] pb-[12px] pt-[32px] sm:px-[24px]'>
             {apikeyDetail?.authorisedDomains?.length === 0 && (
               <div className='text-center'>
                 <div className='text-gray-80 mb-[8px] text-xs'>
@@ -350,7 +376,7 @@ export default function Security() {
                   className='bg-gray-F5 text-dark-normal text-sm'
                   onClick={() => setIsShowAddDomainModal(true)}
                 >
-                  Restrict to a Domain
+                  {isMobile ? 'Add Restrict' : 'Restrict to a Domain'}
                 </Button>
               </div>
             )}
@@ -386,7 +412,7 @@ export default function Security() {
               size='large'
               onClick={() => setIsShowAddDomainModal(true)}
             >
-              Add Authorized Domains
+              Auth Domains
             </Button>
           )}
         </Col>
@@ -400,7 +426,7 @@ export default function Security() {
             To limit usage, restrict to specific AeFinder APIs. Only authorized
             APIs will be able to use the Test Key.
           </div>
-          <div className='border-gray-E0 rounded-lg border px-[24px] pb-[12px] pt-[32px]'>
+          <div className='border-gray-E0 rounded-lg border px-[4px] pb-[12px] pt-[32px] sm:px-[24px]'>
             {apikeyDetail?.authorisedApis?.length === 0 && (
               <div className='text-center'>
                 <div className='text-gray-80 mb-[8px] text-xs'>
@@ -448,7 +474,7 @@ export default function Security() {
               size='large'
               onClick={() => setIsShowEditAPIModal(true)}
             >
-              Edit Authorised APIs
+              Auth APIs
             </Button>
           )}
         </Col>
@@ -462,18 +488,22 @@ export default function Security() {
         destroyOnClose
         footer={false}
       >
-        <div className='text-gray-80 mb-[4px] mt-[24px] text-xs'>Test</div>
+        <div className='text-gray-80 mb-[4px] mt-[24px] text-xs'>
+          {apikeyDetail?.name}
+        </div>
         <div className='text-dark-normal mb-[24px] font-medium'>
           Authorise AeIndexers
         </div>
-        <div>Select Authorised AeIndexers</div>
+        <div>Select Auth AeIndexers</div>
         <Select
           className='h-[60px] w-full py-[12px]'
           value={currentAppId}
           onChange={(value) => setCurrentAppId(value)}
-          placeholder='Select Authorised AeIndexers'
+          placeholder='Select Auth AeIndexers'
+          showSearch
+          onSearch={(value) => handleAeIndexerSearch(value)}
         >
-          {defaultAeindexersList?.map((item: AeIndexersItem) => {
+          {currentMyAeindexersList?.map((item: AuthorisedAeIndexers) => {
             return (
               <Option key={item.appId} value={item.appId}>
                 {item.appName}
@@ -482,16 +512,17 @@ export default function Security() {
           })}
         </Select>
         <div className='mt-[24px] flex items-center  justify-between'>
-          <Button className='w-[40%]' size='large' onClick={handleCancel}>
+          <Button className='w-[32%]' size='large' onClick={handleCancel}>
             Cancel
           </Button>
           <Button
-            className='w-[56%]'
+            className='w-[65%]'
             size='large'
             type='primary'
             onClick={handleAuthAeIndexers}
+            loading={loading}
           >
-            Authorise AeIndexers
+            Auth AeIndexers
           </Button>
         </div>
       </Modal>
@@ -503,7 +534,9 @@ export default function Security() {
         destroyOnClose
         footer={false}
       >
-        <div className='text-gray-80 mb-[4px] mt-[24px] text-xs'>Test</div>
+        <div className='text-gray-80 mb-[4px] mt-[24px] text-xs'>
+          {apikeyDetail?.name}
+        </div>
         <div className='text-dark-normal mb-[24px] font-medium'>
           Authorise Domain
         </div>
@@ -518,16 +551,17 @@ export default function Security() {
           Note: You can authorise all subdomains using a wildcard *.example.com
         </div>
         <div className='mt-[24px] flex items-center  justify-between'>
-          <Button className='w-[40%]' size='large' onClick={handleCancel}>
+          <Button className='w-[32%]' size='large' onClick={handleCancel}>
             Cancel
           </Button>
           <Button
-            className='w-[56%]'
+            className='w-[65%]'
             size='large'
             type='primary'
             onClick={handleAuthDomain}
+            loading={loading}
           >
-            Authorise Domains
+            Auth Domains
           </Button>
         </div>
       </Modal>
@@ -552,13 +586,15 @@ export default function Security() {
             onChange={onCheckBoxChange}
           >
             <Row>
-              {defaultAPIList?.map((item: ApiItem) => {
-                return (
-                  <Col span={24} key={item.api}>
-                    <Checkbox value={item.api}>{ApiType[item.api]}</Checkbox>
-                  </Col>
-                );
-              })}
+              <Col span={24} key={0}>
+                <Checkbox value={0}>{ApiType[0]}</Checkbox>
+              </Col>
+              <Col span={24} key={1}>
+                <Checkbox value={1}>{ApiType[1]}</Checkbox>
+              </Col>
+              <Col span={24} key={2}>
+                <Checkbox value={2}>{ApiType[2]}</Checkbox>
+              </Col>
             </Row>
           </Checkbox.Group>
         </div>
@@ -571,7 +607,7 @@ export default function Security() {
             size='large'
             type='primary'
             onClick={handleAuthAPI}
-            disabled={defaultAPIList.length === 0}
+            loading={loading}
           >
             Confirm
           </Button>

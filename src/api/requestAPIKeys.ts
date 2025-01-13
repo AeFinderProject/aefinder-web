@@ -12,6 +12,7 @@ import {
   ApikeyType,
   DeleteApiKeyRequest,
   GetAeIndexerMyListRequest,
+  GetAeIndexerMyListResponse,
   GetAeIndexerSnapshotsRequest,
   GetAeIndexersRequest,
   GetAeIndexersResponse,
@@ -309,7 +310,9 @@ export const setAuthorisedApis = async (
   }
 };
 
-export const getAeIndexerMyList = async (params: GetAeIndexerMyListRequest) => {
+export const getAeIndexerMyList = async (
+  params: GetAeIndexerMyListRequest
+): Promise<GetAeIndexerMyListResponse> => {
   try {
     const res = await request.apikey.getAeIndexerMyList({ params });
     return res;

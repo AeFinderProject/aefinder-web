@@ -5,19 +5,33 @@ import { MessageInstance } from 'antd/es/message/interface';
 import Image from 'next/image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useDebounceCallback } from '@/lib/utils';
+
+import DeactivatedModal from '@/components/appDetail/DeactivatedModal';
+import DeleteIndexerModal from '@/components/appDetail/DeleteAeIndexerModal';
+import DeletePendingPodModal from '@/components/appDetail/DeletePendingPodModal';
 import DeployDrawer from '@/components/appDetail/DeployDrawer';
+import UpdateCapacityDrawer from '@/components/appDetail/UpdateCapacityDrawer';
 import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setCurrentVersion } from '@/store/slices/appSlice';
+import {
+  setCurrentVersion,
+  setProcessorAssetListSlice,
+} from '@/store/slices/appSlice';
+
+import { getAssetsList, getIsCustomApp } from '@/api/requestMarket';
 
 import { AppStatusType, CurrentTourStepEnum } from '@/types/appType';
+import { AssetsItem } from '@/types/marketType';
 
 type HeaderHandleProps = {
   readonly setDeployDrawerVisible: (visible: boolean) => void;
   readonly messageApi: MessageInstance;
   readonly isNeedRefresh: boolean;
   readonly setIsNeedRefresh: (isNeedRefresh: boolean) => void;
+  readonly isShowUpdateCapacityModal: boolean;
+  readonly setIsShowUpdateCapacityModal: (visible: boolean) => void;
 };
 
 export default function HeaderHandle({
@@ -25,20 +39,32 @@ export default function HeaderHandle({
   messageApi,
   isNeedRefresh,
   setIsNeedRefresh,
+  isShowUpdateCapacityModal,
+  setIsShowUpdateCapacityModal,
 }: HeaderHandleProps) {
   const dispatch = useAppDispatch();
   const DeployRef = useRef<GetRef<typeof Button>>(null);
   const UpdateRef = useRef<GetRef<typeof Button>>(null);
+  const [deployLoading, setDeployLoading] = useState(false);
   const [openDeployTour, setOpenDeployTour] = useState(false);
   const [openUpdateTour, setOpenUpdateTour] = useState(false);
   const username = useAppSelector((state) => state.common.username);
   const [editAppDrawerVisible, setEditAppDrawerVisible] = useState(false);
   const [updateDeployDrawerVisible, setUpdateDeployDrawerVisible] =
     useState(false);
+  const [isShowDeleteAeIndexModal, setIsShowDeleteAeIndexModal] =
+    useState(false);
+  const [isShowDeletePendingPodModal, setIsShowDeletePendingPodModal] =
+    useState(false);
+  const [isShowDeactivatedModal, setIsShowDeactivatedModal] = useState(true);
   const { currentAppDetail, currentVersion } = useAppSelector(
     (state) => state.app
   );
   const currentTourStep = localStorage.getItem('currentTourStep');
+  const [processorAssetList, setProcessorAssetList] = useState<AssetsItem[]>(
+    []
+  );
+  const [storageAssetList, setStorageAssetList] = useState<AssetsItem[]>([]);
 
   const DeploySteps: TourProps['steps'] = [
     {
@@ -56,13 +82,6 @@ export default function HeaderHandle({
       style: {
         width: '320px',
       },
-    },
-  ];
-
-  const dropdownItems: MenuProps['items'] = [
-    {
-      key: '1',
-      label: <Button className='text-danger-normal'>Delete AeIndexer</Button>,
     },
   ];
 
@@ -130,27 +149,108 @@ export default function HeaderHandle({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTourStep]);
 
-  const handleDeleteAeIndexer = useCallback(() => {
-    // todo: delete AeIndexer
-    // delete -> Modal confirm -> route.replace('/dashboard')
-    messageApi.open({
-      type: 'warning',
-      content: 'Are you sure you want to delete this AeIndexer?',
-      duration: 3,
-      onClose: () => {
-        messageApi.open({
-          type: 'error',
-          content: 'This AeIndexer has been deleted.',
-          duration: 3,
-        });
-      },
-    });
-  }, [messageApi]);
+  const handleClickUpdateCapacity = useCallback(() => {
+    if (currentAppDetail?.isLocked) {
+      messageApi.warning('You have unfinished order, Please wait.');
+      return;
+    }
+    setIsShowUpdateCapacityModal(true);
+  }, [currentAppDetail?.isLocked, messageApi, setIsShowUpdateCapacityModal]);
 
-  const handleDeletePendingPod = useCallback(() => {
-    // todo: delete PendingPod
-    console.log('delete PendingPod');
-  }, []);
+  const dropdownItems: MenuProps['items'] = [
+    {
+      key: '1',
+      label: (
+        <Button
+          className='text-blue-link w-full'
+          onClick={() => handleClickUpdateCapacity()}
+        >
+          Update capacity
+        </Button>
+      ),
+    },
+    {
+      key: '2',
+      label: (
+        <Button
+          className='text-danger-normal'
+          onClick={() => setIsShowDeleteAeIndexModal(true)}
+        >
+          Delete AeIndexer
+        </Button>
+      ),
+    },
+  ];
+
+  const getAssetsListTemp = useCallback(async () => {
+    const getProcessorAssetListRes = await getAssetsList({
+      appId: currentAppDetail?.appId,
+      type: 1,
+      skipCount: 0,
+      maxResultCount: 100,
+    });
+    console.log('getProcessorAssetListRes', getProcessorAssetListRes);
+    setProcessorAssetList(getProcessorAssetListRes?.items);
+    dispatch(setProcessorAssetListSlice(getProcessorAssetListRes?.items));
+
+    const getStorageAssetListRes = await getAssetsList({
+      appId: currentAppDetail?.appId,
+      type: 2,
+      skipCount: 0,
+      maxResultCount: 100,
+    });
+    console.log('getStorageAssetListRes', getStorageAssetListRes);
+    setStorageAssetList(getStorageAssetListRes?.items);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentAppDetail?.appId, isShowUpdateCapacityModal, dispatch]);
+
+  useEffect(() => {
+    getAssetsListTemp();
+  }, [getAssetsListTemp]);
+
+  const handleClickDeploy = useDebounceCallback(async () => {
+    if (!currentAppDetail?.appId) return;
+
+    // need to check the aeindexer has buy cpu and memory or not
+    // if yes, then deploy the aeindexer and show the updateCapacity drawer
+    try {
+      setDeployLoading(true);
+      handleDeployCloseTour();
+
+      // for custom app, show the deploy drawer always
+      const getIsCustomAppRes = await getIsCustomApp({
+        appId: currentAppDetail?.appId,
+      });
+      console.log('getIsCustomAppRes', getIsCustomAppRes);
+      if (getIsCustomAppRes) {
+        setDeployDrawerVisible(true);
+        return;
+      }
+
+      if (currentAppDetail?.isLocked) {
+        messageApi.warning('You have unfinished order, Please wait.');
+        return;
+      }
+
+      if (
+        processorAssetList.length &&
+        storageAssetList.length &&
+        !currentAppDetail?.isLocked
+      ) {
+        setDeployDrawerVisible(true);
+      } else {
+        messageApi.info('Please update capacity first: Processor and Storage');
+        setIsShowUpdateCapacityModal(true);
+      }
+    } finally {
+      setDeployLoading(false);
+    }
+  }, [
+    currentAppDetail?.appId,
+    currentAppDetail?.isLocked,
+    processorAssetList,
+    storageAssetList,
+  ]);
 
   return (
     <div className='border-gray-F0 flex h-[130px] items-center justify-between border-b pt-[14px]'>
@@ -182,28 +282,26 @@ export default function HeaderHandle({
             className='border-blue-link text-blue-link mr-3'
             onClick={() => setEditAppDrawerVisible(true)}
           >
-            <EditOutlined className='align-middle' />
+            <EditOutlined className='relative top-[-4px]' />
             Edit
           </Button>
           <Button
             ref={DeployRef}
             type='primary'
-            onClick={() => {
-              handleDeployCloseTour();
-              setDeployDrawerVisible(true);
-            }}
+            onClick={handleClickDeploy}
+            loading={deployLoading}
+            disabled={currentAppDetail?.status === AppStatusType.Deactivated}
           >
-            Deploy...
+            {currentAppDetail?.status === AppStatusType.Deactivated
+              ? 'Deactivated'
+              : 'Deploy...'}
           </Button>
           <Dropdown
             menu={{ items: dropdownItems }}
             trigger={['click']}
             className='ml-3'
           >
-            <Button
-              className='text-blue-link border-blue-link'
-              onClick={handleDeleteAeIndexer}
-            >
+            <Button className='text-blue-link border-blue-link'>
               <MoreOutlined className='relative top-[-2px]' />
             </Button>
           </Dropdown>
@@ -214,7 +312,7 @@ export default function HeaderHandle({
           <Select
             onChange={(value) => handleChangeVersion(value)}
             className='mb-3 h-[40px] w-[100px] sm:mb-0 sm:w-[200px]'
-            defaultValue={currentVersion}
+            value={currentVersion}
           >
             <Select.Option value={currentAppDetail?.versions?.currentVersion}>
               (Current) {currentAppDetail?.versions?.currentVersion}
@@ -223,13 +321,15 @@ export default function HeaderHandle({
               <Select.Option value={currentAppDetail?.versions?.pendingVersion}>
                 <div className='relative w-full truncate pr-[22px]'>
                   {currentAppDetail?.versions?.pendingVersion}
-                  <span className='absolute right-[-4px] top-[-2px] cursor-pointer p-[2px] hover:bg-gray-100'>
+                  <span
+                    className='absolute right-[-4px] cursor-pointer py-[2px] pl-[2px] pr-[6px] hover:bg-gray-100'
+                    onClick={() => setIsShowDeletePendingPodModal(true)}
+                  >
                     <Image
                       src='/assets/svg/delete.svg'
                       alt='delete'
                       width={22}
                       height={22}
-                      onClick={handleDeletePendingPod}
                     />
                   </span>
                 </div>
@@ -276,6 +376,35 @@ export default function HeaderHandle({
           version={currentVersion}
           deployDrawerVisible={updateDeployDrawerVisible}
           setDeployDrawerVisible={setUpdateDeployDrawerVisible}
+          messageApi={messageApi}
+        />
+      )}
+      {isShowUpdateCapacityModal && (
+        <UpdateCapacityDrawer
+          isShowUpdateCapacityModal={isShowUpdateCapacityModal}
+          setIsShowUpdateCapacityModal={setIsShowUpdateCapacityModal}
+          messageApi={messageApi}
+        />
+      )}
+      {isShowDeleteAeIndexModal && (
+        <DeleteIndexerModal
+          isShowDeleteIndexerModal={isShowDeleteAeIndexModal}
+          setIsShowDeleteIndexerModal={setIsShowDeleteAeIndexModal}
+          messageApi={messageApi}
+        />
+      )}
+      {isShowDeletePendingPodModal && (
+        <DeletePendingPodModal
+          isShowDeletePendingPodModal={isShowDeletePendingPodModal}
+          setIsShowDeletePendingPodModal={setIsShowDeletePendingPodModal}
+          messageApi={messageApi}
+        />
+      )}
+      {currentAppDetail?.status === AppStatusType.Deactivated && (
+        <DeactivatedModal
+          isShowDeactivatedModal={isShowDeactivatedModal}
+          setIsShowDeactivatedModal={setIsShowDeactivatedModal}
+          setIsShowUpdateCapacityModal={setIsShowUpdateCapacityModal}
           messageApi={messageApi}
         />
       )}

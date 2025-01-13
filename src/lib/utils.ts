@@ -1,8 +1,10 @@
 'use client';
 
 import { message } from 'antd';
+import BigNumber from 'bignumber.js';
 import BN, { isBN } from 'bn.js';
 import clsx, { ClassValue } from 'clsx';
+import dayjs from 'dayjs';
 import pako from 'pako';
 import { DependencyList, useCallback, useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
@@ -271,4 +273,92 @@ export function objectToQueryString(params: object) {
         `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
     )
     .join('&');
+}
+
+export const getRemainingDays = () => {
+  const now = dayjs();
+  const endOfMonth = now.endOf('month');
+  const remainingDays = endOfMonth.diff(now, 'day');
+  return remainingDays;
+};
+
+export const getQueryFee = (queryCount: number, monthlyUnitPrice: number) => {
+  if (!queryCount || !monthlyUnitPrice) {
+    return 0;
+  }
+  const queryCountBignumber = BigNumber(queryCount);
+  const monthlyUnitPriceBignumber = BigNumber(monthlyUnitPrice);
+  return queryCountBignumber
+    .times(monthlyUnitPriceBignumber)
+    .div(10000)
+    .toNumber();
+};
+
+export const ZERO = new BigNumber(0);
+export const ONE = new BigNumber(1);
+
+// eslint-disable-next-line
+export const isEffectiveNumber = (v: any) => {
+  const val = new BigNumber(v);
+  return !val.isNaN() && !val.lte(0);
+};
+
+export function timesDecimals(
+  a?: BigNumber.Value,
+  decimals: string | number = 18
+) {
+  if (!a) return ZERO;
+  const bigA = ZERO.plus(a);
+  if (bigA.isNaN()) return ZERO;
+  if (typeof decimals === 'string' && decimals.length > 10)
+    return bigA.times(decimals);
+  return bigA.times(`1e${decimals}`);
+}
+export function divDecimals(
+  a?: BigNumber.Value,
+  decimals: string | number = 18
+) {
+  if (!a) return ZERO;
+  const bigA = ZERO.plus(a);
+  if (bigA.isNaN()) return ZERO;
+  if (typeof decimals === 'string' && decimals.length > 10)
+    return bigA.div(decimals);
+  return bigA.div(`1e${decimals}`);
+}
+
+export function divDecimalsStr(
+  a?: BigNumber.Value,
+  decimals: string | number = 8,
+  defaultVal = '--'
+) {
+  const n = divDecimals(a, decimals);
+  return isEffectiveNumber(n) ? n.toFormat() : defaultVal;
+}
+
+export function calcProductNumber(
+  queryCount: number,
+  feeCount: number,
+  productQueryCount: number
+) {
+  if (!queryCount || !productQueryCount) {
+    return 0;
+  }
+
+  const queryCountBignumber = BigNumber(queryCount);
+  const feeCountBignumber = BigNumber(feeCount);
+  const productQueryCountBignumber = BigNumber(productQueryCount);
+  return queryCountBignumber
+    .times(1000)
+    .minus(feeCountBignumber)
+    .dividedBy(productQueryCountBignumber);
+}
+
+export function calcTotalPrice(queryCount: number, price: number) {
+  if (!queryCount || !price) {
+    return 0;
+  }
+
+  const queryCountBignumber = BigNumber(queryCount);
+  const priceBignumber = BigNumber(price);
+  return queryCountBignumber.times(priceBignumber).toString();
 }

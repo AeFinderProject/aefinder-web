@@ -36,7 +36,7 @@ export type GetSummaryResponse = {
 };
 
 export type GetSnapshotsRequest = {
-  id: string;
+  id?: string;
   beginTime: string;
   endTime: string;
   type: number | string;
@@ -153,4 +153,8 @@ export type SetAuthorisedApisRequest = {
 
 export type GetAeIndexerMyListRequest = {
   keyword: string;
+};
+
+export type GetAeIndexerMyListResponse = {
+  items: AuthorisedAeIndexers[];
 };

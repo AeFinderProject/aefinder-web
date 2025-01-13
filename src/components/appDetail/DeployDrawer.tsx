@@ -211,13 +211,8 @@ export default function DeployDrawer({
 
   const handleUpdateCode = useCallback(async () => {
     const Code = form.getFieldValue('code')?.[0];
-    const isGuest = sessionStorage.getItem('isGuest');
     const tempAdditionalJSONFileList = additionalJSONFileList?.filter(
       (file) => {
-        if (isGuest === 'true') {
-          // if isGuest -> upload all
-          return true;
-        }
         return file?.uid?.startsWith('rc-upload');
       }
     );
