@@ -77,23 +77,23 @@ export default function Overview() {
     <div>
       <Row
         gutter={24}
-        className='border-gray-E0 bg-gray-F5 mb-[30px] rounded-lg border p-[24px]'
+        className='border-gray-E0 bg-gray-F5 mb-[30px] rounded-lg border p-[24px] pt-[14px]'
       >
-        <Col sm={8} md={8}>
+        <Col sm={8} md={8} className='my-[10px]'>
           <Statistic
             title='Remaining Balance'
             value={`${orgBalance?.balance} USDT`}
             valueStyle={{ fontSize: '16px', fontWeight: 500 }}
           />
         </Col>
-        <Col sm={8} md={8}>
+        <Col sm={8} md={8} className='my-[10px]'>
           <Statistic
             title='Locked'
             value={`${orgBalance?.lockedBalance} USDT`}
             valueStyle={{ fontSize: '16px', fontWeight: 500 }}
           />
         </Col>
-        <Col sm={8} md={8} className='mt-[20px] sm:mt-[0px]'>
+        <Col sm={8} md={8} className='my-[10px]'>
           <Statistic
             title='Renews in'
             value={`${getRemainingDays()} Days`}

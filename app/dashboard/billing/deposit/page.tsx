@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import {
+  calcTotalPrice,
   divDecimals,
   divDecimalsStr,
   getOmittedStr,
@@ -280,10 +281,13 @@ export default function Deposit() {
               onChange={(value) => setCurrentAmount(value as number)}
             />
             <div className='mb-[18px]'>
-              <span className='text-gray-80 text-sm'>
-                Estimated Transaction Fee:{' '}
+              <span className='text-gray-80 mr-[10px] text-sm'>
+                Estimated Transaction Fee is approximately:
               </span>
-              <span className='text-dark-normal text-sm'>0.2161 ELF</span>
+              <span className='text-dark-normal text-sm'>
+                {calcTotalPrice(currentAmount || 0, 0.2161)}
+                <span className='ml-[10px]'>ELF</span>
+              </span>
             </div>
           </div>
           <div className='mb-[20px] text-xl font-medium text-black'>

@@ -68,9 +68,9 @@ export default function OrderDetail() {
         <div className='text-dark-normal mb-[12px] mt-[24px] text-xl font-medium'>
           Order overview
         </div>
-        <div className='bg-gray-F5 w-full rounded-lg p-[24px]'>
+        <div className='bg-gray-F5 w-full rounded-lg px-[24px] py-[12px]'>
           <Row gutter={24}>
-            <Col xs={12} md={6}>
+            <Col xs={12} md={6} className='my-[12px]'>
               <Copy
                 label='Order Id'
                 content={currentOrderDetail?.id}
@@ -78,25 +78,23 @@ export default function OrderDetail() {
                 showLittle={true}
               />
             </Col>
-            <Col xs={12} md={6}>
+            <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>Amount</div>
               {String(currentOrderDetail?.amount)} USDT
             </Col>
-            <Col xs={12} md={6}>
-              <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
+            <Col xs={12} md={6} className='my-[12px]'>
+              <div className='text-gray-80 mb-[10px] text-xs'>
                 DeductionAmount
               </div>
               {String(currentOrderDetail?.deductionAmount)} USDT
             </Col>
-            <Col xs={12} md={6}>
-              <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
-                ActualAmount
-              </div>
+            <Col xs={12} md={6} className='my-[12px]'>
+              <div className='text-gray-80 mb-[10px] text-xs'>ActualAmount</div>
               {String(currentOrderDetail?.actualAmount)} USDT
             </Col>
           </Row>
-          <Row gutter={24} className='mt-[24px]'>
-            <Col xs={12} md={6}>
+          <Row gutter={24}>
+            <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>Status</div>
               <div>
                 {currentOrderDetail?.status === 0 && (
@@ -116,7 +114,7 @@ export default function OrderDetail() {
                 )}
               </div>
             </Col>
-            <Col xs={12} md={6}>
+            <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>PaymentType</div>
               <div>
                 {currentOrderDetail?.paymentType === 0 && (
@@ -127,20 +125,16 @@ export default function OrderDetail() {
                 )}
               </div>
             </Col>
-            <Col xs={12} md={6}>
-              <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
-                OrderTime
-              </div>
+            <Col xs={12} md={6} className='my-[12px]'>
+              <div className='text-gray-80 mb-[10px] text-xs'>OrderTime</div>
               <div>
                 {dayjs(currentOrderDetail?.orderTime).format(
                   'YYYY/MM/DD HH:mm:ss'
                 )}
               </div>
             </Col>
-            <Col xs={12} md={6}>
-              <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
-                PaymentTime
-              </div>
+            <Col xs={12} md={6} className='my-[12px]'>
+              <div className='text-gray-80 mb-[10px] text-xs'>PaymentTime</div>
               <div>
                 {dayjs(currentOrderDetail?.paymentTime).format(
                   'YYYY/MM/DD HH:mm:ss'
@@ -156,12 +150,12 @@ export default function OrderDetail() {
                 <Divider className='my-[24px]' />
                 {item?.originalAsset?.id && (
                   <div>
-                    <div className='text-dark-normal mb-[12px] mt-[24px] text-xl'>
+                    <div className='text-dark-normal my-[12px] text-xl'>
                       Original Asset
                     </div>
-                    <div className='bg-gray-F5 w-full rounded-lg p-[24px]'>
+                    <div className='bg-gray-F5 w-full rounded-lg px-[24px] py-[12px]'>
                       <Row gutter={24}>
-                        <Col xs={12} md={6}>
+                        <Col xs={12} md={6} className='my-[12px]'>
                           <Copy
                             label='Order Id'
                             content={item?.originalAsset?.id}
@@ -169,53 +163,53 @@ export default function OrderDetail() {
                             showLittle={true}
                           />
                         </Col>
-                        <Col xs={12} md={6}>
+                        <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
                             PaidAmount
                           </div>
                           {String(item?.originalAsset?.paidAmount)} USDT
                         </Col>
-                        <Col xs={12} md={6}>
-                          <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
                             FreeQuantity
                           </div>
                           {item?.originalAsset?.freeQuantity || '--'}
                         </Col>
-                        <Col xs={12} md={6}>
-                          <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
                             Quantity
                           </div>
                           {item?.originalAsset?.quantity || '--'}
                         </Col>
                       </Row>
-                      <Row gutter={24} className='mt-[24px]'>
-                        <Col xs={12} md={6}>
+                      <Row gutter={24}>
+                        <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
                             FreeReplicas
                           </div>
                           {item?.originalAsset?.freeReplicas || '--'}
                         </Col>
-                        <Col xs={12} md={6}>
+                        <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
                             Replicas
                           </div>
                           {item?.originalAsset?.replicas || '--'}
                         </Col>
-                        <Col xs={12} md={6}>
-                          <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
                             AeIndexer
                           </div>
                           {item?.originalAsset?.appId || '--'}
                         </Col>
-                        <Col xs={12} md={6}>
-                          <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
                             isLocked
                           </div>
                           {String(item?.originalAsset?.isLocked)}
                         </Col>
                       </Row>
-                      <Row gutter={24} className='mt-[24px]'>
-                        <Col xs={12} md={6}>
+                      <Row gutter={24}>
+                        <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
                             Status
                           </div>
@@ -237,7 +231,7 @@ export default function OrderDetail() {
                             )}
                           </div>
                         </Col>
-                        <Col xs={12} md={6}>
+                        <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
                             createTime
                           </div>
@@ -245,16 +239,16 @@ export default function OrderDetail() {
                             'YYYY/MM/DD HH:mm:ss'
                           )}
                         </Col>
-                        <Col xs={12} md={6}>
-                          <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
                             StartTime
                           </div>
                           {dayjs(item?.originalAsset?.startTime).format(
                             'YYYY/MM/DD HH:mm:ss'
                           )}
                         </Col>
-                        <Col xs={12} md={6}>
-                          <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
                             EndTime
                           </div>
                           {dayjs(item?.originalAsset?.endTime).format(
@@ -266,57 +260,57 @@ export default function OrderDetail() {
                   </div>
                 )}
                 <div>
-                  <div className='text-dark-normal mb-[12px] mt-[24px] text-xl'>
+                  <div className='text-dark-normal my-[12px] text-xl'>
                     Existing Assets
                   </div>
-                  <div className='bg-gray-F5 w-full  rounded-lg p-[24px]'>
+                  <div className='bg-gray-F5 w-full  rounded-lg px-[24px] py-[12px]'>
                     <Row gutter={24}>
-                      <Col xs={12} md={6}>
+                      <Col xs={12} md={6} className='my-[12px]'>
                         <div className='text-gray-80 mb-[10px] text-xs'>
                           Merchandise Name
                         </div>
                         {item?.merchandise?.name || '--'}
                       </Col>
-                      <Col xs={12} md={6}>
+                      <Col xs={12} md={6} className='my-[12px]'>
                         <div className='text-gray-80 mb-[10px] text-xs'>
                           Description
                         </div>
                         {item?.merchandise?.description || '--'}
                       </Col>
-                      <Col xs={12} md={6}>
-                        <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
+                      <Col xs={12} md={6} className='my-[12px]'>
+                        <div className='text-gray-80 mb-[10px] text-xs'>
                           Quantity
                         </div>
                         {item?.quantity || '--'}
                       </Col>
-                      <Col xs={12} md={6}>
-                        <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
+                      <Col xs={12} md={6} className='my-[12px]'>
+                        <div className='text-gray-80 mb-[10px] text-xs'>
                           Replicas
                         </div>
                         {item?.replicas || '--'}
                       </Col>
                     </Row>
-                    <Row gutter={24} className='mt-[24px]'>
-                      <Col xs={12} md={6}>
+                    <Row gutter={24}>
+                      <Col xs={12} md={6} className='my-[12px]'>
                         <div className='text-gray-80 mb-[10px] text-xs'>
                           Price
                         </div>
                         {item?.merchandise?.price || '--'} USDT
                       </Col>
-                      <Col xs={12} md={6}>
+                      <Col xs={12} md={6} className='my-[12px]'>
                         <div className='text-gray-80 mb-[10px] text-xs'>
                           Amount
                         </div>
                         {String(item?.amount)} USDT
                       </Col>
-                      <Col xs={12} md={6}>
-                        <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
+                      <Col xs={12} md={6} className='my-[12px]'>
+                        <div className='text-gray-80 mb-[10px] text-xs'>
                           DeductionAmount
                         </div>
                         {String(item?.deductionAmount)} USDT
                       </Col>
-                      <Col xs={12} md={6}>
-                        <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
+                      <Col xs={12} md={6} className='my-[12px]'>
+                        <div className='text-gray-80 mb-[10px] text-xs'>
                           ActualAmount
                         </div>
                         {String(item?.actualAmount)} USDT

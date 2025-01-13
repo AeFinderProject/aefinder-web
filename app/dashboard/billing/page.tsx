@@ -197,7 +197,7 @@ export default function Billing() {
           </Button>
           <Button
             type='primary'
-            className='ml-[10px] h-[40px] w-[148px] text-sm'
+            className='mx-[10px] h-[40px] w-[148px] text-sm'
             onClick={() => {
               router.push('/dashboard/billing/upgrade');
             }}
@@ -213,7 +213,7 @@ export default function Billing() {
           </Button>
           <Button
             type='primary'
-            className='my-[20px] ml-[0px] h-[40px] w-[148px] text-sm sm:my-[0px] sm:ml-[10px]'
+            className='my-[10px] h-[40px] w-[148px] text-sm sm:my-[0px]'
             onClick={() => {
               router.push('/dashboard/billing/manage');
             }}

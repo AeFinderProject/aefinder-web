@@ -52,8 +52,8 @@ const networkHostMap = {
     RPC_SERVER_AELF: 'https://aelf-test-node.aelf.io',
     RPC_SERVER_TDVV: 'https://tdvw-test-node.aelf.io',
     RPC_SERVER_TDVW: 'https://tdvw-test-node.aelf.io',
-    // todo: testnet address
-    AeFinderContractAddress: '',
+    AeFinderContractAddress:
+      '228wMdKVJSCyBrn5SGW9RTrUisCErHKg8x3yKqrFynsVH3WrGj',
     tokenContractAddress: 'ASh2Wt7nSEmYqnGxPPzp4pnVDU4uhj1XW9Se5VeZcX2UDdyjx',
     aelfscanAddress: 'https://testnet.aelfscan.io',
   },

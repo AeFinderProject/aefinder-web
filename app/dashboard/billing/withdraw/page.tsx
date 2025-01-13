@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import {
+  calcTotalPrice,
   divDecimalsStr,
   getOmittedStr,
   handleErrorMessage,
@@ -308,10 +309,13 @@ export default function Withdraw() {
               onChange={(value) => setCurrentAmount(value as number)}
             />
             <div className='mb-[18px]'>
-              <span className='text-gray-80 text-sm'>
-                Estimated Transaction Fee:{' '}
+              <span className='text-gray-80 mr-[10px] text-sm'>
+                Estimated Transaction Fee is approximately:
               </span>
-              <span className='text-dark-normal text-sm'>0.25885 ELF</span>
+              <span className='text-dark-normal text-sm'>
+                {calcTotalPrice(currentAmount || 0, 0.25885)}
+                <span className='ml-[10px]'>ELF</span>
+              </span>
             </div>
           </div>
           <Button

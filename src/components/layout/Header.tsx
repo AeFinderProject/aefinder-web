@@ -97,14 +97,14 @@ export default function Header() {
   }, [router]);
 
   return (
-    <header className='border-gray-E0 flex h-[72px] w-full items-center justify-between border-b px-[16px] py-[24px] sm:px-[40px]'>
+    <header className='border-gray-E0 m-h-[72px] flex w-full items-center justify-between border-b px-[16px] py-[24px] sm:px-[40px] lg:h-[72px]'>
       <Image
         src='/assets/svg/aefinder-logo.svg'
         alt='logo'
         width={150}
         height={24}
         onClick={handleLinkToHome}
-        className='cursor-pointer'
+        className='mb:mr-[0px] mr-[30px] cursor-pointer'
         style={{ width: '150px', height: '24px' }}
       />
       {pathname === '/login' && (
@@ -154,7 +154,7 @@ export default function Header() {
             Docs
           </Link>
           <div
-            className='border-gray-E0 relative inline-block min-h-10 min-w-[180px] cursor-pointer rounded border pl-[20px] pr-[30px] text-center leading-[40px] sm:min-w-[240px]'
+            className='border-gray-E0 mb:my-[0px] relative my-[10px] inline-block min-h-10 min-w-[180px] cursor-pointer rounded border pl-[20px] pr-[30px] text-center leading-[40px] sm:min-w-[240px]'
             onClick={() => {
               setTimeout(() => {
                 setIsShowBox(!isShowBox);
@@ -182,7 +182,6 @@ export default function Header() {
                 !isShowBox && 'hidden'
               )}
             >
-              {/* <UpOutlined className='border-b-none text-gray-F0 absolute hidden bg-white text-xs sm:right-[105px] sm:top-[-12px] sm:block' /> */}
               <PrimaryLink
                 href='/dashboard'
                 className='hover:bg-gray-F5 w-full border-none px-[16px] sm:hidden'

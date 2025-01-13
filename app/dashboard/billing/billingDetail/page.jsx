@@ -67,30 +67,26 @@ export default function BillingDetail() {
         <div className='text-dark-normal mb-[12px] mt-[24px] text-xl font-medium'>
           Billing overview
         </div>
-        <div className='bg-gray-F5 w-full rounded-lg p-[24px]'>
+        <div className='bg-gray-F5 w-full rounded-lg px-[24px] py-[12px]'>
           <Row gutter={24}>
-            <Col xs={12} md={6}>
+            <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>RefundAmount</div>
               {String(currentBillingDetail?.refundAmount)} USDT
             </Col>
-            <Col xs={12} md={6}>
+            <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>PaidAmount</div>
               {String(currentBillingDetail?.paidAmount)} USDT
             </Col>
-            <Col xs={12} md={6}>
-              <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
-                BeginTime
-              </div>
+            <Col xs={12} md={6} className='my-[12px]'>
+              <div className='text-gray-80 mb-[10px] text-xs'>BeginTime</div>
               <div>
                 {dayjs(currentBillingDetail?.beginTime).format(
                   'YYYY/MM/DD HH:mm:ss'
                 )}
               </div>
             </Col>
-            <Col xs={12} md={6}>
-              <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
-                EndTime
-              </div>
+            <Col xs={12} md={6} className='my-[12px]'>
+              <div className='text-gray-80 mb-[10px] text-xs'>EndTime</div>
               <div>
                 {dayjs(currentBillingDetail?.endTime).format(
                   'YYYY/MM/DD HH:mm:ss'
@@ -98,8 +94,8 @@ export default function BillingDetail() {
               </div>
             </Col>
           </Row>
-          <Row gutter={24} className='mt-[24px]'>
-            <Col xs={12} md={6}>
+          <Row gutter={24}>
+            <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>Type</div>
               <div>
                 {currentBillingDetail?.type === 0 && (
@@ -114,7 +110,7 @@ export default function BillingDetail() {
                 )}
               </div>
             </Col>
-            <Col xs={12} md={6}>
+            <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>Status</div>
               <div>
                 {currentBillingDetail?.status === 0 && (
@@ -131,20 +127,16 @@ export default function BillingDetail() {
                 )}
               </div>
             </Col>
-            <Col xs={12} md={6}>
-              <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
-                CreateTime
-              </div>
+            <Col xs={12} md={6} className='my-[12px]'>
+              <div className='text-gray-80 mb-[10px] text-xs'>CreateTime</div>
               <div>
                 {dayjs(currentBillingDetail?.createTime).format(
                   'YYYY/MM/DD HH:mm:ss'
                 )}
               </div>
             </Col>
-            <Col xs={12} md={6}>
-              <div className='text-gray-80 mb-[10px] mt-[24px] text-xs sm:mt-[0px]'>
-                PaymentTime
-              </div>
+            <Col xs={12} md={6} className='my-[12px]'>
+              <div className='text-gray-80 mb-[10px] text-xs'>PaymentTime</div>
               <div>
                 {dayjs(currentBillingDetail?.paymentTime).format(
                   'YYYY/MM/DD HH:mm:ss'
@@ -164,7 +156,7 @@ export default function BillingDetail() {
                   <div className='text-dark-normal mb-[12px] text-xl'>
                     Billing Item - {index + 1}
                   </div>
-                  <div className='bg-gray-F5 w-full  rounded-lg p-[24px]'>
+                  <div className='bg-gray-F5 w-full  rounded-lg px-[24px] py-[12px]'>
                     <Row gutter={24}>
                       <Col xs={12} md={6} className='my-[12px]'>
                         <div className='text-gray-80 mb-[10px] text-xs'>
