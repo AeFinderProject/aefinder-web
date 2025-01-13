@@ -107,7 +107,7 @@ export default function Header() {
         className='mb:mr-[0px] mr-[30px] cursor-pointer'
         style={{ width: '150px', height: '24px' }}
       />
-      {pathname === '/login' && (
+      {isLoginPathname && (
         <div>
           <LogInButton className='mx-auto h-[40px] w-[160px] md:w-[170px]' />
         </div>

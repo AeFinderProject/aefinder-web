@@ -386,7 +386,6 @@ export default function Upgrade() {
               *First 100,000 is free, subsequent queries are chargeable at
               $4/100,000 queries
             </div>
-
             <Divider className='my-[35px]' />
             <div className='mb-[28px] text-xl font-medium text-black'>
               <Image
