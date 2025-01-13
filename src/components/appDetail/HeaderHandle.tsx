@@ -20,7 +20,7 @@ import {
   setProcessorAssetListSlice,
 } from '@/store/slices/appSlice';
 
-import { getAssetsList } from '@/api/requestMarket';
+import { getAssetsList, getIsCustomApp } from '@/api/requestMarket';
 
 import { AppStatusType, CurrentTourStepEnum } from '@/types/appType';
 import { AssetsItem } from '@/types/marketType';
@@ -209,12 +209,23 @@ export default function HeaderHandle({
   }, [getAssetsListTemp]);
 
   const handleClickDeploy = useDebounceCallback(async () => {
+    if (!currentAppDetail?.appId) return;
+
     // need to check the aeindexer has buy cpu and memory or not
     // if yes, then deploy the aeindexer and show the updateCapacity drawer
     try {
       setDeployLoading(true);
       handleDeployCloseTour();
-      if (!currentAppDetail?.appId) return;
+
+      // for custom app, show the deploy drawer always
+      const getIsCustomAppRes = await getIsCustomApp({
+        appId: currentAppDetail?.appId,
+      });
+      console.log('getIsCustomAppRes', getIsCustomAppRes);
+      if (getIsCustomAppRes) {
+        setDeployDrawerVisible(true);
+        return;
+      }
 
       if (currentAppDetail?.isLocked) {
         messageApi.warning('You have unfinished order, Please wait.');

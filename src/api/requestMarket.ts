@@ -22,6 +22,7 @@ import {
   GetBillingsListResponse,
   GetFullPodUsageRequest,
   GetFullPodUsageResponse,
+  GetIsCustomAppRequest,
   GetMerchandisesListRequest,
   GetMerchandisesListResponse,
   GetOrdersDetailRequest,
@@ -279,5 +280,16 @@ export const getBillingsDetail = async (
     return res;
   } catch (error) {
     throw new Error(handleErrorMessage(error, 'getBillingsDetail error'));
+  }
+};
+
+export const getIsCustomApp = async (
+  params: GetIsCustomAppRequest
+): Promise<boolean> => {
+  try {
+    const res = await request.market.getIsCustomApp({ params });
+    return res;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'getIsCustomApp error'));
   }
 };

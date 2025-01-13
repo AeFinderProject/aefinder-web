@@ -382,3 +382,7 @@ export type GetBillingsListResponse = {
 export type GetBillingsDetailRequest = {
   id: string;
 };
+
+export type GetIsCustomAppRequest = {
+  appId: string;
+};

@@ -211,6 +211,7 @@ export const marketList = {
   },
   getBillingsList: `${AeFinderHost}/api/billings`,
   getBillingsDetail: `${AeFinderHost}/api/billings`,
+  getIsCustomApp: `${AeFinderHost}/api/app-deploy/iscustomapp`,
 };
 
 /**
