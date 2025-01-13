@@ -37,28 +37,20 @@ export default function Header() {
   const isLoginPathname = pathname?.startsWith('/login');
   const [messageApi, contextHolder] = message.useMessage();
 
-  const { walletInfo } = useConnectWallet();
+  const { walletInfo, isConnected, disConnectWallet } = useConnectWallet();
 
   const getUsersInfoTemp = useThrottleCallback(async () => {
     await queryAuthToken();
     const res = await getUsersInfo();
     console.log('userInfo', res);
 
-    if (!walletInfo?.address) {
-      messageApi.warning('Please bind wallet first');
-      router.push('/login/bindwallet');
-      return;
-    }
-
-    if (res?.walletAddress === walletInfo?.address) {
-      setAddress(res?.walletAddress);
-    } else if (res?.walletAddress !== walletInfo?.address) {
-      messageApi.warning('Please use the bind wallet address to login');
-      router.push('/login');
-    }
     dispatch(setUsername(res?.userName));
     dispatch(setUserInfo(res));
-  }, [dispatch, router, walletInfo?.address, messageApi]);
+
+    if (res?.walletAddress) {
+      setAddress(res?.walletAddress);
+    }
+  }, [dispatch, router, messageApi]);
 
   const getSummaryTemp = useThrottleCallback(async () => {
     const res = await getSummary();
@@ -88,9 +80,12 @@ export default function Header() {
   }, []);
 
   const handleLogout = useCallback(async () => {
+    if (isConnected) {
+      await disConnectWallet();
+    }
     setAddress('');
     router.push('/login');
-  }, [router]);
+  }, [router, isConnected, disConnectWallet]);
 
   const handleResetPassword = useCallback(() => {
     router.push('/reset-password');

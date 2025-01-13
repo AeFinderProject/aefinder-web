@@ -18,6 +18,8 @@ import {
   useThrottleCallback,
 } from '@/lib/utils';
 
+import ConnectWalletFirst from '@/components/wallet/ConnectWalletFirst';
+
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setElfBalance, setUsdtBalance } from '@/store/slices/commonSlice';
 
@@ -28,7 +30,6 @@ import {
 } from '@/constant';
 
 import { ApproveResponseType, GetBalanceResponseType } from '@/types/appType';
-
 export default function Deposit() {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -302,15 +303,18 @@ export default function Deposit() {
           </div>
           <div className='flex items-center justify-between'>
             <div className='w-[48%]'>
-              <Button
-                type='primary'
-                className='w-full'
-                size='large'
-                onClick={handleApprove}
-                loading={loading}
-              >
-                Deposit
-              </Button>
+              {isConnected && (
+                <Button
+                  type='primary'
+                  className='w-full'
+                  size='large'
+                  onClick={handleApprove}
+                  loading={loading}
+                >
+                  Deposit
+                </Button>
+              )}
+              {!isConnected && <ConnectWalletFirst />}
             </div>
             <div className='w-[48%]'></div>
           </div>

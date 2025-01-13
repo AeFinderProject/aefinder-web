@@ -18,6 +18,7 @@ import {
 } from '@/lib/utils';
 
 import QuerySlider from '@/components/billing/QuerySlider';
+import ConnectWalletFirst from '@/components/wallet/ConnectWalletFirst';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
@@ -480,7 +481,7 @@ export default function Upgrade() {
                   Insufficient billing balance
                 </Button>
               )}
-              {currentActualAmount <= orgBalance?.balance && (
+              {currentActualAmount <= orgBalance?.balance && isConnected && (
                 <Button
                   type='primary'
                   disabled={isLocked}
@@ -489,6 +490,9 @@ export default function Upgrade() {
                 >
                   Confirm monthly purchase
                 </Button>
+              )}
+              {currentActualAmount <= orgBalance?.balance && !isConnected && (
+                <ConnectWalletFirst />
               )}
             </div>
             <div className='text-gray-80 text-sm'>

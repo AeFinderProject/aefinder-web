@@ -25,7 +25,7 @@ export default function LogIn() {
   const currentTourStep = localStorage.getItem('currentTourStep');
   const [loading, setLoading] = useState(false);
 
-  const { walletInfo, isConnected, disConnectWallet } = useConnectWallet();
+  const { walletInfo, isConnected } = useConnectWallet();
 
   const walletInfoRef = useRef<TWalletInfo>();
   walletInfoRef.current = walletInfo;
@@ -45,22 +45,14 @@ export default function LogIn() {
       resetLocalJWT();
       initialTourValues();
     }
-    if (walletInfoRef.current) {
-      disConnectWallet();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname, initialTourValues, walletInfoRef.current, disConnectWallet]);
+  }, [pathname, initialTourValues]);
 
   const loginSuccessActive = useCallback(() => {
     messageApi.open({
       type: 'success',
       content: 'login success',
     });
-    if (isConnectedRef.current && walletInfoRef.current?.address) {
-      router.push('/dashboard');
-    } else {
-      router.push('/login/bindwallet');
-    }
+    router.push('/dashboard');
   }, [router, messageApi]);
 
   const handleLogin = useDebounceCallback(async () => {

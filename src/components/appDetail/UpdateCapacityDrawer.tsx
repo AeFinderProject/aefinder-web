@@ -14,6 +14,8 @@ import {
   useDebounceCallback,
 } from '@/lib/utils';
 
+import ConnectWalletFirst from '@/components/wallet/ConnectWalletFirst';
+
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setOrgBalance } from '@/store/slices/commonSlice';
 
@@ -44,7 +46,7 @@ export default function UpdateCapacityDrawer({
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const { callSendMethod } = useConnectWallet();
+  const { callSendMethod, isConnected } = useConnectWallet();
 
   const [isShowCapacityCollapse, setIsShowCapacityCollapse] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -605,19 +607,22 @@ export default function UpdateCapacityDrawer({
           </div>
         )}
       </div>
-      <Button
-        type='primary'
-        className='mt-[24px] w-full'
-        size='large'
-        onClick={handleSave}
-        loading={loading}
-        disabled={
-          originalCapacityType === currentCapacityType &&
-          originalStorageNum === currentStorageNum
-        }
-      >
-        Save
-      </Button>
+      {isConnected && (
+        <Button
+          type='primary'
+          className='mt-[24px] w-full'
+          size='large'
+          onClick={handleSave}
+          loading={loading}
+          disabled={
+            originalCapacityType === currentCapacityType &&
+            originalStorageNum === currentStorageNum
+          }
+        >
+          Save
+        </Button>
+      )}
+      {!isConnected && <ConnectWalletFirst />}
       <Divider className='my-[24px]' />
       <div className='text-gray-80 mt-[24px] text-sm'>
         Processor Amount = (The remaining hours of the current month) * price

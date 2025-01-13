@@ -18,6 +18,8 @@ import {
   useThrottleCallback,
 } from '@/lib/utils';
 
+import ConnectWalletFirst from '@/components/wallet/ConnectWalletFirst';
+
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   setElfBalance,
@@ -318,15 +320,18 @@ export default function Withdraw() {
               </span>
             </div>
           </div>
-          <Button
-            type='primary'
-            className='w-full'
-            size='large'
-            onClick={handleWithdraw}
-            loading={loading}
-          >
-            Withdraw
-          </Button>
+          {isConnected && (
+            <Button
+              type='primary'
+              className='w-full'
+              size='large'
+              onClick={handleWithdraw}
+              loading={loading}
+            >
+              Withdraw
+            </Button>
+          )}
+          {!isConnected && <ConnectWalletFirst />}
         </Col>
       </Row>
     </div>
