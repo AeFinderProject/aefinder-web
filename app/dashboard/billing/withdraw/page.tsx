@@ -320,7 +320,7 @@ export default function Withdraw() {
               </span>
             </div>
           </div>
-          {isConnected && (
+          {isConnectedRef.current && walletInfoRef.current && (
             <Button
               type='primary'
               className='w-full'
@@ -331,7 +331,9 @@ export default function Withdraw() {
               Withdraw
             </Button>
           )}
-          {!isConnected && <ConnectWalletFirst />}
+          {(!isConnectedRef.current || !walletInfoRef.current) && (
+            <ConnectWalletFirst />
+          )}
         </Col>
       </Row>
     </div>

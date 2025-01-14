@@ -481,19 +481,22 @@ export default function Upgrade() {
                   Insufficient billing balance
                 </Button>
               )}
-              {currentActualAmount <= orgBalance?.balance && isConnected && (
-                <Button
-                  type='primary'
-                  disabled={isLocked}
-                  onClick={handleCreateOrder}
-                  loading={loading}
-                >
-                  Confirm monthly purchase
-                </Button>
-              )}
-              {currentActualAmount <= orgBalance?.balance && !isConnected && (
-                <ConnectWalletFirst />
-              )}
+              {currentActualAmount <= orgBalance?.balance &&
+                isConnectedRef.current &&
+                walletInfoRef.current && (
+                  <Button
+                    type='primary'
+                    disabled={isLocked}
+                    onClick={handleCreateOrder}
+                    loading={loading}
+                  >
+                    Confirm monthly purchase
+                  </Button>
+                )}
+              {currentActualAmount <= orgBalance?.balance &&
+                (!isConnectedRef.current || !walletInfoRef.current) && (
+                  <ConnectWalletFirst />
+                )}
             </div>
             <div className='text-gray-80 text-sm'>
               * This amount will be locked in your Billing Balance and cannot be

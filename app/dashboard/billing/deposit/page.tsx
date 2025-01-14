@@ -303,7 +303,7 @@ export default function Deposit() {
           </div>
           <div className='flex items-center justify-between'>
             <div className='w-[48%]'>
-              {isConnected && (
+              {isConnectedRef.current && walletInfoRef.current && (
                 <Button
                   type='primary'
                   className='w-full'
@@ -314,7 +314,9 @@ export default function Deposit() {
                   Deposit
                 </Button>
               )}
-              {!isConnected && <ConnectWalletFirst />}
+              {(!isConnectedRef.current || !walletInfoRef.current) && (
+                <ConnectWalletFirst />
+              )}
             </div>
             <div className='w-[48%]'></div>
           </div>

@@ -1,11 +1,12 @@
 'use client';
 
+import { TWalletInfo } from '@aelf-web-login/wallet-adapter-base';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import type { CollapseProps } from 'antd';
 import { Button, Col, Collapse, Divider, Drawer, InputNumber, Row } from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   handleErrorMessage,
@@ -46,7 +47,7 @@ export default function UpdateCapacityDrawer({
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const { callSendMethod, isConnected } = useConnectWallet();
+  const { callSendMethod, isConnected, walletInfo } = useConnectWallet();
 
   const [isShowCapacityCollapse, setIsShowCapacityCollapse] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -91,6 +92,11 @@ export default function UpdateCapacityDrawer({
     useState<number>(0);
   const [currentTotalActualAmount, setCurrentTotalActualAmount] =
     useState<number>(0);
+
+  const walletInfoRef = useRef<TWalletInfo>();
+  walletInfoRef.current = walletInfo;
+  const isConnectedRef = useRef<boolean>();
+  isConnectedRef.current = isConnected;
 
   const getMerchandisesListTemp = useCallback(async () => {
     const { items } = await getMerchandisesList({
@@ -607,7 +613,7 @@ export default function UpdateCapacityDrawer({
           </div>
         )}
       </div>
-      {isConnected && (
+      {isConnectedRef.current && walletInfoRef.current && (
         <Button
           type='primary'
           className='mt-[24px] w-full'
@@ -622,7 +628,9 @@ export default function UpdateCapacityDrawer({
           Save
         </Button>
       )}
-      {!isConnected && <ConnectWalletFirst />}
+      {(!isConnectedRef.current || !walletInfoRef.current) && (
+        <ConnectWalletFirst />
+      )}
       <Divider className='my-[24px]' />
       <div className='text-gray-80 mt-[24px] text-sm'>
         Processor Amount = (The remaining hours of the current month) * price
