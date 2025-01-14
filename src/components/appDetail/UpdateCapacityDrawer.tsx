@@ -27,7 +27,7 @@ import {
   watchOrdersCost,
 } from '@/api/requestMarket';
 import { getAssetsList, getMerchandisesList } from '@/api/requestMarket';
-import { AeFinderContractAddress } from '@/constant';
+import { AeFinderContractAddress, CHAIN_ID } from '@/constant';
 
 import { ApproveResponseType } from '@/types/appType';
 import { MerchandisesItem } from '@/types/marketType';
@@ -366,7 +366,7 @@ export default function UpdateCapacityDrawer({
           amount: timesDecimals(billingAmount, 6),
           billingId: billingId,
         },
-        chainId: 'tDVV',
+        chainId: CHAIN_ID,
       });
       if (lockResult?.data?.Status === 'MINED') {
         messageApi.open({

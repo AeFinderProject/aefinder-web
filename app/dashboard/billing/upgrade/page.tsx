@@ -271,7 +271,7 @@ export default function Upgrade() {
           amount: timesDecimals(billingAmount, 6),
           billingId: billingId,
         },
-        chainId: 'tDVV',
+        chainId: CHAIN_ID,
       });
       if (lockResult?.data?.Status === 'MINED') {
         messageApi.open({

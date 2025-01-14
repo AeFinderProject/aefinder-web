@@ -142,7 +142,7 @@ export default function Withdraw() {
           amount: timesDecimals(currentAmount, 6),
           address: withdrawAddress,
         },
-        chainId: 'tDVV',
+        chainId: CHAIN_ID,
       });
       if (withdrawResult?.data?.Status === 'MINED') {
         messageApi.open({

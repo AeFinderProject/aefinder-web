@@ -132,7 +132,7 @@ export default function Deposit() {
             symbol: 'USDT',
             amount: timesDecimals(currentAmount, 6),
           },
-          chainId: 'tDVV',
+          chainId: CHAIN_ID,
         });
         if (depositResult?.data?.Status === 'MINED') {
           messageApi.open({
