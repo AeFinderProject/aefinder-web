@@ -629,7 +629,7 @@ export default function UpdateCapacityDrawer({
         </Button>
       )}
       {(!isConnectedRef.current || !walletInfoRef.current) && (
-        <ConnectWalletFirst />
+        <ConnectWalletFirst classNames='w-full mt-[24px]' />
       )}
       <Divider className='my-[24px]' />
       <div className='text-gray-80 mt-[24px] text-sm'>

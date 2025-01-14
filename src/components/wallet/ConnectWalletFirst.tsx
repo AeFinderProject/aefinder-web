@@ -6,10 +6,17 @@ import {
 } from '@aelf-web-login/wallet-adapter-base';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { Button, message } from 'antd';
+import clsx from 'clsx';
 import Image from 'next/image';
 import { useCallback, useRef, useState } from 'react';
 
-export default function ConnectWalletFirst() {
+type ConnectWalletFirstProps = {
+  readonly classNames?: string;
+};
+
+export default function ConnectWalletFirst({
+  classNames,
+}: ConnectWalletFirstProps) {
   const { connectWallet, walletInfo, walletType, isConnected } =
     useConnectWallet();
   const [messageApi, contextHolder] = message.useMessage();
@@ -52,7 +59,7 @@ export default function ConnectWalletFirst() {
 
   return (
     <Button
-      className='h-[40px] w-[280px]'
+      className={clsx('m-w-[280px] h-[40px]', classNames)}
       type='primary'
       icon={
         <Image
