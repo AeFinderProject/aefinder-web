@@ -93,12 +93,6 @@ export default function TransactionHistory() {
         </div>
       ),
     },
-    {
-      title: 'Payment Method',
-      dataIndex: 'paymentMethod',
-      key: 'paymentMethod',
-      render: (text: number) => <div>{text}</div>,
-    },
   ];
 
   return (

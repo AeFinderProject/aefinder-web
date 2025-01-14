@@ -419,7 +419,7 @@ export default function Upgrade() {
                 )}
               {currentActualAmount <= orgBalance?.balance &&
                 (!isConnectedRef.current || !walletInfoRef.current) && (
-                  <ConnectWalletFirst />
+                  <ConnectWalletFirst messageApi={messageApi} />
                 )}
             </div>
             <div className='text-gray-80 text-sm'>

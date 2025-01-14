@@ -340,7 +340,7 @@ export default function Deposit() {
                 </Button>
               )}
               {(!isConnectedRef.current || !walletInfoRef.current) && (
-                <ConnectWalletFirst />
+                <ConnectWalletFirst messageApi={messageApi} />
               )}
             </div>
             <div className='w-[48%]'></div>

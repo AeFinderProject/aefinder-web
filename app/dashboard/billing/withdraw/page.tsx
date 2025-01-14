@@ -253,7 +253,7 @@ export default function Withdraw() {
             </Button>
           )}
           {(!isConnectedRef.current || !walletInfoRef.current) && (
-            <ConnectWalletFirst />
+            <ConnectWalletFirst messageApi={messageApi} />
           )}
         </Col>
       </Row>

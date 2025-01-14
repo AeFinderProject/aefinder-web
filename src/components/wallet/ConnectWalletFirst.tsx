@@ -5,22 +5,33 @@ import {
   WalletTypeEnum,
 } from '@aelf-web-login/wallet-adapter-base';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
-import { Button, message } from 'antd';
+import { Button } from 'antd';
+import { MessageInstance } from 'antd/es/message/interface';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { useCallback, useRef, useState } from 'react';
 
+import { useAppSelector } from '@/store/hooks';
+
 type ConnectWalletFirstProps = {
   readonly classNames?: string;
+  readonly messageApi?: MessageInstance;
 };
 
 export default function ConnectWalletFirst({
   classNames,
+  messageApi,
 }: ConnectWalletFirstProps) {
-  const { connectWallet, walletInfo, walletType, isConnected } =
-    useConnectWallet();
-  const [messageApi, contextHolder] = message.useMessage();
+  const {
+    connectWallet,
+    walletInfo,
+    walletType,
+    isConnected,
+    disConnectWallet,
+  } = useConnectWallet();
+
   const [isLoading, setIsLoading] = useState(false);
+  const userInfo = useAppSelector((state) => state.common.userInfo);
 
   const walletInfoRef = useRef<TWalletInfo>();
   walletInfoRef.current = walletInfo;
@@ -39,9 +50,22 @@ export default function ConnectWalletFirst({
       try {
         setIsLoading(true);
         res = await connectWallet();
+        if (userInfo?.walletAddress !== res?.address) {
+          console.log(
+            'userInfo?.walletAddress !== res?.address',
+            userInfo?.walletAddress,
+            res?.address
+          );
+          messageApi?.open({
+            type: 'warning',
+            content: `Please use the same wallet address as the one you bind to sign in.`,
+            duration: 8,
+          });
+          await disConnectWallet();
+        }
         // eslint-disable-next-line
       } catch (error: any) {
-        messageApi.open({
+        messageApi?.open({
           type: 'error',
           content: `${error?.message}` || 'connectWallet error',
         });
@@ -50,12 +74,12 @@ export default function ConnectWalletFirst({
       }
     }
     const currentAddress = res?.address || walletInfoRef.current?.address;
-    if (currentAddress) {
-      messageApi.success('Connect wallet success');
+    if (currentAddress && currentAddress === userInfo?.walletAddress) {
+      messageApi?.success('Connect wallet success');
     } else {
-      messageApi.error('Connect wallet failed');
+      messageApi?.error('Connect wallet failed');
     }
-  }, [connectWallet, messageApi]);
+  }, [connectWallet, messageApi, disConnectWallet, userInfo?.walletAddress]);
 
   return (
     <Button
@@ -74,7 +98,6 @@ export default function ConnectWalletFirst({
       loading={isLoading}
       onClick={() => connectWalletFirst()}
     >
-      {contextHolder}
       Connect wallet
     </Button>
   );
