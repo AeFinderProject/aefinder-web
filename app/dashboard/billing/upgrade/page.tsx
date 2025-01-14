@@ -39,7 +39,8 @@ export default function Upgrade() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
-  const { callSendMethod, walletInfo, isConnected } = useConnectWallet();
+  const { callSendMethod, walletInfo, isConnected, disConnectWallet } =
+    useConnectWallet();
 
   const walletInfoRef = useRef<TWalletInfo>();
   walletInfoRef.current = walletInfo;
@@ -207,6 +208,7 @@ export default function Upgrade() {
 
     if (!checkAddressEqual()) {
       messageApi.warning('Please using the wallet address you have bound.');
+      await disConnectWallet();
       return;
     }
 
@@ -264,7 +266,7 @@ export default function Upgrade() {
     } finally {
       setLoading(false);
     }
-  }, [checkAddressEqual]);
+  }, [checkAddressEqual, disConnectWallet]);
 
   return (
     <div className='px-[16px] pb-[36px] sm:px-[40px]'>

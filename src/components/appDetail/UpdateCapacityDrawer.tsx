@@ -47,7 +47,8 @@ export default function UpdateCapacityDrawer({
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const { callSendMethod, isConnected, walletInfo } = useConnectWallet();
+  const { callSendMethod, isConnected, walletInfo, disConnectWallet } =
+    useConnectWallet();
 
   const [isShowCapacityCollapse, setIsShowCapacityCollapse] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -275,6 +276,7 @@ export default function UpdateCapacityDrawer({
   const handlePreCreateOrder = useCallback(async () => {
     if (!checkAddressEqual()) {
       messageApi.warning('Please using the wallet address you have bound.');
+      await disConnectWallet();
       return {
         billingId: '',
         billingAmount: 0,
@@ -359,6 +361,7 @@ export default function UpdateCapacityDrawer({
     messageApi,
     currentAppDetail?.appId,
     checkAddressEqual,
+    disConnectWallet,
   ]);
 
   const handleSave = useDebounceCallback(async () => {
