@@ -51,6 +51,7 @@ export default function UpdateCapacityDrawer({
 
   const [isShowCapacityCollapse, setIsShowCapacityCollapse] = useState(false);
   const [loading, setLoading] = useState(false);
+  const userInfo = useAppSelector((state) => state.common.userInfo);
   const orgBalance = useAppSelector((state) => state.common.orgBalance);
   const currentAppDetail = useAppSelector(
     (state) => state.app.currentAppDetail
@@ -263,7 +264,23 @@ export default function UpdateCapacityDrawer({
     setIsShowUpdateCapacityModal(false);
   }, [setIsShowUpdateCapacityModal]);
 
+  // check current wallet address === bind address
+  const checkAddressEqual = useCallback(() => {
+    if (!isConnectedRef.current || !walletInfoRef.current) {
+      return false;
+    }
+    return userInfo?.walletAddress === walletInfoRef.current?.address;
+  }, [userInfo?.walletAddress]);
+
   const handlePreCreateOrder = useCallback(async () => {
+    if (!checkAddressEqual()) {
+      messageApi.warning('Please using the wallet address you have bound.');
+      return {
+        billingId: '',
+        billingAmount: 0,
+      };
+    }
+
     const currentProcessMerchandise = processMerchandisesList.find(
       (item) => item.specification === currentCapacityType
     );
@@ -341,12 +358,13 @@ export default function UpdateCapacityDrawer({
     originalStorageNum,
     messageApi,
     currentAppDetail?.appId,
+    checkAddressEqual,
   ]);
 
   const handleSave = useDebounceCallback(async () => {
     setLoading(true);
     const { billingId, billingAmount } = await handlePreCreateOrder();
-    if (billingAmount === 0) {
+    if (billingId && billingAmount === 0) {
       messageApi.open({
         type: 'success',
         content:

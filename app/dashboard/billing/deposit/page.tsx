@@ -5,10 +5,9 @@ import { LeftOutlined } from '@ant-design/icons';
 import { Button, Col, Divider, InputNumber, message, Row } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
-  calcTotalPrice,
   divDecimals,
   divDecimalsStr,
   getOmittedStr,
@@ -98,6 +97,14 @@ export default function Deposit() {
     getBalance();
   }, [getBalance]);
 
+  // check current wallet address === bind address
+  const checkAddressEqual = useCallback(() => {
+    if (!isConnectedRef.current || !walletInfoRef.current) {
+      return false;
+    }
+    return userInfo?.walletAddress === walletInfoRef.current?.address;
+  }, [userInfo?.walletAddress]);
+
   const handleApprove = useDebounceCallback(async () => {
     if (
       !currentAmount ||
@@ -107,6 +114,12 @@ export default function Deposit() {
       messageApi.warning('Insufficient USDT balance');
       return;
     }
+
+    if (!checkAddressEqual()) {
+      messageApi.warning('Please using the wallet address you have bound.');
+      return;
+    }
+
     try {
       setLoading(true);
       const approveResult: ApproveResponseType = await callSendMethod({
@@ -144,7 +157,7 @@ export default function Deposit() {
           await getBalance();
           setTimeout(() => {
             router.back();
-          }, 4000);
+          }, 2000);
         } else {
           messageApi.open({
             type: 'error',
@@ -163,7 +176,7 @@ export default function Deposit() {
     } finally {
       setLoading(false);
     }
-  }, [callSendMethod, currentAmount, setCurrentAmount]);
+  }, [callSendMethod, currentAmount, setCurrentAmount, checkAddressEqual]);
 
   return (
     <div className='px-[16px] pb-[40px] sm:px-[40px]'>
@@ -209,13 +222,17 @@ export default function Deposit() {
               <div>
                 <div className='text-dark-normal font-medium'>
                   <span className='mr-[8px]'>
-                    {divDecimalsStr(usdtBalance?.balance || 0, 6)}
+                    {checkAddressEqual()
+                      ? divDecimalsStr(usdtBalance?.balance || 0, 6)
+                      : '--'}
                   </span>
                   <span>USDT</span>
                 </div>
                 <div className='text-dark-normal mt-[10px] font-medium'>
                   <span className='mr-[8px]'>
-                    {divDecimalsStr(elfBalance?.balance || 0, 8)}
+                    {checkAddressEqual()
+                      ? divDecimalsStr(elfBalance?.balance || 0, 8)
+                      : '--'}
                   </span>
                   <span>ELF</span>
                 </div>
@@ -286,7 +303,7 @@ export default function Deposit() {
                 Estimated Transaction Fee is approximately:
               </span>
               <span className='text-dark-normal text-sm'>
-                {calcTotalPrice(currentAmount || 0, 0.2161)}
+                0.2161
                 <span className='ml-[10px]'>ELF</span>
               </span>
             </div>

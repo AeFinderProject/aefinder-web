@@ -44,6 +44,7 @@ export const AuthList = {
     target: `${AeFinderHost}/api/users/register/confirm`,
     baseConfig: { method: 'POST' },
   },
+  getEnableRegister: `${AeFinderHost}/api/users/register/enable`,
 };
 
 export const appApiList = {

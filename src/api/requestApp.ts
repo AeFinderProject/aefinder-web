@@ -151,3 +151,12 @@ export const emailVerification = async (
     throw new Error(handleErrorMessage(error, 'emailVerification error'));
   }
 };
+
+export const getEnableRegister = async (): Promise<boolean> => {
+  try {
+    const res = await request.auth.getEnableRegister();
+    return res;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'getEnableRegister error'));
+  }
+};

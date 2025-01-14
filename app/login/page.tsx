@@ -15,6 +15,7 @@ import { queryAuthApi, resetLocalJWT } from '@/api/apiUtils';
 import { CurrentTourStepEnum } from '@/types/appType';
 
 import LogInButton from '@/components/wallet/LoginButton';
+import { getEnableRegister } from '@/api/requestApp';
 
 export default function LogIn() {
   const [form] = Form.useForm();
@@ -24,7 +25,7 @@ export default function LogIn() {
   const [messageApi, contextHolder] = message.useMessage();
   const currentTourStep = localStorage.getItem('currentTourStep');
   const [loading, setLoading] = useState(false);
-
+  const [enableRegister, setEnableRegister] = useState(false);
   const { walletInfo, isConnected } = useConnectWallet();
 
   const walletInfoRef = useRef<TWalletInfo>();
@@ -46,6 +47,15 @@ export default function LogIn() {
       initialTourValues();
     }
   }, [pathname, initialTourValues]);
+
+  const getEnableRegisterTemp = useCallback(async () => {
+    const res = await getEnableRegister();
+    setEnableRegister(res);
+  }, []);
+
+  useEffect(() => {
+    getEnableRegisterTemp();
+  }, [getEnableRegisterTemp]);
 
   const loginSuccessActive = useCallback(() => {
     messageApi.open({
@@ -125,16 +135,18 @@ export default function LogIn() {
             <FormItem>
               <LogInButton className='mx-auto h-[48px] w-full' />
             </FormItem>
-            <div className='mb-[16px]'>
-              Don’t have an account yet?
-              <span
-                className='text-blue-link cursor-pointer font-medium'
-                onClick={() => router.push('/login/signup')}
-              >
-                {' '}
-                Sign up
-              </span>
-            </div>
+            {enableRegister && (
+              <div className='mb-[16px]'>
+                Don’t have an account yet?
+                <span
+                  className='text-blue-link cursor-pointer font-medium'
+                  onClick={() => router.push('/login/signup')}
+                >
+                  {' '}
+                  Sign up
+                </span>
+              </div>
+            )}
           </Form>
         </div>
       </div>

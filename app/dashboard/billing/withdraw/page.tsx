@@ -6,12 +6,9 @@ import { LeftOutlined } from '@ant-design/icons';
 import { Button, Col, Divider, Input, InputNumber, message, Row } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
-  calcTotalPrice,
-  divDecimalsStr,
-  getOmittedStr,
   handleErrorMessage,
   timesDecimals,
   useDebounceCallback,
@@ -21,37 +18,21 @@ import {
 import ConnectWalletFirst from '@/components/wallet/ConnectWalletFirst';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import {
-  setElfBalance,
-  setOrgBalance,
-  setUsdtBalance,
-} from '@/store/slices/commonSlice';
+import { setOrgBalance } from '@/store/slices/commonSlice';
 
 import { getOrgBalance } from '@/api/requestMarket';
-import {
-  AeFinderContractAddress,
-  CHAIN_ID,
-  tokenContractAddress,
-} from '@/constant';
+import { AeFinderContractAddress, CHAIN_ID } from '@/constant';
 
-import { ApproveResponseType, GetBalanceResponseType } from '@/types/appType';
+import { ApproveResponseType } from '@/types/appType';
 
 export default function Withdraw() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
   const isMobile = window?.innerWidth < 640;
-  const {
-    callSendMethod,
-    callViewMethod,
-    getAccountByChainId,
-    walletInfo,
-    isConnected,
-  } = useConnectWallet();
+  const { callSendMethod, walletInfo, isConnected } = useConnectWallet();
   const [loading, setLoading] = useState(false);
   const userInfo = useAppSelector((state) => state.common.userInfo);
-  const usdtBalance = useAppSelector((state) => state.common.usdtBalance);
-  const elfBalance = useAppSelector((state) => state.common.elfBalance);
   const orgBalance = useAppSelector((state) => state.common.orgBalance);
   const [withdrawAddress, setWithdrawAddress] = useState(
     userInfo?.walletAddress
@@ -62,50 +43,6 @@ export default function Withdraw() {
   walletInfoRef.current = walletInfo;
   const isConnectedRef = useRef<boolean>();
   isConnectedRef.current = isConnected;
-
-  const getBalance = useThrottleCallback(async () => {
-    if (!isConnectedRef.current || !walletInfoRef.current) {
-      return;
-    }
-    try {
-      const getELFBalance: GetBalanceResponseType = await callViewMethod({
-        chainId: CHAIN_ID,
-        contractAddress: tokenContractAddress,
-        methodName: 'GetBalance',
-        args: {
-          symbol: 'ELF',
-          owner: await getAccountByChainId(CHAIN_ID),
-        },
-      });
-      console.log('getELFBalance', getELFBalance);
-      dispatch(setElfBalance(getELFBalance?.data));
-      const getUSDTBalance: GetBalanceResponseType = await callViewMethod({
-        chainId: CHAIN_ID,
-        contractAddress: tokenContractAddress,
-        methodName: 'GetBalance',
-        args: {
-          symbol: 'USDT',
-          owner: await getAccountByChainId(CHAIN_ID),
-        },
-      });
-      console.log('getUSDTBalance', getUSDTBalance);
-      dispatch(setUsdtBalance(getUSDTBalance?.data));
-    } catch (error) {
-      messageApi.error(handleErrorMessage(error));
-    }
-  }, [
-    callViewMethod,
-    dispatch,
-    setElfBalance,
-    setUsdtBalance,
-    messageApi,
-    isConnectedRef.current,
-    walletInfoRef.current,
-  ]);
-
-  useEffect(() => {
-    getBalance();
-  }, [getBalance]);
 
   const getOrgBalanceTemp = useThrottleCallback(async () => {
     const getOrgBalanceRes = await getOrgBalance();
@@ -118,6 +55,14 @@ export default function Withdraw() {
   useEffect(() => {
     getOrgBalanceTemp();
   }, [getOrgBalanceTemp]);
+
+  // check current wallet address === bind address
+  const checkAddressEqual = useCallback(() => {
+    if (!isConnectedRef.current || !walletInfoRef.current) {
+      return false;
+    }
+    return userInfo?.walletAddress === walletInfoRef.current?.address;
+  }, [userInfo?.walletAddress]);
 
   const handleWithdraw = useDebounceCallback(async () => {
     if (!withdrawAddress) {
@@ -132,6 +77,12 @@ export default function Withdraw() {
       messageApi.warning('withdraw USDT balance is not enough');
       return;
     }
+
+    if (!checkAddressEqual()) {
+      messageApi.warning('Please using the wallet address you have bound.');
+      return;
+    }
+
     try {
       setLoading(true);
       const withdrawResult: ApproveResponseType = await callSendMethod({
@@ -151,10 +102,9 @@ export default function Withdraw() {
           duration: 3,
         });
         setCurrentAmount(null);
-        await getBalance();
         setTimeout(() => {
           router.back();
-        }, 4000);
+        }, 2000);
       } else {
         messageApi.open({
           type: 'error',
@@ -170,7 +120,7 @@ export default function Withdraw() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [checkAddressEqual]);
 
   return (
     <div className='px-[16px] pb-[40px] sm:px-[40px]'>
@@ -197,37 +147,6 @@ export default function Withdraw() {
             Wallet
           </div>
           <div className='mt-[20px]'>
-            <span className='text-gray-80 mr-[20px]'>From </span>
-            <Button
-              icon={
-                <Image
-                  src='/assets/svg/user.svg'
-                  alt='user'
-                  width={18}
-                  height={18}
-                  className='relative top-[4px]'
-                />
-              }
-            >
-              <span>{getOmittedStr(userInfo.walletAddress, 8, 9)}</span>
-            </Button>
-            <div className='mt-[20px] flex items-start justify-start'>
-              <span className='text-gray-80 mr-[20px]'>Wallet Balance:</span>
-              <div>
-                <div className='text-dark-normal font-medium'>
-                  <span className='mr-[8px]'>
-                    {divDecimalsStr(usdtBalance?.balance || 0, 6)}
-                  </span>
-                  <span>USDT</span>
-                </div>
-                <div className='text-dark-normal mt-[10px] font-medium'>
-                  <span className='mr-[8px]'>
-                    {divDecimalsStr(elfBalance?.balance || 0, 8)}
-                  </span>
-                  <span>ELF</span>
-                </div>
-              </div>
-            </div>
             <div className='my-[8px]'>
               <span className='text-gray-80 mr-[20px]'>Billing balance:</span>
               <span className='text-dark-normal mr-[2px] font-medium'>
@@ -315,7 +234,7 @@ export default function Withdraw() {
                 Estimated Transaction Fee is approximately:
               </span>
               <span className='text-dark-normal text-sm'>
-                {calcTotalPrice(currentAmount || 0, 0.25885)}
+                0.25885
                 <span className='ml-[10px]'>ELF</span>
               </span>
             </div>

@@ -9,8 +9,6 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
-  divDecimalsStr,
-  getOmittedStr,
   handleErrorMessage,
   timesDecimals,
   useDebounceCallback,
@@ -21,11 +19,7 @@ import QuerySlider from '@/components/billing/QuerySlider';
 import ConnectWalletFirst from '@/components/wallet/ConnectWalletFirst';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import {
-  setElfBalance,
-  setOrgBalance,
-  setUsdtBalance,
-} from '@/store/slices/commonSlice';
+import { setOrgBalance } from '@/store/slices/commonSlice';
 
 import {
   cancelOrder,
@@ -36,26 +30,16 @@ import {
   payOrder,
   watchOrdersCost,
 } from '@/api/requestMarket';
-import {
-  AeFinderContractAddress,
-  CHAIN_ID,
-  tokenContractAddress,
-} from '@/constant';
+import { AeFinderContractAddress, CHAIN_ID } from '@/constant';
 
-import { ApproveResponseType, GetBalanceResponseType } from '@/types/appType';
+import { ApproveResponseType } from '@/types/appType';
 import { MerchandisesItem } from '@/types/marketType';
 
 export default function Upgrade() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
-  const {
-    callSendMethod,
-    callViewMethod,
-    getAccountByChainId,
-    walletInfo,
-    isConnected,
-  } = useConnectWallet();
+  const { callSendMethod, walletInfo, isConnected } = useConnectWallet();
 
   const walletInfoRef = useRef<TWalletInfo>();
   walletInfoRef.current = walletInfo;
@@ -75,8 +59,6 @@ export default function Upgrade() {
   const [originalAssetId, setOriginalAssetId] = useState<string>();
 
   const userInfo = useAppSelector((state) => state.common.userInfo);
-  const usdtBalance = useAppSelector((state) => state.common.usdtBalance);
-  const elfBalance = useAppSelector((state) => state.common.elfBalance);
   const orgBalance = useAppSelector((state) => state.common.orgBalance);
 
   const getAssetsListTemp = useCallback(async () => {
@@ -99,50 +81,6 @@ export default function Upgrade() {
   useEffect(() => {
     getAssetsListTemp();
   }, [getAssetsListTemp]);
-
-  const getBalance = useCallback(async () => {
-    if (!isConnectedRef.current || !walletInfoRef.current) {
-      return;
-    }
-    try {
-      const getELFBalance: GetBalanceResponseType = await callViewMethod({
-        chainId: CHAIN_ID,
-        contractAddress: tokenContractAddress,
-        methodName: 'GetBalance',
-        args: {
-          symbol: 'ELF',
-          owner: await getAccountByChainId(CHAIN_ID),
-        },
-      });
-      console.log('getELFBalance', getELFBalance);
-      dispatch(setElfBalance(getELFBalance?.data));
-      const getUSDTBalance: GetBalanceResponseType = await callViewMethod({
-        chainId: CHAIN_ID,
-        contractAddress: tokenContractAddress,
-        methodName: 'GetBalance',
-        args: {
-          symbol: 'USDT',
-          owner: await getAccountByChainId(CHAIN_ID),
-        },
-      });
-      console.log('getUSDTBalance', getUSDTBalance);
-      dispatch(setUsdtBalance(getUSDTBalance?.data));
-    } catch (error) {
-      messageApi.error(handleErrorMessage(error));
-    }
-    // eslint-disable-next-line
-  }, [
-    callViewMethod,
-    getAccountByChainId,
-    dispatch,
-    messageApi,
-    walletInfoRef.current,
-    isConnectedRef.current,
-  ]);
-
-  useEffect(() => {
-    getBalance();
-  }, [getBalance]);
 
   const getOrgBalanceTemp = useCallback(async () => {
     const getOrgBalanceRes = await getOrgBalance();
@@ -209,6 +147,14 @@ export default function Upgrade() {
     router.back();
   }, [router]);
 
+  // check current wallet address === bind address
+  const checkAddressEqual = useCallback(() => {
+    if (!isConnectedRef.current || !walletInfoRef.current) {
+      return false;
+    }
+    return userInfo?.walletAddress === walletInfoRef.current?.address;
+  }, [userInfo?.walletAddress]);
+
   const handlePreCreateOrder = useCallback(async () => {
     if (!merchandisesItem?.id || !currentQueryCount || isLocked) {
       return {
@@ -246,7 +192,7 @@ export default function Upgrade() {
     setLoading(true);
     const { billingId, billingAmount } = await handlePreCreateOrder();
     // if actualAmount = 0, customer need't to lock
-    if (billingAmount === 0) {
+    if (billingId && billingAmount === 0) {
       messageApi.open({
         type: 'success',
         content:
@@ -255,9 +201,15 @@ export default function Upgrade() {
       });
       setTimeout(() => {
         handleRouteBack();
-      }, 4000);
+      }, 2000);
       return;
     }
+
+    if (!checkAddressEqual()) {
+      messageApi.warning('Please using the wallet address you have bound.');
+      return;
+    }
+
     try {
       if (!billingId || !billingAmount) {
         messageApi.warning('Create order failed');
@@ -279,8 +231,6 @@ export default function Upgrade() {
           content: 'Confirm monthly purchase successfully',
           duration: 3,
         });
-        // refresh balance when Confirm monthly purchase success
-        await getBalance();
         await getOrgBalanceTemp();
         const payRes = await payOrder({
           id: billingId,
@@ -289,7 +239,7 @@ export default function Upgrade() {
         if (payRes) {
           setTimeout(() => {
             handleRouteBack();
-          }, 4000);
+          }, 2000);
         }
       } else {
         messageApi.open({
@@ -314,7 +264,7 @@ export default function Upgrade() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [checkAddressEqual]);
 
   return (
     <div className='px-[16px] pb-[36px] sm:px-[40px]'>
@@ -398,44 +348,16 @@ export default function Upgrade() {
               />
               Confirm wallet
             </div>
-            <div className='mb-[20px]'>
-              <span className='text-gray-80 mr-[16px]'>Pay with: </span>
-              <Button>
-                <Image
-                  src='/assets/svg/user.svg'
-                  alt='user'
-                  width={18}
-                  height={18}
-                  className='hover:text-blue-link mr-3 inline-block'
-                />
-                <span>{getOmittedStr(userInfo.walletAddress, 8, 9)}</span>
-              </Button>
-            </div>
-            <div className='flex items-start justify-start'>
-              <span className='text-gray-80 mr-[16px] text-sm'>
-                Wallet balance:
-              </span>
-              <div>
-                <div className='text-dark-normal mr-[4px] text-sm'>
-                  {divDecimalsStr(usdtBalance?.balance || 0, 6)} USDT
-                </div>
-                <div className='text-dark-normal text-sm'>
-                  {divDecimalsStr(elfBalance?.balance || 0, 8)} ELF
-                </div>
-              </div>
-            </div>
             <div className='my-[8px] flex items-start justify-start'>
-              <span className='text-gray-80 mr-[16px] text-sm'>
+              <span className='text-gray-80 mr-[6px] text-sm'>
                 Billing balance:
               </span>
-              <div>
-                <div className='text-dark-normal mr-[2px] text-sm'>
-                  {orgBalance?.balance || '--'} USDT{' '}
-                </div>
-                <div className='text-gray-80 mt-[6px] text-sm'>
-                  Locked: {orgBalance?.lockedBalance || '--'} USDT
-                </div>
+              <div className='text-dark-normal mr-[2px] text-sm'>
+                {orgBalance?.balance || '--'} USDT
               </div>
+            </div>
+            <div className='text-gray-80 my-[8px] text-sm'>
+              Locked balance: {orgBalance?.lockedBalance || '--'} USDT
             </div>
             <Tag
               icon={
