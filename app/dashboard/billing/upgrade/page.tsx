@@ -39,8 +39,7 @@ export default function Upgrade() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
-  const { callSendMethod, walletInfo, isConnected, disConnectWallet } =
-    useConnectWallet();
+  const { callSendMethod, walletInfo, isConnected } = useConnectWallet();
 
   const walletInfoRef = useRef<TWalletInfo>();
   walletInfoRef.current = walletInfo;
@@ -59,7 +58,6 @@ export default function Upgrade() {
   const [merchandisesItem, setMerchandisesItem] = useState<MerchandisesItem>();
   const [originalAssetId, setOriginalAssetId] = useState<string>();
 
-  const userInfo = useAppSelector((state) => state.common.userInfo);
   const orgBalance = useAppSelector((state) => state.common.orgBalance);
 
   const getAssetsListTemp = useCallback(async () => {
@@ -148,14 +146,6 @@ export default function Upgrade() {
     router.back();
   }, [router]);
 
-  // check current wallet address === bind address
-  const checkAddressEqual = useCallback(() => {
-    if (!isConnectedRef.current || !walletInfoRef.current) {
-      return false;
-    }
-    return userInfo?.walletAddress === walletInfoRef.current?.address;
-  }, [userInfo?.walletAddress]);
-
   const handlePreCreateOrder = useCallback(async () => {
     if (!merchandisesItem?.id || !currentQueryCount || isLocked) {
       return {
@@ -203,12 +193,6 @@ export default function Upgrade() {
       setTimeout(() => {
         handleRouteBack();
       }, 2000);
-      return;
-    }
-
-    if (!checkAddressEqual()) {
-      messageApi.warning('Please using the wallet address you have bound.');
-      await disConnectWallet();
       return;
     }
 
@@ -266,7 +250,7 @@ export default function Upgrade() {
     } finally {
       setLoading(false);
     }
-  }, [checkAddressEqual, disConnectWallet]);
+  }, []);
 
   return (
     <div className='px-[16px] pb-[36px] sm:px-[40px]'>

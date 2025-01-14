@@ -6,7 +6,7 @@ import { LeftOutlined } from '@ant-design/icons';
 import { Button, Col, Divider, Input, InputNumber, message, Row } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
   handleErrorMessage,
@@ -30,8 +30,7 @@ export default function Withdraw() {
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
   const isMobile = window?.innerWidth < 640;
-  const { callSendMethod, walletInfo, isConnected, disConnectWallet } =
-    useConnectWallet();
+  const { callSendMethod, walletInfo, isConnected } = useConnectWallet();
   const [loading, setLoading] = useState(false);
   const userInfo = useAppSelector((state) => state.common.userInfo);
   const orgBalance = useAppSelector((state) => state.common.orgBalance);
@@ -57,14 +56,6 @@ export default function Withdraw() {
     getOrgBalanceTemp();
   }, [getOrgBalanceTemp]);
 
-  // check current wallet address === bind address
-  const checkAddressEqual = useCallback(() => {
-    if (!isConnectedRef.current || !walletInfoRef.current) {
-      return false;
-    }
-    return userInfo?.walletAddress === walletInfoRef.current?.address;
-  }, [userInfo?.walletAddress]);
-
   const handleWithdraw = useDebounceCallback(async () => {
     if (!withdrawAddress) {
       messageApi.warning('Please input withdraw address');
@@ -76,12 +67,6 @@ export default function Withdraw() {
     }
     if (currentAmount > orgBalance?.balance) {
       messageApi.warning('withdraw USDT balance is not enough');
-      return;
-    }
-
-    if (!checkAddressEqual()) {
-      messageApi.warning('Please using the wallet address you have bound.');
-      await disConnectWallet();
       return;
     }
 
@@ -122,7 +107,7 @@ export default function Withdraw() {
     } finally {
       setLoading(false);
     }
-  }, [checkAddressEqual, disConnectWallet]);
+  }, []);
 
   return (
     <div className='px-[16px] pb-[40px] sm:px-[40px]'>

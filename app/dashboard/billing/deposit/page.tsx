@@ -40,7 +40,6 @@ export default function Deposit() {
     getAccountByChainId,
     walletInfo,
     isConnected,
-    disConnectWallet,
   } = useConnectWallet();
   const [loading, setLoading] = useState(false);
   const [currentAmount, setCurrentAmount] = useState<number | null>(null);
@@ -116,12 +115,6 @@ export default function Deposit() {
       return;
     }
 
-    if (!checkAddressEqual()) {
-      messageApi.warning('Please using the wallet address you have bound.');
-      await disConnectWallet();
-      return;
-    }
-
     try {
       setLoading(true);
       const approveResult: ApproveResponseType = await callSendMethod({
@@ -178,13 +171,7 @@ export default function Deposit() {
     } finally {
       setLoading(false);
     }
-  }, [
-    callSendMethod,
-    currentAmount,
-    setCurrentAmount,
-    checkAddressEqual,
-    disConnectWallet,
-  ]);
+  }, [callSendMethod, currentAmount, setCurrentAmount]);
 
   return (
     <div className='px-[16px] pb-[40px] sm:px-[40px]'>
