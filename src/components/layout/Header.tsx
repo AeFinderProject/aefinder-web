@@ -49,6 +49,8 @@ export default function Header() {
 
     if (res?.walletAddress) {
       setAddress(res?.walletAddress);
+    } else if (!res?.walletAddress) {
+      router.push('/login/bindwallet');
     }
   }, [dispatch, router, messageApi]);
 
