@@ -83,7 +83,7 @@ export default function OrderList() {
       ),
     },
     {
-      title: 'DeductionAmount',
+      title: 'Deduction Amount',
       dataIndex: 'deductionAmount',
       key: 'deductionAmount',
       render: (text: number) => (
@@ -94,7 +94,7 @@ export default function OrderList() {
       ),
     },
     {
-      title: 'ActualAmount',
+      title: 'Actual Amount',
       dataIndex: 'actualAmount',
       key: 'actualAmount',
       render: (text: number) => (
@@ -111,26 +111,26 @@ export default function OrderList() {
       render: (text: number) => (
         <div>
           {text === 0 && <Tag color='volcano'>Unpaid</Tag>}
-          {text === 1 && <Tag color='processing'>PaymentPending</Tag>}
-          {text === 2 && <Tag color='success'>PaymentConfirmed</Tag>}
+          {text === 1 && <Tag color='processing'>Payment Pending</Tag>}
+          {text === 2 && <Tag color='success'>Payment Confirmed</Tag>}
           {text === 3 && <Tag color='orange'>Canceled</Tag>}
-          {text === 4 && <Tag color='red'>PaymentFailed</Tag>}
+          {text === 4 && <Tag color='red'>Payment Failed</Tag>}
         </div>
       ),
     },
     {
-      title: 'PaymentType',
+      title: 'Payment Type',
       dataIndex: 'paymentType',
       key: 'paymentType',
       render: (text: number) => (
         <div>
           {text === 0 && <Tag color='warning'>--</Tag>}
-          {text === 1 && <Tag color='success'>WalletPay</Tag>}
+          {text === 1 && <Tag color='success'>Wallet Pay</Tag>}
         </div>
       ),
     },
     {
-      title: 'OrderTime',
+      title: 'Order Time',
       dataIndex: 'orderTime',
       key: 'orderTime',
       render: (text: string) => (
@@ -138,7 +138,7 @@ export default function OrderList() {
       ),
     },
     {
-      title: 'PaymentTime',
+      title: 'Payment Time',
       dataIndex: 'paymentTime',
       key: 'paymentTime',
       render: (text: string) => (
@@ -146,7 +146,7 @@ export default function OrderList() {
       ),
     },
     {
-      title: 'TransactionId',
+      title: 'Transaction Id',
       dataIndex: 'transactionId',
       key: 'transactionId',
       render: (text: string) => (
@@ -160,7 +160,7 @@ export default function OrderList() {
       ),
     },
     {
-      title: 'CancelOrder',
+      title: 'Cancel Order',
       dataIndex: '',
       key: 'cancelOrder',
       render: (record) => (

@@ -198,20 +198,19 @@ export default function Deposit() {
             Wallet
           </div>
           <div className='mt-[20px]'>
-            <span className='text-gray-80 mr-[20px]'>From </span>
-            <Button
-              icon={
+            <div className='flex items-start justify-start'>
+              <span className='text-gray-80 mr-[20px]'>From </span>
+              <div className='border-gray-F0 relative top-[-8px] cursor-default rounded-lg border px-[16px] py-[8px]'>
                 <Image
                   src='/assets/svg/user.svg'
                   alt='user'
                   width={18}
                   height={18}
-                  className='relative top-[4px]'
+                  className='relative top-[-2px] mr-[8px] inline-block'
                 />
-              }
-            >
-              <span>{getOmittedStr(userInfo.walletAddress, 8, 9)}</span>
-            </Button>
+                <span>{getOmittedStr(userInfo.walletAddress, 8, 9)}</span>
+              </div>
+            </div>
             <div className='mt-[20px] flex items-start justify-start'>
               <span className='text-gray-80 mr-[20px]'>Balance</span>
               <div>

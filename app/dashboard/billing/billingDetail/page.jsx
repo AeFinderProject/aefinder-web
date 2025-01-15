@@ -70,15 +70,17 @@ export default function BillingDetail() {
         <div className='bg-gray-F5 w-full rounded-lg px-[24px] py-[12px]'>
           <Row gutter={24}>
             <Col xs={12} md={6} className='my-[12px]'>
-              <div className='text-gray-80 mb-[10px] text-xs'>RefundAmount</div>
+              <div className='text-gray-80 mb-[10px] text-xs'>
+                Refund Amount
+              </div>
               {String(currentBillingDetail?.refundAmount)} USDT
             </Col>
             <Col xs={12} md={6} className='my-[12px]'>
-              <div className='text-gray-80 mb-[10px] text-xs'>PaidAmount</div>
+              <div className='text-gray-80 mb-[10px] text-xs'>Paid Amount</div>
               {String(currentBillingDetail?.paidAmount)} USDT
             </Col>
             <Col xs={12} md={6} className='my-[12px]'>
-              <div className='text-gray-80 mb-[10px] text-xs'>BeginTime</div>
+              <div className='text-gray-80 mb-[10px] text-xs'>Begin Time</div>
               <div>
                 {dayjs(currentBillingDetail?.beginTime).format(
                   'YYYY/MM/DD HH:mm:ss'
@@ -86,7 +88,7 @@ export default function BillingDetail() {
               </div>
             </Col>
             <Col xs={12} md={6} className='my-[12px]'>
-              <div className='text-gray-80 mb-[10px] text-xs'>EndTime</div>
+              <div className='text-gray-80 mb-[10px] text-xs'>End Time</div>
               <div>
                 {dayjs(currentBillingDetail?.endTime).format(
                   'YYYY/MM/DD HH:mm:ss'
@@ -117,18 +119,18 @@ export default function BillingDetail() {
                   <Tag color='volcano'>Unpaid</Tag>
                 )}
                 {currentBillingDetail?.status === 1 && (
-                  <Tag color='processing'>PaymentPending</Tag>
+                  <Tag color='processing'>Payment Pending</Tag>
                 )}
                 {currentBillingDetail?.status === 2 && (
-                  <Tag color='success'>PaymentConfirmed</Tag>
+                  <Tag color='success'>Payment Confirmed</Tag>
                 )}
                 {currentBillingDetail?.status === 3 && (
-                  <Tag color='red'>PaymentFailed</Tag>
+                  <Tag color='red'>Payment Failed</Tag>
                 )}
               </div>
             </Col>
             <Col xs={12} md={6} className='my-[12px]'>
-              <div className='text-gray-80 mb-[10px] text-xs'>CreateTime</div>
+              <div className='text-gray-80 mb-[10px] text-xs'>Create Time</div>
               <div>
                 {dayjs(currentBillingDetail?.createTime).format(
                   'YYYY/MM/DD HH:mm:ss'
@@ -136,7 +138,7 @@ export default function BillingDetail() {
               </div>
             </Col>
             <Col xs={12} md={6} className='my-[12px]'>
-              <div className='text-gray-80 mb-[10px] text-xs'>PaymentTime</div>
+              <div className='text-gray-80 mb-[10px] text-xs'>Payment Time</div>
               <div>
                 {dayjs(currentBillingDetail?.paymentTime).format(
                   'YYYY/MM/DD HH:mm:ss'
@@ -184,7 +186,7 @@ export default function BillingDetail() {
                       </Col>
                       <Col xs={12} md={6} className='my-[12px]'>
                         <div className='text-gray-80 mb-[10px] text-xs'>
-                          PaidAmount
+                          Paid Amount
                         </div>
                         {String(item?.paidAmount)} USDT
                       </Col>
@@ -206,7 +208,7 @@ export default function BillingDetail() {
                       {item?.asset?.createTime && (
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            createTime
+                            Create Time
                           </div>
                           {dayjs(item?.asset?.createTime).format(
                             'YYYY/MM/DD HH:mm:ss'
@@ -216,7 +218,7 @@ export default function BillingDetail() {
                       {item?.asset?.startTime && (
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            StartTime
+                            Start Time
                           </div>
                           {dayjs(item?.asset?.startTime).format(
                             'YYYY/MM/DD HH:mm:ss'
@@ -226,7 +228,7 @@ export default function BillingDetail() {
                       {item?.asset?.endTime && (
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            EndTime
+                            End Time
                           </div>
                           {dayjs(item?.asset?.endTime).format(
                             'YYYY/MM/DD HH:mm:ss'

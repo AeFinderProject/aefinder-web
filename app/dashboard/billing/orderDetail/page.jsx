@@ -84,12 +84,14 @@ export default function OrderDetail() {
             </Col>
             <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>
-                DeductionAmount
+                Deduction Amount
               </div>
               {String(currentOrderDetail?.deductionAmount)} USDT
             </Col>
             <Col xs={12} md={6} className='my-[12px]'>
-              <div className='text-gray-80 mb-[10px] text-xs'>ActualAmount</div>
+              <div className='text-gray-80 mb-[10px] text-xs'>
+                Actual Amount
+              </div>
               {String(currentOrderDetail?.actualAmount)} USDT
             </Col>
           </Row>
@@ -101,32 +103,32 @@ export default function OrderDetail() {
                   <Tag color='volcano'>Unpaid</Tag>
                 )}
                 {currentOrderDetail?.status === 1 && (
-                  <Tag color='processing'>PaymentPending</Tag>
+                  <Tag color='processing'>Payment Pending</Tag>
                 )}
                 {currentOrderDetail?.status === 2 && (
-                  <Tag color='success'>PaymentConfirmed</Tag>
+                  <Tag color='success'>Payment Confirmed</Tag>
                 )}
                 {currentOrderDetail?.status === 3 && (
                   <Tag color='orange'>Canceled</Tag>
                 )}
                 {currentOrderDetail?.status === 4 && (
-                  <Tag color='red'>PaymentFailed</Tag>
+                  <Tag color='red'>Payment Failed</Tag>
                 )}
               </div>
             </Col>
             <Col xs={12} md={6} className='my-[12px]'>
-              <div className='text-gray-80 mb-[10px] text-xs'>PaymentType</div>
+              <div className='text-gray-80 mb-[10px] text-xs'>Payment Type</div>
               <div>
                 {currentOrderDetail?.paymentType === 0 && (
                   <Tag color='warning'>--</Tag>
                 )}
                 {currentOrderDetail?.paymentType === 1 && (
-                  <Tag color='success'>WalletPay</Tag>
+                  <Tag color='success'>Wallet Pay</Tag>
                 )}
               </div>
             </Col>
             <Col xs={12} md={6} className='my-[12px]'>
-              <div className='text-gray-80 mb-[10px] text-xs'>OrderTime</div>
+              <div className='text-gray-80 mb-[10px] text-xs'>Order Time</div>
               <div>
                 {dayjs(currentOrderDetail?.orderTime).format(
                   'YYYY/MM/DD HH:mm:ss'
@@ -134,7 +136,7 @@ export default function OrderDetail() {
               </div>
             </Col>
             <Col xs={12} md={6} className='my-[12px]'>
-              <div className='text-gray-80 mb-[10px] text-xs'>PaymentTime</div>
+              <div className='text-gray-80 mb-[10px] text-xs'>Payment Time</div>
               <div>
                 {dayjs(currentOrderDetail?.paymentTime).format(
                   'YYYY/MM/DD HH:mm:ss'
@@ -165,13 +167,13 @@ export default function OrderDetail() {
                         </Col>
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            PaidAmount
+                            Paid Amount
                           </div>
                           {String(item?.originalAsset?.paidAmount)} USDT
                         </Col>
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            FreeQuantity
+                            Free Quantity
                           </div>
                           {item?.originalAsset?.freeQuantity || '--'}
                         </Col>
@@ -185,7 +187,7 @@ export default function OrderDetail() {
                       <Row gutter={24}>
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            FreeReplicas
+                            Free Replicas
                           </div>
                           {item?.originalAsset?.freeReplicas || '--'}
                         </Col>
@@ -203,7 +205,7 @@ export default function OrderDetail() {
                         </Col>
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            isLocked
+                            Locked
                           </div>
                           {String(item?.originalAsset?.isLocked)}
                         </Col>
@@ -218,22 +220,22 @@ export default function OrderDetail() {
                               <Tag color='volcano'>Unpaid</Tag>
                             )}
                             {item?.originalAsset?.status === 1 && (
-                              <Tag color='processing'>PaymentPending</Tag>
+                              <Tag color='processing'>Payment Pending</Tag>
                             )}
                             {item?.originalAsset?.status === 2 && (
-                              <Tag color='success'>PaymentConfirmed</Tag>
+                              <Tag color='success'>Payment Confirmed</Tag>
                             )}
                             {item?.originalAsset?.status === 3 && (
                               <Tag color='orange'>Canceled</Tag>
                             )}
                             {item?.originalAsset?.status === 4 && (
-                              <Tag color='red'>PaymentFailed</Tag>
+                              <Tag color='red'>Payment Failed</Tag>
                             )}
                           </div>
                         </Col>
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            createTime
+                            create Time
                           </div>
                           {dayjs(item?.originalAsset?.createTime).format(
                             'YYYY/MM/DD HH:mm:ss'
@@ -241,7 +243,7 @@ export default function OrderDetail() {
                         </Col>
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            StartTime
+                            Start Time
                           </div>
                           {dayjs(item?.originalAsset?.startTime).format(
                             'YYYY/MM/DD HH:mm:ss'
@@ -249,7 +251,7 @@ export default function OrderDetail() {
                         </Col>
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            EndTime
+                            End Time
                           </div>
                           {dayjs(item?.originalAsset?.endTime).format(
                             'YYYY/MM/DD HH:mm:ss'
@@ -305,13 +307,13 @@ export default function OrderDetail() {
                       </Col>
                       <Col xs={12} md={6} className='my-[12px]'>
                         <div className='text-gray-80 mb-[10px] text-xs'>
-                          DeductionAmount
+                          Deduction Amount
                         </div>
                         {String(item?.deductionAmount)} USDT
                       </Col>
                       <Col xs={12} md={6} className='my-[12px]'>
                         <div className='text-gray-80 mb-[10px] text-xs'>
-                          ActualAmount
+                          Actual Amount
                         </div>
                         {String(item?.actualAmount)} USDT
                       </Col>

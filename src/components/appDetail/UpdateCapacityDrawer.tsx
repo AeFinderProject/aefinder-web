@@ -636,7 +636,11 @@ export default function UpdateCapacityDrawer({
       )}
       <Divider className='my-[24px]' />
       <div className='text-gray-80 mt-[24px] text-sm'>
-        Processor Amount = (The remaining hours of the current month) * price
+        The current prices are promotional and available for a limited time
+        only.
+      </div>
+      <div className='text-gray-80 mt-[10px] text-sm'>
+        Processor Amount = (The remaining hours of the current month) * price.
       </div>
       <div className='text-gray-80 mt-[10px] text-sm'>
         *This amount will remain locked in your Billing Balance and be charged

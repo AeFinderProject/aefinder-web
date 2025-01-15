@@ -69,7 +69,7 @@ export default function Capacity() {
                   <div className='text-dark-normal mb-[6px] mt-[8px] font-medium'>
                     -- / -- GB
                   </div>
-                  <Progress percent={31} showInfo={false} />
+                  <Progress percent={0} showInfo={false} />
                 </div>
               </div>
             </div>

@@ -99,15 +99,15 @@ export default function Billing() {
       render: (text: number) => (
         <div>
           {text === 0 && <Tag color='volcano'>Unpaid</Tag>}
-          {text === 1 && <Tag color='processing'>PaymentPending</Tag>}
-          {text === 2 && <Tag color='success'>PaymentConfirmed</Tag>}
+          {text === 1 && <Tag color='processing'>Payment Pending</Tag>}
+          {text === 2 && <Tag color='success'>Payment Confirmed</Tag>}
           {text === 3 && <Tag color='orange'>Canceled</Tag>}
-          {text === 4 && <Tag color='red'>PaymentFailed</Tag>}
+          {text === 4 && <Tag color='red'>Payment Failed</Tag>}
         </div>
       ),
     },
     {
-      title: 'RefundAmount',
+      title: 'Refund Amount',
       dataIndex: 'refundAmount',
       key: 'refundAmount',
       render: (text: number) => (
@@ -118,7 +118,7 @@ export default function Billing() {
       ),
     },
     {
-      title: 'PaidAmount',
+      title: 'Paid Amount',
       dataIndex: 'paidAmount',
       key: 'paidAmount',
       render: (text: number) => (
@@ -129,7 +129,7 @@ export default function Billing() {
       ),
     },
     {
-      title: 'TransactionId',
+      title: 'Transaction Id',
       dataIndex: 'transactionId',
       key: 'transactionId',
       render: (text: string) => (
@@ -139,7 +139,7 @@ export default function Billing() {
       ),
     },
     {
-      title: 'CreateTime',
+      title: 'Create Time',
       dataIndex: 'createTime',
       key: 'createTime',
       render: (text: string) => (
@@ -147,7 +147,7 @@ export default function Billing() {
       ),
     },
     {
-      title: 'PaymentTime',
+      title: 'Payment Time',
       dataIndex: 'paymentTime',
       key: 'paymentTime',
       render: (text: string) => (

@@ -21,7 +21,7 @@ export default function DeactivatedModal({
 
   const handleShowUpdateCapacity = useCallback(() => {
     setIsShowDeactivatedModal(false);
-    setIsShowUpdateCapacityModal(false);
+    setIsShowUpdateCapacityModal(true);
   }, [setIsShowDeactivatedModal, setIsShowUpdateCapacityModal]);
 
   return (

@@ -1,7 +1,7 @@
 'use client';
 
 import { Line } from '@ant-design/charts';
-import { Col, Row, Slider, Statistic } from 'antd';
+import { Col, Progress, Row, Statistic } from 'antd';
 import dayjs from 'dayjs';
 import React, { useCallback, useEffect, useState } from 'react';
 
@@ -114,18 +114,13 @@ export default function Overview() {
               valueStyle={{ fontSize: '16px', fontWeight: 500 }}
             />
             <div className='text-gray-80 relative top-[4px] text-xs'>
-              {apiMerchandisesItem?.price}
+              {apiMerchandisesItem?.price ?? '-- '}
               <span className='text-gray-80 ml-[4px] mr-[12px] font-medium'>
                 USDT/Query
               </span>
             </div>
           </div>
-          <Slider
-            value={apikeySummary.query}
-            min={0}
-            max={apikeySummary.queryLimit}
-            disabled
-          />
+          <Progress percent={apikeySummary.query / apikeySummary.queryLimit} />
         </Col>
         <Col
           sm={8}

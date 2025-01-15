@@ -423,12 +423,17 @@ export default function Upgrade() {
               Your Plan Details
             </div>
             <div className='text-gray-80 my-[16px] text-sm'>
-              Growth plan will also include 100K free monthly queries.
+              Your plan will also include 100K free monthly queries. The current
+              prices are promotional and available for a limited time only.
             </div>
             <div className='bg-gray-F5 rounded-lg p-[20px]'>
               <div className='mb-[20px] flex justify-between'>
                 <div className='text-gray-80 text-sm'>Est. Queries</div>
-                <div className='text-dark-normal'>{currentQueryCount}</div>
+                <div className='text-dark-normal'>
+                  {currentQueryCount
+                    ?.toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                </div>
               </div>
               <Divider />
               <div className='flex justify-between'>
@@ -447,13 +452,13 @@ export default function Upgrade() {
                 <div className='text-dark-normal'>{currentAmount} USDT</div>
               </div>
               <div className='mt-[20px] flex justify-between'>
-                <div className='text-gray-80 text-sm'>DeductionAmount</div>
+                <div className='text-gray-80 text-sm'>Deduction Amount</div>
                 <div className='text-dark-normal'>
                   {currentDeductionAmount} USDT
                 </div>
               </div>
               <div className='mt-[20px] flex justify-between'>
-                <div className='text-dark-normal'>ActualAmount</div>
+                <div className='text-dark-normal'>Actual Amount</div>
                 <div className='text-dark-normal'>
                   {currentActualAmount} USDT
                 </div>
