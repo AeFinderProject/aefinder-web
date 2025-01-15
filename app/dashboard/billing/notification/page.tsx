@@ -79,6 +79,8 @@ export default function Notification() {
       title: 'Billing Alerts',
       dataIndex: 'alerts',
       key: 'alerts',
+      // todo : current feature is not available
+      className: 'hidden',
       render: () => <Switch defaultChecked onChange={handleSwitchChange} />,
     },
   ];
