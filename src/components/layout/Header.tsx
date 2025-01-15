@@ -150,7 +150,7 @@ export default function Header() {
                 : 'text-dark-primaryText'
             )}
           >
-            APIKeys
+            API Keys
           </Link>
           <Link
             href='https://docs.aefinder.io'
@@ -203,7 +203,7 @@ export default function Header() {
                 href='/dashboard/apikey'
                 className='hover:bg-gray-F5 w-full border-none px-[16px] sm:hidden'
               >
-                Api Key
+                API Keys
               </PrimaryLink>
               <div className='hover:bg-gray-F5 border-gray-F0 w-full border-b border-t px-[16px] text-left sm:hidden'>
                 <UnstyledLink
