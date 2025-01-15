@@ -362,3 +362,13 @@ export function calcTotalPrice(queryCount: number, price: number) {
   const priceBignumber = BigNumber(price);
   return queryCountBignumber.times(priceBignumber).toString();
 }
+
+export function calcDiv(number1: number, number2: number) {
+  if (!number1 || !number2) {
+    return 0;
+  }
+
+  const number1Bignumber = BigNumber(number1);
+  const number2Bignumber = BigNumber(number2);
+  return number1Bignumber.div(number2Bignumber).toNumber();
+}

@@ -33,6 +33,7 @@ export default function Withdraw() {
   const { callSendMethod, walletInfo, isConnected } = useConnectWallet();
   const [loading, setLoading] = useState(false);
   const userInfo = useAppSelector((state) => state.common.userInfo);
+  const orgUser = useAppSelector((state) => state.common.orgUser);
   const orgBalance = useAppSelector((state) => state.common.orgBalance);
   const [withdrawAddress, setWithdrawAddress] = useState(
     userInfo?.walletAddress
@@ -135,13 +136,13 @@ export default function Withdraw() {
           </div>
           <div className='mt-[20px]'>
             <div className='my-[8px]'>
-              <span className='text-gray-80 mr-[20px]'>Billing balance:</span>
+              <span className='text-gray-80 mr-[12px]'>Balance:</span>
               <span className='text-dark-normal mr-[2px] font-medium'>
                 {orgBalance?.balance || '--'} USDT
               </span>
             </div>
             <div className='my-[8px]'>
-              <span className='text-gray-80 mr-[12px]'>Locked balance:</span>
+              <span className='text-gray-80 mr-[12px]'>Locked:</span>
               <span className='text-gray-80 mt-[6px] font-medium'>
                 {orgBalance?.lockedBalance || '--'} USDT
               </span>
@@ -233,6 +234,7 @@ export default function Withdraw() {
               size='large'
               onClick={handleWithdraw}
               loading={loading}
+              disabled={orgUser?.organizationStatus === 1}
             >
               Withdraw
             </Button>

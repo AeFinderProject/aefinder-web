@@ -155,9 +155,6 @@ export default function BillingDetail() {
                 className='border-gray-F5 hover:bg-gray-F7 my-[24px] rounded-lg border p-[12px]'
               >
                 <div>
-                  <div className='text-dark-normal mb-[12px] text-xl'>
-                    Billing Item - {index + 1}
-                  </div>
                   <div className='bg-gray-F5 w-full  rounded-lg px-[24px] py-[12px]'>
                     <Row gutter={24}>
                       <Col xs={12} md={6} className='my-[12px]'>
@@ -168,51 +165,42 @@ export default function BillingDetail() {
                       </Col>
                       <Col xs={12} md={6} className='my-[12px]'>
                         <div className='text-gray-80 mb-[10px] text-xs'>
-                          Specification
-                        </div>
-                        {item?.merchandise?.specification || '--'}
-                      </Col>
-                      <Col xs={12} md={6} className='my-[12px]'>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
-                          Quantity
-                        </div>
-                        {item?.quantity || '--'}
-                      </Col>
-                      <Col xs={12} md={6} className='my-[12px]'>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
-                          Replicas
-                        </div>
-                        {item?.replicas || '--'}
-                      </Col>
-                      <Col xs={12} md={6} className='my-[12px]'>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
-                          Paid Amount
-                        </div>
-                        {String(item?.paidAmount)} USDT
-                      </Col>
-                      <Col xs={12} md={6} className='my-[12px]'>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
                           Price
                         </div>
                         {item?.merchandise?.price || '--'} USDT/
                         {String(item?.merchandise?.unit)}
                       </Col>
+                      {item?.merchandise?.type === 0 && (
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
+                            Quantity
+                          </div>
+                          {item?.quantity || '--'}
+                        </Col>
+                      )}
+                      {item?.merchandise?.type === 1 && (
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
+                            Specification
+                          </div>
+                          {item?.merchandise?.specification || '--'}
+                        </Col>
+                      )}
+                      {item?.merchandise?.type === 2 && (
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
+                            Replicas
+                          </div>
+                          {item?.replicas || '--'}{' '}
+                          {String(item?.merchandise?.unit)}
+                        </Col>
+                      )}
                       {item?.asset?.appId && (
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
                             AeIndexer
                           </div>
                           {item?.asset?.appId}
-                        </Col>
-                      )}
-                      {item?.asset?.createTime && (
-                        <Col xs={12} md={6} className='my-[12px]'>
-                          <div className='text-gray-80 mb-[10px] text-xs'>
-                            Create Time
-                          </div>
-                          {dayjs(item?.asset?.createTime).format(
-                            'YYYY/MM/DD HH:mm:ss'
-                          )}
                         </Col>
                       )}
                       {item?.asset?.startTime && (

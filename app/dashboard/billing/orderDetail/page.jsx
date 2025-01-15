@@ -20,6 +20,8 @@ export default function OrderDetail() {
 
   const [orderId, setOrderId] = useState('');
   const [currentOrderDetail, setCurrentOrderDetail] = useState(null);
+  const [originResources, setOriginResources] = useState([]);
+  const [currentResources, setCurrentResources] = useState([]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -34,12 +36,13 @@ export default function OrderDetail() {
 
   const getAppDetailTemp = useDebounceCallback(async () => {
     await queryAuthToken();
-    if (orderId) {
-      const res = await getOrdersDetail({ id: String(orderId) });
-      console.log('res', res);
-      if (typeof res === 'object' && res?.id) {
-        setCurrentOrderDetail(res);
-      }
+    if (!orderId) {
+      return;
+    }
+    const res = await getOrdersDetail({ id: String(orderId) });
+    console.log('res', res);
+    if (typeof res === 'object' && res?.id) {
+      setCurrentOrderDetail(res);
     }
   }, [orderId]);
 
@@ -50,8 +53,50 @@ export default function OrderDetail() {
   const handleRouteBack = useCallback(() => {
     setOrderId('');
     setCurrentOrderDetail(null);
+    setOriginResources([]);
+    setCurrentResources([]);
     router.back();
   }, [router, setCurrentOrderDetail]);
+
+  useEffect(() => {
+    if (currentOrderDetail?.details?.length === 0) {
+      setOriginResources([]);
+      setCurrentResources([]);
+      return;
+    }
+    const tempOriginResources = [];
+    const tempCurrentResources = [];
+    currentOrderDetail?.details?.map((item) => {
+      if (item?.originalAsset) {
+        tempOriginResources.push({
+          name: item?.merchandise?.name,
+          price: item?.merchandise?.price,
+          unit: item?.merchandise?.unit,
+          type: item?.merchandise?.type,
+          specification: item?.merchandise?.specification,
+          quantity: item?.originalAsset?.quantity,
+          replicas: item?.originalAsset?.replicas,
+          appId:
+            item?.originalAsset?.appId ||
+            currentOrderDetail?.extraData?.RelateAppId,
+        });
+      }
+      tempCurrentResources.push({
+        name: item?.merchandise?.name,
+        price: item?.merchandise?.price,
+        unit: item?.merchandise?.unit,
+        type: item?.merchandise?.type,
+        specification: item?.merchandise?.specification,
+        quantity: item?.quantity,
+        replicas: item?.replicas,
+        appId:
+          item?.originalAsset?.appId ||
+          currentOrderDetail?.extraData?.RelateAppId,
+      });
+    });
+    setOriginResources(tempOriginResources);
+    setCurrentResources(tempCurrentResources);
+  }, [currentOrderDetail]);
 
   return (
     <div className='px-[16px] pb-[36px] sm:px-[40px]'>
@@ -145,184 +190,130 @@ export default function OrderDetail() {
             </Col>
           </Row>
         </div>
-        {currentOrderDetail?.details?.length > 0 &&
-          currentOrderDetail?.details?.map((item, index) => {
-            return (
-              <div key={index}>
-                <Divider className='my-[24px]' />
-                {item?.originalAsset?.id && (
-                  <div>
-                    <div className='text-dark-normal my-[12px] text-xl'>
-                      Original Asset
-                    </div>
-                    <div className='bg-gray-F5 w-full rounded-lg px-[24px] py-[12px]'>
-                      <Row gutter={24}>
-                        <Col xs={12} md={6} className='my-[12px]'>
-                          <Copy
-                            label='Order Id'
-                            content={item?.originalAsset?.id}
-                            isShowCopy={true}
-                            showLittle={true}
-                          />
-                        </Col>
-                        <Col xs={12} md={6} className='my-[12px]'>
-                          <div className='text-gray-80 mb-[10px] text-xs'>
-                            Paid Amount
-                          </div>
-                          {String(item?.originalAsset?.paidAmount)} USDT
-                        </Col>
-                        <Col xs={12} md={6} className='my-[12px]'>
-                          <div className='text-gray-80 mb-[10px] text-xs'>
-                            Free Quantity
-                          </div>
-                          {item?.originalAsset?.freeQuantity || '--'}
-                        </Col>
-                        <Col xs={12} md={6} className='my-[12px]'>
-                          <div className='text-gray-80 mb-[10px] text-xs'>
-                            Quantity
-                          </div>
-                          {item?.originalAsset?.quantity || '--'}
-                        </Col>
-                      </Row>
-                      <Row gutter={24}>
-                        <Col xs={12} md={6} className='my-[12px]'>
-                          <div className='text-gray-80 mb-[10px] text-xs'>
-                            Free Replicas
-                          </div>
-                          {item?.originalAsset?.freeReplicas || '--'}
-                        </Col>
-                        <Col xs={12} md={6} className='my-[12px]'>
-                          <div className='text-gray-80 mb-[10px] text-xs'>
-                            Replicas
-                          </div>
-                          {item?.originalAsset?.replicas || '--'}
-                        </Col>
-                        <Col xs={12} md={6} className='my-[12px]'>
-                          <div className='text-gray-80 mb-[10px] text-xs'>
-                            AeIndexer
-                          </div>
-                          {item?.originalAsset?.appId || '--'}
-                        </Col>
-                        <Col xs={12} md={6} className='my-[12px]'>
-                          <div className='text-gray-80 mb-[10px] text-xs'>
-                            Locked
-                          </div>
-                          {String(item?.originalAsset?.isLocked)}
-                        </Col>
-                      </Row>
-                      <Row gutter={24}>
-                        <Col xs={12} md={6} className='my-[12px]'>
-                          <div className='text-gray-80 mb-[10px] text-xs'>
-                            Status
-                          </div>
-                          <div>
-                            {item?.originalAsset?.status === 0 && (
-                              <Tag color='volcano'>Unpaid</Tag>
-                            )}
-                            {item?.originalAsset?.status === 1 && (
-                              <Tag color='processing'>Payment Pending</Tag>
-                            )}
-                            {item?.originalAsset?.status === 2 && (
-                              <Tag color='success'>Payment Confirmed</Tag>
-                            )}
-                            {item?.originalAsset?.status === 3 && (
-                              <Tag color='orange'>Canceled</Tag>
-                            )}
-                            {item?.originalAsset?.status === 4 && (
-                              <Tag color='red'>Payment Failed</Tag>
-                            )}
-                          </div>
-                        </Col>
-                        <Col xs={12} md={6} className='my-[12px]'>
-                          <div className='text-gray-80 mb-[10px] text-xs'>
-                            create Time
-                          </div>
-                          {dayjs(item?.originalAsset?.createTime).format(
-                            'YYYY/MM/DD HH:mm:ss'
-                          )}
-                        </Col>
-                        <Col xs={12} md={6} className='my-[12px]'>
-                          <div className='text-gray-80 mb-[10px] text-xs'>
-                            Start Time
-                          </div>
-                          {dayjs(item?.originalAsset?.startTime).format(
-                            'YYYY/MM/DD HH:mm:ss'
-                          )}
-                        </Col>
-                        <Col xs={12} md={6} className='my-[12px]'>
-                          <div className='text-gray-80 mb-[10px] text-xs'>
-                            End Time
-                          </div>
-                          {dayjs(item?.originalAsset?.endTime).format(
-                            'YYYY/MM/DD HH:mm:ss'
-                          )}
-                        </Col>
-                      </Row>
-                    </div>
-                  </div>
-                )}
-                <div>
-                  <div className='text-dark-normal my-[12px] text-xl'>
-                    Existing Assets
-                  </div>
-                  <div className='bg-gray-F5 w-full  rounded-lg px-[24px] py-[12px]'>
+        {originResources?.length > 0 && (
+          <div>
+            <Divider className='my-[24px]' />
+            <div className='text-dark-normal my-[12px] text-xl'>
+              Origin Resources
+            </div>
+            {originResources?.map((item, index) => {
+              return (
+                <div key={index} className='mt-[10px]'>
+                  <div className='bg-gray-F5 w-full rounded-lg px-[24px] py-[12px]'>
                     <Row gutter={24}>
                       <Col xs={12} md={6} className='my-[12px]'>
                         <div className='text-gray-80 mb-[10px] text-xs'>
                           Merchandise Name
                         </div>
-                        {item?.merchandise?.name || '--'}
+                        {item?.name || '--'}
                       </Col>
-                      <Col xs={12} md={6} className='my-[12px]'>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
-                          Description
-                        </div>
-                        {item?.merchandise?.description || '--'}
-                      </Col>
-                      <Col xs={12} md={6} className='my-[12px]'>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
-                          Quantity
-                        </div>
-                        {item?.quantity || '--'}
-                      </Col>
-                      <Col xs={12} md={6} className='my-[12px]'>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
-                          Replicas
-                        </div>
-                        {item?.replicas || '--'}
-                      </Col>
-                    </Row>
-                    <Row gutter={24}>
                       <Col xs={12} md={6} className='my-[12px]'>
                         <div className='text-gray-80 mb-[10px] text-xs'>
                           Price
                         </div>
-                        {item?.merchandise?.price || '--'} USDT
+                        {item?.price || '--'} USDT/{item?.unit || '--'}
                       </Col>
-                      <Col xs={12} md={6} className='my-[12px]'>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
-                          Amount
-                        </div>
-                        {String(item?.amount)} USDT
-                      </Col>
-                      <Col xs={12} md={6} className='my-[12px]'>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
-                          Deduction Amount
-                        </div>
-                        {String(item?.deductionAmount)} USDT
-                      </Col>
-                      <Col xs={12} md={6} className='my-[12px]'>
-                        <div className='text-gray-80 mb-[10px] text-xs'>
-                          Actual Amount
-                        </div>
-                        {String(item?.actualAmount)} USDT
-                      </Col>
+                      {item?.type === 0 && (
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
+                            Quantity
+                          </div>
+                          {item?.quantity || '--'}
+                        </Col>
+                      )}
+                      {item?.type === 1 && (
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
+                            Quantity
+                          </div>
+                          {item?.specification || '--'}
+                        </Col>
+                      )}
+                      {item?.type === 2 && (
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
+                            Replicas
+                          </div>
+                          {item?.replicas || '--'}
+                        </Col>
+                      )}
+                      {item?.appId && (
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
+                            AeIndexer
+                          </div>
+                          {item?.appId || '--'}
+                        </Col>
+                      )}
                     </Row>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+        )}
+        {currentResources?.length > 0 && (
+          <div>
+            <Divider className='my-[24px]' />
+            <div className='text-dark-normal my-[12px] text-xl'>
+              Current Resources
+            </div>
+            {currentResources?.map((item, index) => {
+              return (
+                <div key={index} className='mt-[10px]'>
+                  <div className='bg-gray-F5 w-full rounded-lg px-[24px] py-[12px]'>
+                    <Row gutter={24}>
+                      <Col xs={12} md={6} className='my-[12px]'>
+                        <div className='text-gray-80 mb-[10px] text-xs'>
+                          Merchandise Name
+                        </div>
+                        {item?.name || '--'}
+                      </Col>
+                      <Col xs={12} md={6} className='my-[12px]'>
+                        <div className='text-gray-80 mb-[10px] text-xs'>
+                          Price
+                        </div>
+                        {item?.price || '--'} USDT/{item?.unit || '--'}
+                      </Col>
+                      {item?.type === 0 && (
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
+                            Quantity
+                          </div>
+                          {item?.quantity || '--'}
+                        </Col>
+                      )}
+                      {item?.type === 1 && (
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
+                            Quantity
+                          </div>
+                          {item?.specification || '--'}
+                        </Col>
+                      )}
+                      {item?.type === 2 && (
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
+                            Replicas
+                          </div>
+                          {item?.replicas || '--'}
+                        </Col>
+                      )}
+                      {item?.appId && (
+                        <Col xs={12} md={6} className='my-[12px]'>
+                          <div className='text-gray-80 mb-[10px] text-xs'>
+                            AeIndexer
+                          </div>
+                          {item?.appId || '--'}
+                        </Col>
+                      )}
+                    </Row>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

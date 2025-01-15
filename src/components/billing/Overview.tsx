@@ -1,8 +1,10 @@
 'use client';
 
 import { Line } from '@ant-design/charts';
-import { Col, Progress, Row, Statistic } from 'antd';
+import { Button, Col, Progress, Row, Statistic } from 'antd';
 import dayjs from 'dayjs';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { getRemainingDays, useDebounceCallback } from '@/lib/utils';
@@ -18,6 +20,7 @@ import { SnapshotsItemType } from '@/types/apikeyType';
 
 export default function Overview() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const [snapshotsData, setSnapshotsData] = useState<SnapshotsItemType[]>([]);
 
@@ -81,7 +84,7 @@ export default function Overview() {
       >
         <Col sm={8} md={8} className='my-[10px]'>
           <Statistic
-            title='Remaining Balance'
+            title='Balance'
             value={`${orgBalance?.balance} USDT`}
             valueStyle={{ fontSize: '16px', fontWeight: 500 }}
           />
@@ -114,13 +117,20 @@ export default function Overview() {
               valueStyle={{ fontSize: '16px', fontWeight: 500 }}
             />
             <div className='text-gray-80 relative top-[4px] text-xs'>
-              {apiMerchandisesItem?.price ?? '-- '}
-              <span className='text-gray-80 ml-[4px] mr-[12px] font-medium'>
-                USDT/Query
-              </span>
+              {apiMerchandisesItem?.price && (
+                <div>
+                  {apiMerchandisesItem?.price}
+                  <span className='text-gray-80 ml-[4px] mr-[12px] font-medium'>
+                    USDT/Query
+                  </span>
+                </div>
+              )}
             </div>
           </div>
-          <Progress percent={apikeySummary.query / apikeySummary.queryLimit} />
+          <Progress
+            percent={apikeySummary.query / apikeySummary.queryLimit}
+            showInfo={false}
+          />
         </Col>
         <Col
           sm={8}
@@ -135,14 +145,57 @@ export default function Overview() {
           <div></div>
         </Col>
       </Row>
+      {apikeySummary.apiKeyCount === 0 && (
+        <div className='flex flex-col items-center justify-start'>
+          <Image
+            src='/assets/svg/billing-empty.svg'
+            alt='billing'
+            width={410}
+            height={292}
+            className='mt-[20px]'
+          />
+          <div className='text-dark-normal my-[22px] text-2xl'>
+            Account ready to query the network
+          </div>
+          <div className='text-gray-80'>
+            With a positive billing balance you are ready to query the network.
+          </div>
+          <div className='text-gray-80 mb-[22px]'>
+            Create an API key to get started.
+          </div>
+          <Button
+            className='bg-gray-F5 mb-[22px] h-[40px] w-[148px] border-none font-medium'
+            onClick={() => router.push('/dashboard/apikey')}
+          >
+            Create API Key
+          </Button>
+          {/* <div
+            className='text-blue-link cursor-pointer'
+            onClick={() =>
+              window.open('https://docs.aefinder.io/docs/quick-start', '_blank')
+            }
+          >
+            View documentation
+            <Image
+              src='/assets/svg/right-arrow.svg'
+              alt='arrow'
+              width={24}
+              height={24}
+              className='relative top-[-1px] ml-[8px] inline-block'
+            />
+          </div> */}
+        </div>
+      )}
       <div>
         <div className='text-dark-normal mt-[32px]'>Current period queries</div>
-        {snapshotsData.length === 0 && (
+        {snapshotsData.length === 0 && apikeySummary.apiKeyCount > 0 && (
           <div className='text-gray-80 border-gray-E0 mt-[6px] h-[120px] rounded-lg border bg-gradient-to-b from-[#F5F7FF] to-[#E6EBF5] p-[24px] text-center text-sm leading-[85px]'>
             Chart will be visible when we have enough data
           </div>
         )}
-        {snapshotsData.length > 0 && <Line {...config} />}
+        {snapshotsData.length > 0 && apikeySummary.apiKeyCount > 0 && (
+          <Line {...config} />
+        )}
       </div>
     </div>
   );

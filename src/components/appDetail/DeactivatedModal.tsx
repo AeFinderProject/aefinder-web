@@ -58,7 +58,7 @@ export default function DeactivatedModal({
           size='large'
           type='primary'
         >
-          Update Capacity
+          Set Capacity
         </Button>
       </div>
     </Modal>

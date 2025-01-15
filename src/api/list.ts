@@ -154,6 +154,7 @@ export const apiKeyList = {
 };
 
 export const marketList = {
+  getUserAll: `${AeFinderHost}/api/organizations/user/all`,
   getOrgBalance: `${AeFinderHost}/api/organizations/balance`,
   resourceBillPlan: {
     target: `${AeFinderHost}/api/market/calculate/resource-bill-plan`,

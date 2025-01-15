@@ -1,5 +1,5 @@
 import type { TableColumnsType } from 'antd';
-import { Button, message, Popconfirm, Table, Tag } from 'antd';
+import { Button, message, Popconfirm, Spin, Table, Tag } from 'antd';
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -17,6 +17,7 @@ export default function OrderList() {
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [orderList, setOrderList] = useState<NewOrderItemType[]>([]);
   const [skipCount, setSkipCount] = useState(1);
   const [maxResultCount, setMaxResultCount] = useState(10);
@@ -37,13 +38,18 @@ export default function OrderList() {
   );
 
   const getOrdersListTemp = useDebounceCallback(async () => {
-    const { items, totalCount } = await getOrdersList({
-      sortType: 1,
-      skipCount: (skipCount - 1) * maxResultCount,
-      maxResultCount: maxResultCount,
-    });
-    setOrderList(items);
-    setTotalCountItems(totalCount);
+    setIsLoading(true);
+    try {
+      const { items, totalCount } = await getOrdersList({
+        sortType: 1,
+        skipCount: (skipCount - 1) * maxResultCount,
+        maxResultCount: maxResultCount,
+      });
+      setOrderList(items);
+      setTotalCountItems(totalCount);
+    } finally {
+      setIsLoading(false);
+    }
   }, [skipCount, maxResultCount]);
 
   useEffect(() => {
@@ -223,6 +229,11 @@ export default function OrderList() {
           <div className='text-gray-80'>
             Your orders will appear here once you've made a purchase.
           </div>
+          {isLoading && (
+            <div className='flex items-center justify-center'>
+              <Spin size='large' />
+            </div>
+          )}
         </div>
       )}
       {orderList.length > 0 && (

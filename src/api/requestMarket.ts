@@ -31,6 +31,7 @@ import {
   GetOrgBalanceResponse,
   GetTransactionHistoryRequest,
   GetTransactionHistoryResponse,
+  GetUserAllResponse,
   NewOrderItemType,
   PayRequest,
   ResourceBillPlanRequest,
@@ -38,6 +39,15 @@ import {
   SetNotificationRequest,
   WatchOrdersCostRequest,
 } from '@/types/marketType';
+
+export const getUserAll = async (): Promise<GetUserAllResponse[]> => {
+  try {
+    const res = await request.market.getUserAll();
+    return res;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'getUserAll error'));
+  }
+};
 
 export const getOrgBalance = async (): Promise<GetOrgBalanceResponse> => {
   try {

@@ -2,6 +2,8 @@ export type GetUserAllResponse = {
   id: string;
   displayName: string;
   creationTime: string;
+  organizationWalletAddress: string;
+  organizationStatus: number;
 };
 
 export type GetOrgBalanceResponse = {

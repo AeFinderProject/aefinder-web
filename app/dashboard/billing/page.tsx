@@ -1,203 +1,67 @@
 'use client';
-
-import type { TableColumnsType } from 'antd';
-import { Button, Table, Tag } from 'antd';
-import dayjs from 'dayjs';
+import { BellOutlined, UploadOutlined } from '@ant-design/icons';
+import type { TabsProps } from 'antd';
+import { Button, Tabs } from 'antd';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import { useThrottleCallback } from '@/lib/utils';
-
-import Copy from '@/components/Copy';
-
-import { useAppDispatch } from '@/store/hooks';
-
-import { getBillingsList } from '@/api/requestMarket';
-
-import { BillingEnum, BillingItem } from '@/types/marketType';
+import BillingTab from '@/components/billing/BillingTab';
+import OrderList from '@/components/billing/OrderList';
+import Overview from '@/components/billing/Overview';
+import TransactionHistory from '@/components/billing/TransactionHistory';
 
 export default function Billing() {
-  const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const [billingsList, setBillingsList] = useState<BillingItem[]>([]);
-  const [skipCount, setSkipCount] = useState(1);
-  const [maxResultCount, setMaxResultCount] = useState(10);
-  const [totalCountItems, setTotalCountItems] = useState(0);
-
-  const getBillingsListTemp = useThrottleCallback(async () => {
-    const { items, totalCount } = await getBillingsList({
-      sortType: 1,
-      skipCount: (skipCount - 1) * maxResultCount,
-      maxResultCount: maxResultCount,
-    });
-    console.log('getBillingsListTemp items', items);
-    setBillingsList(items);
-    setTotalCountItems(totalCount);
-  }, [dispatch]);
-
-  useEffect(() => {
-    getBillingsListTemp();
-  }, [getBillingsListTemp]);
-
-  const tableOnChange = useCallback(
-    (page: number, pageSize: number) => {
-      if (page !== skipCount) {
-        setSkipCount(page);
-      }
-      if (maxResultCount !== pageSize) {
-        // pageSize change and skipCount need init 1
-        setSkipCount(1);
-        setMaxResultCount(pageSize);
-      }
-    },
-    [skipCount, maxResultCount]
+  const [activeTabKey, setActiveTabKey] = useState(
+    localStorage.getItem('billingTabKey') || 'overview'
   );
 
-  const columns: TableColumnsType = [
+  const onTabChange = (key: string) => {
+    localStorage.setItem('billingTabKey', key);
+    setActiveTabKey(key);
+  };
+
+  const items: TabsProps['items'] = [
     {
-      title: 'Billing ID',
-      dataIndex: 'id',
-      key: 'id',
-      render: (text: string) => (
-        <div>
-          <Copy label='' content={text} isShowCopy={true} showLittle={true} />
-        </div>
-      ),
+      key: 'overview',
+      label: 'Overview',
+      children: <Overview />,
     },
     {
-      title: 'Begin Time',
-      dataIndex: 'beginTime',
-      key: 'beginTime',
-      render: (text: string) => (
-        <div>{dayjs(text).format('YYYY/MM/DD HH:mm:ss')}</div>
-      ),
+      key: 'billing',
+      label: 'Billing',
+      children: <BillingTab />,
     },
     {
-      title: 'End Time',
-      dataIndex: 'endTime',
-      key: 'endTime',
+      key: 'order',
+      label: 'Order',
+      children: <OrderList />,
     },
     {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
-      render: (text: number) => {
-        return (
-          <div>
-            {text === 0 && <Tag color='success'>{BillingEnum[text]}</Tag>}
-            {text === 1 && <Tag color='processing'>{BillingEnum[text]}</Tag>}
-          </div>
-        );
-      },
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (text: number) => (
-        <div>
-          {text === 0 && <Tag color='volcano'>Unpaid</Tag>}
-          {text === 1 && <Tag color='processing'>Payment Pending</Tag>}
-          {text === 2 && <Tag color='success'>Payment Confirmed</Tag>}
-          {text === 3 && <Tag color='orange'>Canceled</Tag>}
-          {text === 4 && <Tag color='red'>Payment Failed</Tag>}
-        </div>
-      ),
-    },
-    {
-      title: 'Refund Amount',
-      dataIndex: 'refundAmount',
-      key: 'refundAmount',
-      render: (text: number) => (
-        <div>
-          {text}
-          <span className='ml-[4px] text-sm'>USDT</span>
-        </div>
-      ),
-    },
-    {
-      title: 'Paid Amount',
-      dataIndex: 'paidAmount',
-      key: 'paidAmount',
-      render: (text: number) => (
-        <div>
-          {text}
-          <span className='ml-[4px] text-sm'>USDT</span>
-        </div>
-      ),
-    },
-    {
-      title: 'Transaction Id',
-      dataIndex: 'transactionId',
-      key: 'transactionId',
-      render: (text: string) => (
-        <div>
-          <Copy label='' content={text} isShowCopy={true} showLittle={true} />
-        </div>
-      ),
-    },
-    {
-      title: 'Create Time',
-      dataIndex: 'createTime',
-      key: 'createTime',
-      render: (text: string) => (
-        <div>{dayjs(text).format('YYYY/MM/DD HH:mm:ss')}</div>
-      ),
-    },
-    {
-      title: 'Payment Time',
-      dataIndex: 'paymentTime',
-      key: 'paymentTime',
-      render: (text: string) => (
-        <div>{dayjs(text).format('YYYY/MM/DD HH:mm:ss')}</div>
-      ),
-    },
-    {
-      title: 'Billing Details',
-      dataIndex: 'id',
-      key: 'id',
-      render: (text: string) => (
-        console.log(text),
-        (
-          <div
-            className='text-blue-link cursor-pointer'
-            onClick={() =>
-              router.push(`/dashboard/billing/billingDetail?billingId=${text}`)
-            }
-          >
-            Details
-          </div>
-        )
-      ),
+      key: 'transactionHistory',
+      label: 'Transaction History',
+      children: <TransactionHistory />,
     },
   ];
 
   return (
     <div className='overflow-hidden px-[16px] pb-[40px] sm:px-[40px]'>
-      <div className='border-gray-F0 flex flex-wrap items-center justify-between border-b sm:h-[120px]'>
-        <div className='my-[20px] text-3xl text-black sm:my-[0px]'>Billing</div>
+      <div className='flex flex-wrap items-center justify-between sm:h-[120px]'>
+        <div className='my-[20px] text-3xl text-black sm:my-[0px]'>
+          Billing Management
+        </div>
         <div>
-          <Button
-            type='primary'
-            className='h-[40px] w-[160px] text-sm'
+          <BellOutlined
+            className='hover:text-blue-link mr-[16px] cursor-pointer text-xl text-black'
             onClick={() => {
               router.push('/dashboard/billing/notification');
             }}
-          >
-            <Image
-              src='/assets/svg/notifications.svg'
-              alt='notification'
-              width={16}
-              height={16}
-              className='mr-2 inline-block'
-            />
-            Notification
-          </Button>
+          />
           <Button
             type='primary'
-            className='mx-[10px] h-[40px] w-[148px] text-sm'
+            className='mx-[10px] h-[40px] w-[160px] text-sm'
             onClick={() => {
               router.push('/dashboard/billing/upgrade');
             }}
@@ -207,90 +71,43 @@ export default function Billing() {
               alt='shopping'
               width={14}
               height={14}
-              className='mr-2 inline-block'
+              className='relative top-[-2px] mr-2 inline-block'
             />
-            Purchase
+            Purchase Queries
           </Button>
           <Button
             type='primary'
-            className='my-[10px] h-[40px] w-[148px] text-sm sm:my-[0px]'
+            className='mx-[10px] h-[40px] w-[120px] text-sm'
             onClick={() => {
-              router.push('/dashboard/billing/manage');
+              router.push('/dashboard/billing/deposit');
             }}
           >
             <Image
-              src='/assets/svg/manage-accounts.svg'
-              alt='manage'
-              width={14}
-              height={14}
-              className='mr-2 inline-block'
+              src='/assets/svg/wallet.svg'
+              alt='wallet'
+              width={20}
+              height={20}
+              className='relative top-[-2px] mr-2 inline-block'
             />
-            Manage Billing
+            Deposit
+          </Button>
+          <Button
+            type='primary'
+            className='my-[10px] h-[40px] w-[120px] text-sm sm:my-[0px]'
+            onClick={() => {
+              router.push('/dashboard/billing/withdraw');
+            }}
+          >
+            <UploadOutlined className='relative top-[-3px] mr-[2px] inline-block text-lg text-white' />
+            Withdraw
           </Button>
         </div>
       </div>
-      {billingsList?.length === 0 && (
-        <div className='flex flex-col items-center'>
-          <Image
-            src='/assets/svg/billing-empty.svg'
-            alt='billing'
-            width={410}
-            height={292}
-            className='mt-[100px]'
-          />
-          <div className='text-dark-normal my-[22px] text-2xl'>
-            Account ready to query the network
-          </div>
-          <div className='text-gray-80'>
-            With a positive billing balance you are ready to query the network.
-          </div>
-          <div className='text-gray-80 mb-[22px]'>
-            Create an API key to get started.
-          </div>
-          <Button
-            className='bg-gray-F5 mb-[22px] h-[40px] w-[148px] border-none font-medium'
-            onClick={() => router.push('/dashboard/apikey')}
-          >
-            Create API Key
-          </Button>
-          <div
-            className='text-blue-link cursor-pointer'
-            onClick={() =>
-              window.open('https://docs.aefinder.io/docs/quick-start', '_blank')
-            }
-          >
-            View documentation
-            <Image
-              src='/assets/svg/right-arrow.svg'
-              alt='arrow'
-              width={24}
-              height={24}
-              className='relative top-[-1px] ml-[8px] inline-block'
-            />
-          </div>
-        </div>
-      )}
-      {billingsList?.length > 0 && (
-        <div className='mt-[16px]'>
-          <Table
-            rowKey='id'
-            columns={columns}
-            dataSource={billingsList}
-            className='w-full'
-            scroll={{ x: 'max-content' }}
-            pagination={{
-              current: skipCount,
-              pageSize: maxResultCount,
-              total: totalCountItems,
-              onChange: tableOnChange,
-              showSizeChanger: true,
-              showTitle: true,
-              showTotal: (total) => `Total ${total} Billings`,
-              pageSizeOptions: ['10', '20', '50'],
-            }}
-          />
-        </div>
-      )}
+      <Tabs
+        defaultActiveKey={activeTabKey}
+        items={items}
+        onChange={onTabChange}
+      />
     </div>
   );
 }

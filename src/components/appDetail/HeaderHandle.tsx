@@ -165,7 +165,7 @@ export default function HeaderHandle({
           className='text-blue-link w-full'
           onClick={() => handleClickUpdateCapacity()}
         >
-          Update capacity
+          Set Capacity
         </Button>
       ),
     },
@@ -239,7 +239,7 @@ export default function HeaderHandle({
       ) {
         setDeployDrawerVisible(true);
       } else {
-        messageApi.info('Please update capacity first: Processor and Storage');
+        messageApi.info('Please set capacity first: Processor and Storage');
         setIsShowUpdateCapacityModal(true);
       }
     } finally {

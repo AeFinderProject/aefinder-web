@@ -51,6 +51,7 @@ export default function UpdateCapacityDrawer({
 
   const [isShowCapacityCollapse, setIsShowCapacityCollapse] = useState(false);
   const [loading, setLoading] = useState(false);
+  const orgUser = useAppSelector((state) => state.common.orgUser);
   const orgBalance = useAppSelector((state) => state.common.orgBalance);
   const currentAppDetail = useAppSelector(
     (state) => state.app.currentAppDetail
@@ -463,7 +464,7 @@ export default function UpdateCapacityDrawer({
 
   return (
     <Drawer
-      title='Update Capacity'
+      title='Set Capacity'
       placement='right'
       onClose={handleClose}
       open={isShowUpdateCapacityModal}
@@ -531,7 +532,7 @@ export default function UpdateCapacityDrawer({
       )}
       <div className='bg-gray-F5 rounded-lg p-[20px]'>
         <div className='flex items-center justify-between'>
-          <span className='text-gray-80 text-sm'>Billing Balance</span>
+          <span className='text-gray-80 text-sm'>Balance</span>
           <span className='text-dark-normal'>{orgBalance?.balance} USDT</span>
         </div>
         <div className='mt-[10px] flex items-center justify-between'>
@@ -544,21 +545,19 @@ export default function UpdateCapacityDrawer({
           <div>
             <Divider className='my-[20px]' />
             <div className='flex justify-between'>
-              <div className='text-gray-80 text-sm'>Processor Amount</div>
+              <div className='text-gray-80 text-sm'>Processor</div>
               <div className='text-dark-normal'>
                 {currentProcessAmount} USDT
               </div>
             </div>
             <div className='mt-[20px] flex justify-between'>
-              <div className='text-gray-80 text-sm'>
-                Processor Deduction Amount
-              </div>
+              <div className='text-gray-80 text-sm'>Deduction Amount</div>
               <div className='text-dark-normal'>
                 {currentProcessDeductionAmount} USDT
               </div>
             </div>
             <div className='mt-[20px] flex justify-between'>
-              <div className='text-dark-normal'>Processor Actual Amount</div>
+              <div className='text-dark-normal'>Actual Amount</div>
               <div className='text-dark-normal'>
                 {currentProcessActualAmount} USDT
               </div>
@@ -569,21 +568,19 @@ export default function UpdateCapacityDrawer({
           <div>
             <Divider className='my-[20px]' />
             <div className='flex justify-between'>
-              <div className='text-gray-80 text-sm'>Storage Amount</div>
+              <div className='text-gray-80 text-sm'>Storage</div>
               <div className='text-dark-normal'>
                 {currentStorageAmount} USDT
               </div>
             </div>
             <div className='mt-[20px] flex justify-between'>
-              <div className='text-gray-80 text-sm'>
-                Storage Deduction Amount
-              </div>
+              <div className='text-gray-80 text-sm'>Deduction Amount</div>
               <div className='text-dark-normal'>
                 {currentStorageDeductionAmount} USDT
               </div>
             </div>
             <div className='mt-[20px] flex justify-between'>
-              <div className='text-dark-normal'>Storage Actual Amount</div>
+              <div className='text-dark-normal'>Actual Amount</div>
               <div className='text-dark-normal'>
                 {currentStorageActualAmount} USDT
               </div>
@@ -621,8 +618,9 @@ export default function UpdateCapacityDrawer({
           onClick={handleSave}
           loading={loading}
           disabled={
-            originalCapacityType === currentCapacityType &&
-            originalStorageNum === currentStorageNum
+            (originalCapacityType === currentCapacityType &&
+              originalStorageNum === currentStorageNum) ||
+            orgUser?.organizationStatus === 1
           }
         >
           Save

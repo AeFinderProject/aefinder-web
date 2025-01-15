@@ -4,7 +4,6 @@ import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import type { GetRef, TourProps } from 'antd';
 import { Button, message, Tooltip, Tour } from 'antd';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { getRemainingDays, useThrottleCallback } from '@/lib/utils';
@@ -31,7 +30,6 @@ import { CurrentTourStepEnum } from '@/types/appType';
 
 export default function Dashboard() {
   const dispatch = useAppDispatch();
-  const router = useRouter();
 
   const createRef = useRef<GetRef<typeof Button>>(null);
   const [createAppDrawerVisible, setCreateAppDrawerVisible] = useState(false);
@@ -157,22 +155,6 @@ export default function Dashboard() {
             >
               Create AeIndexer
             </Button>
-            <Button
-              type='primary'
-              onClick={() => {
-                router.push('/dashboard/billing/upgrade');
-              }}
-              className='ml-[20px] hidden h-[40px] w-[148px] text-sm sm:inline-block'
-            >
-              <Image
-                src='/assets/svg/shopping-cart.svg'
-                alt='shopping'
-                width={14}
-                height={14}
-                className='mr-2 inline-block'
-              />
-              Purchase
-            </Button>
           </div>
         </div>
         <div className='border-gray-E0 mb-[31px] flex h-[98px] items-center justify-between rounded-lg border p-[24px]'>
@@ -192,20 +174,6 @@ export default function Dashboard() {
           </div>
           <div className='flex flex-col items-start'>
             <div className='text-gray-80 text-base'>
-              Renews in
-              <Tooltip
-                title='Remaining days before the trial period ends.'
-                className='relative top-[-3px] ml-[4px]'
-              >
-                <InfoCircleOutlined />
-              </Tooltip>
-            </div>
-            <div className='text-dark-normal mt-[2px] text-base font-medium'>
-              {getRemainingDays()} Days
-            </div>
-          </div>
-          <div className='flex flex-col items-start'>
-            <div className='text-gray-80 text-base'>
               API Keys
               <Tooltip
                 title='There are currently active API keys.'
@@ -216,6 +184,20 @@ export default function Dashboard() {
             </div>
             <div className='text-dark-normal mt-[2px] text-base font-medium'>
               {apikeySummary.apiKeyCount}/{apikeySummary.maxApiKeyCount || 10}
+            </div>
+          </div>
+          <div className='flex flex-col items-start'>
+            <div className='text-gray-80 text-base'>
+              Renews in
+              <Tooltip
+                title='Remaining days before the trial period ends.'
+                className='relative top-[-3px] ml-[4px]'
+              >
+                <InfoCircleOutlined />
+              </Tooltip>
+            </div>
+            <div className='text-dark-normal mt-[2px] text-base font-medium'>
+              {getRemainingDays()} Days
             </div>
           </div>
           <div></div>

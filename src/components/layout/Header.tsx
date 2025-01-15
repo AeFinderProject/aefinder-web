@@ -19,11 +19,16 @@ import LogInButton from '@/components/wallet/LoginButton';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setApikeySummary } from '@/store/slices/appSlice';
-import { setUserInfo, setUsername } from '@/store/slices/commonSlice';
+import {
+  setOrgUser,
+  setUserInfo,
+  setUsername,
+} from '@/store/slices/commonSlice';
 
 import { queryAuthToken } from '@/api/apiUtils';
 import { getSummary } from '@/api/requestAPIKeys';
 import { getUsersInfo } from '@/api/requestApp';
+import { getUserAll } from '@/api/requestMarket';
 import { CHAIN_ID } from '@/constant';
 
 export default function Header() {
@@ -56,16 +61,29 @@ export default function Header() {
 
   const getSummaryTemp = useThrottleCallback(async () => {
     const res = await getSummary();
-    console.log('res', res);
+    console.log('getSummaryTemp res', res);
     dispatch(setApikeySummary(res));
+  }, [dispatch]);
+
+  const getUserAllTemp = useThrottleCallback(async () => {
+    const res = await getUserAll();
+    console.log('getUserAll', res);
+    dispatch(setOrgUser(res[0]));
   }, [dispatch]);
 
   useEffect(() => {
     if (pathname !== '/' && !isLoginPathname) {
       getUsersInfoTemp();
       getSummaryTemp();
+      getUserAllTemp();
     }
-  }, [getUsersInfoTemp, getSummaryTemp, pathname, isLoginPathname]);
+  }, [
+    getUsersInfoTemp,
+    getSummaryTemp,
+    getUserAllTemp,
+    pathname,
+    isLoginPathname,
+  ]);
 
   useEffect(() => {
     const logoutContainer = document?.getElementById('logout-container');

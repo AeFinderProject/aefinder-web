@@ -1,7 +1,7 @@
 import { Progress } from 'antd';
 import { useEffect, useState } from 'react';
 
-import { useThrottleCallback } from '@/lib/utils';
+import { calcDiv, useThrottleCallback } from '@/lib/utils';
 
 import { useAppSelector } from '@/store/hooks';
 
@@ -55,22 +55,34 @@ export default function Capacity() {
                   <div className='text-dark-normal mb-[6px] mt-[8px] font-medium'>
                     {item?.cpuUsage || '--'} / {item?.limitCpu || '--'}
                   </div>
-                  <Progress percent={20} showInfo={false} />
+                  <Progress
+                    percent={calcDiv(
+                      Number(item?.cpuUsage || 0),
+                      Number(item?.limitCpu || 0)
+                    )}
+                    showInfo={false}
+                  />
                 </div>
                 <div className='border-gray-E0 flex-1 rounded-lg border p-[24px]'>
                   <div className='text-gray-80'>RAM</div>
                   <div className='text-dark-normal mb-[6px] mt-[8px] font-medium'>
-                    {item?.memoryUsage || '--'} / {item?.limitMemory || '--'}MB
+                    {item?.memoryUsage || '--'} / {item?.limitMemory || '--'}
                   </div>
-                  <Progress percent={45} showInfo={false} />
+                  <Progress
+                    percent={calcDiv(
+                      Number(item?.memoryUsage || 0),
+                      Number(item?.limitMemory || 0)
+                    )}
+                    showInfo={false}
+                  />
                 </div>
-                <div className='border-gray-E0 flex-1 rounded-lg border p-[24px]'>
+                {/* <div className='border-gray-E0 flex-1 rounded-lg border p-[24px]'>
                   <div className='text-gray-80'>Disk</div>
                   <div className='text-dark-normal mb-[6px] mt-[8px] font-medium'>
                     -- / -- GB
                   </div>
                   <Progress percent={0} showInfo={false} />
-                </div>
+                </div> */}
               </div>
             </div>
           );

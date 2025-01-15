@@ -1,12 +1,13 @@
 import { createAppSlice } from '@/store/createAppSlice';
 
 import { BalanceType, UserInfoType } from '@/types/appType';
-import { GetOrgBalanceResponse } from '@/types/marketType';
+import { GetOrgBalanceResponse, GetUserAllResponse } from '@/types/marketType';
 
 export interface CommonSliceState {
   isLoading: boolean;
   username: string;
   userInfo: UserInfoType;
+  orgUser: GetUserAllResponse;
   usdtBalance: BalanceType;
   elfBalance: BalanceType;
   orgBalance: GetOrgBalanceResponse;
@@ -21,6 +22,13 @@ const initialState: CommonSliceState = {
     emailConfirmed: false,
     notification: false,
     walletAddress: '',
+  },
+  orgUser: {
+    id: '',
+    displayName: '',
+    creationTime: '',
+    organizationWalletAddress: '',
+    organizationStatus: 0,
   },
   usdtBalance: {
     balance: '0',
@@ -57,6 +65,9 @@ export const commonSlice = createAppSlice({
     setUserInfo: (state, action) => {
       state.userInfo = action.payload;
     },
+    setOrgUser: (state, action) => {
+      state.orgUser = action.payload;
+    },
     setUsdtBalance: (state, action) => {
       state.usdtBalance = action.payload;
     },
@@ -73,6 +84,7 @@ export const {
   setIsLoading,
   setUsername,
   setUserInfo,
+  setOrgUser,
   setUsdtBalance,
   setElfBalance,
   setOrgBalance,

@@ -4,11 +4,11 @@ import { TWalletInfo } from '@aelf-web-login/wallet-adapter-base';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { ExclamationCircleOutlined, LeftOutlined } from '@ant-design/icons';
 import { Button, Col, Divider, InputNumber, message, Row, Tag } from 'antd';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
+  calcTotalPrice,
   handleErrorMessage,
   timesDecimals,
   useDebounceCallback,
@@ -58,6 +58,7 @@ export default function Upgrade() {
   const [merchandisesItem, setMerchandisesItem] = useState<MerchandisesItem>();
   const [originalAssetId, setOriginalAssetId] = useState<string>();
 
+  const orgUser = useAppSelector((state) => state.common.orgUser);
   const orgBalance = useAppSelector((state) => state.common.orgBalance);
 
   const getAssetsListTemp = useCallback(async () => {
@@ -261,7 +262,7 @@ export default function Upgrade() {
             className='relative top-[-7px] mr-[16px] cursor-pointer align-middle text-sm'
             onClick={handleRouteBack}
           />
-          <span className='text-3xl text-black'>Purchase</span>
+          <span className='text-3xl text-black'>Purchase Queries</span>
         </div>
         {isLocked && (
           <Tag
@@ -277,13 +278,6 @@ export default function Upgrade() {
           <Col xs={24} md={14}>
             <div className='mb-[28px] flex items-center justify-between'>
               <div className='text-xl font-medium text-black'>
-                <Image
-                  src='/assets/svg/step1.svg'
-                  alt='step1'
-                  width={24}
-                  height={24}
-                  className='relative top-[-2px] mr-[16px] inline-block align-middle'
-                />
                 Estimated number of queries
               </div>
               <div>
@@ -320,30 +314,22 @@ export default function Upgrade() {
               isLocked={isLocked}
             />
             <div className='text-gray-80 mt-[20px] text-sm'>
-              *First 100,000 is free, subsequent queries are chargeable at
-              $4/100,000 queries
+              *First {freeQuantity} is free, subsequent queries are chargeable
+              at ${calcTotalPrice(freeQuantity, merchandisesItem?.price || 0)}/
+              {freeQuantity} queries
             </div>
             <Divider className='my-[35px]' />
-            <div className='mb-[28px] text-xl font-medium text-black'>
-              <Image
-                src='/assets/svg/step2.svg'
-                alt='step2'
-                width={24}
-                height={24}
-                className='relative top-[-2px] mr-[16px] inline-block align-middle'
-              />
-              Confirm wallet
+            <div className='mb-[20px] text-xl font-medium text-black'>
+              Balance
             </div>
             <div className='my-[8px] flex items-start justify-start'>
-              <span className='text-gray-80 mr-[6px] text-sm'>
-                Billing balance:
-              </span>
+              <span className='text-gray-80 mr-[6px] text-sm'>Balance:</span>
               <div className='text-dark-normal mr-[2px] text-sm'>
                 {orgBalance?.balance || '--'} USDT
               </div>
             </div>
             <div className='text-gray-80 my-[8px] text-sm'>
-              Locked balance: {orgBalance?.lockedBalance || '--'} USDT
+              Locked: {orgBalance?.lockedBalance || '--'} USDT
             </div>
             <Tag
               icon={
@@ -394,7 +380,7 @@ export default function Upgrade() {
                 walletInfoRef.current && (
                   <Button
                     type='primary'
-                    disabled={isLocked}
+                    disabled={isLocked || orgUser?.organizationStatus === 1}
                     onClick={handleCreateOrder}
                     loading={loading}
                   >
@@ -407,9 +393,9 @@ export default function Upgrade() {
                 )}
             </div>
             <div className='text-gray-80 text-sm'>
-              * This amount will be locked in your Billing Balance and cannot be
+              * This amount will be locked from your balance and cannot be
               withdrawn. We will charge the exact amount consumed at the end of
-              each month. Any unused funds in your Billing Balance will then be
+              each month. Any unused funds in your locked balance will then be
               unlocked and available for withdrawal.
             </div>
           </Col>
@@ -420,10 +406,10 @@ export default function Upgrade() {
             className='mt-[24px] sm:mt-[0px]'
           >
             <div className='text-xl font-medium text-black'>
-              Your Plan Details
+              Purchase Details
             </div>
             <div className='text-gray-80 my-[16px] text-sm'>
-              Your plan will also include 100K free monthly queries. The current
+              This will also include 100K free monthly queries. The current
               prices are promotional and available for a limited time only.
             </div>
             <div className='bg-gray-F5 rounded-lg p-[20px]'>

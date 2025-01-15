@@ -203,9 +203,7 @@ export default function Apikey() {
         </Col>
         <Col sm={12} md={6} className='my-[10px] sm:my-[0px]'>
           <div className='mb-[4px]'>
-            <span className='text-gray-80 mr-[8px] text-sm'>
-              Billing Balance
-            </span>
+            <span className='text-gray-80 mr-[8px] text-sm'>Balance</span>
             <Tooltip
               title='GRT currently available in your billing contract. Withdraw at any time.'
               className='inline-block align-middle'

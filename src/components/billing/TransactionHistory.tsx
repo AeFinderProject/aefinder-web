@@ -1,5 +1,5 @@
 import type { TableColumnsType } from 'antd';
-import { Table } from 'antd';
+import { Spin, Table } from 'antd';
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -13,6 +13,7 @@ import { getTransactionHistory } from '@/api/requestMarket';
 import { TransactionHistoryItem } from '@/types/marketType';
 
 export default function TransactionHistory() {
+  const [isLoading, setIsLoading] = useState(false);
   const [transactionHistoryList, setTransactionHistoryList] = useState<
     TransactionHistoryItem[]
   >([]);
@@ -35,12 +36,17 @@ export default function TransactionHistory() {
   );
 
   const getTransactionHistoryList = useThrottleCallback(async () => {
-    const { items, totalCount } = await getTransactionHistory({
-      skipCount: (skipCount - 1) * maxResultCount,
-      maxResultCount: maxResultCount,
-    });
-    setTransactionHistoryList(items);
-    setTotalCountItems(totalCount);
+    setIsLoading(true);
+    try {
+      const { items, totalCount } = await getTransactionHistory({
+        skipCount: (skipCount - 1) * maxResultCount,
+        maxResultCount: maxResultCount,
+      });
+      setTransactionHistoryList(items);
+      setTotalCountItems(totalCount);
+    } finally {
+      setIsLoading(false);
+    }
   }, [skipCount, maxResultCount]);
 
   useEffect(() => {
@@ -113,6 +119,11 @@ export default function TransactionHistory() {
             As you add and remove USDT from the billing contract, a record of
             those transaction will show up here
           </div>
+          {isLoading && (
+            <div className='flex items-center justify-center'>
+              <Spin size='large' />
+            </div>
+          )}
         </div>
       )}
       {transactionHistoryList.length > 0 && (

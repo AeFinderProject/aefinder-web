@@ -37,7 +37,7 @@ export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
               <Copy
                 className='ml-[32px]'
                 label='AeIndexer capacity'
-                content={processorAssetListSlice[0]?.merchandise?.name}
+                content={processorAssetListSlice[0]?.merchandise?.specification}
               />
             )}
           </div>
