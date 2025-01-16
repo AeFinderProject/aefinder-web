@@ -70,8 +70,8 @@ const networkHostMap = {
     RPC_SERVER_AELF: 'https://aelf-public-node.aelf.io',
     RPC_SERVER_TDVV: 'https://tdvv-public-node.aelf.io',
     RPC_SERVER_TDVW: 'https://tdvv-public-node.aelf.io',
-    // todo: add to mainnet address
-    AeFinderContractAddress: '',
+    AeFinderContractAddress:
+      '1PnHh5EadqBT7gcNioH4NM2fYPig2EMH5cH4SUarCf2ZL2neZ',
     tokenContractAddress: '7RzVGiuVWkvL4VfVHdZfQF2Tri3sgLe9U991bohHFfSRZXuGX',
     aelfscanAddress: 'https://aelfscan.io',
   },
