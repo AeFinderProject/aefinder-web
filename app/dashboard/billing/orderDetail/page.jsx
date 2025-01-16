@@ -224,7 +224,7 @@ export default function OrderDetail() {
                       {item?.type === 1 && (
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            Quantity
+                            Type
                           </div>
                           {item?.specification || '--'}
                         </Col>
@@ -232,9 +232,10 @@ export default function OrderDetail() {
                       {item?.type === 2 && (
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            Replicas
+                            Size
                           </div>
                           {item?.replicas || '--'}
+                          {item?.unit || ''}
                         </Col>
                       )}
                       {item?.appId && (
@@ -286,7 +287,7 @@ export default function OrderDetail() {
                       {item?.type === 1 && (
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            Quantity
+                            Type
                           </div>
                           {item?.specification || '--'}
                         </Col>
@@ -294,9 +295,10 @@ export default function OrderDetail() {
                       {item?.type === 2 && (
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            Replicas
+                            Size
                           </div>
                           {item?.replicas || '--'}
+                          {item?.unit || ''}
                         </Col>
                       )}
                       {item?.appId && (

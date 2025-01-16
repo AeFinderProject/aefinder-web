@@ -46,7 +46,7 @@ export default function DeactivatedModal({
       <div className='text-gray-80'>
         Your AeIndexer is currently deactivated due to insufficient balance. To
         reactivate your AeIndexer and continue enjoying our services, please add
-        funds to your Billing Balance.
+        funds to your Balance.
       </div>
       <div className='mt-[24px] flex justify-between'>
         <Button className='w-[48%]' onClick={handleClose} size='large'>

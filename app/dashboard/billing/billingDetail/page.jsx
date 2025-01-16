@@ -181,7 +181,7 @@ export default function BillingDetail() {
                       {item?.merchandise?.type === 1 && (
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            Specification
+                            Type
                           </div>
                           {item?.merchandise?.specification || '--'}
                         </Col>
@@ -189,9 +189,9 @@ export default function BillingDetail() {
                       {item?.merchandise?.type === 2 && (
                         <Col xs={12} md={6} className='my-[12px]'>
                           <div className='text-gray-80 mb-[10px] text-xs'>
-                            Replicas
+                            Size
                           </div>
-                          {item?.replicas || '--'}{' '}
+                          {item?.replicas || '--'}
                           {String(item?.merchandise?.unit)}
                         </Col>
                       )}

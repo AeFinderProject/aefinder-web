@@ -298,7 +298,7 @@ export default function Deposit() {
                 Estimated Transaction Fee is approximately:
               </span>
               <span className='text-dark-normal text-sm'>
-                0.2161
+                0.003625
                 <span className='ml-[10px]'>ELF</span>
               </span>
             </div>

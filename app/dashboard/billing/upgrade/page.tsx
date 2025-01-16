@@ -351,7 +351,7 @@ export default function Upgrade() {
                 className='h-[40px] w-full truncate leading-10'
               >
                 <span className='text-gray-80 text-sm'>
-                  You don’t have enough billing balance. Please
+                  You don’t have enough balance. Please
                   <span
                     className='text-blue-link mx-[4px] cursor-pointer text-sm'
                     onClick={() => router.push('/dashboard/billing/deposit')}
@@ -372,7 +372,7 @@ export default function Upgrade() {
               </div>
               {currentActualAmount > orgBalance?.balance && (
                 <Button type='default' disabled={true}>
-                  Insufficient billing balance
+                  Insufficient balance
                 </Button>
               )}
               {currentActualAmount <= orgBalance?.balance &&

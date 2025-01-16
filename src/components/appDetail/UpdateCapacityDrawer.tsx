@@ -641,8 +641,8 @@ export default function UpdateCapacityDrawer({
         Processor Amount = (The remaining hours of the current month) * price.
       </div>
       <div className='text-gray-80 mt-[10px] text-sm'>
-        *This amount will remain locked in your Billing Balance and be charged
-        at the end of the month.
+        *This amount will remain locked in your Balance and be charged at the
+        end of the month.
       </div>
     </Drawer>
   );
