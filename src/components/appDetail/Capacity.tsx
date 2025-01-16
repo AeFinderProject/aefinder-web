@@ -1,11 +1,11 @@
 import { Progress } from 'antd';
-import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useState } from 'react';
 
 import {
   bytesToGiB,
-  calcDiv,
+  calcDiv100,
   convertToGiB,
+  formatToTwoDecimals,
   processValue,
   useThrottleCallback,
 } from '@/lib/utils';
@@ -52,7 +52,7 @@ export default function Capacity() {
     if (podUsage && podUsage?.length > 0) {
       // 1 fixed 2
       const currentPodUsage = podUsage[0];
-      res.currentCpuUsage = new BigNumber(currentPodUsage?.cpuUsage).toFixed(2);
+      res.currentCpuUsage = formatToTwoDecimals(currentPodUsage?.cpuUsage);
       // 2 fixed 2 m/1000 or number
       res.currentCpuLimit = processValue(currentPodUsage?.limitCpu);
       // 3 div 1024 1024 1024 GiB
@@ -85,7 +85,7 @@ export default function Capacity() {
                     {displayCapacity()?.currentCpuLimit}
                   </div>
                   <Progress
-                    percent={calcDiv(
+                    percent={calcDiv100(
                       Number(displayCapacity()?.currentCpuUsage),
                       Number(displayCapacity()?.currentCpuLimit)
                     )}
@@ -95,12 +95,13 @@ export default function Capacity() {
                 <div className='border-gray-E0 flex-1 rounded-lg border p-[24px]'>
                   <div className='text-gray-80'>RAM</div>
                   <div className='text-dark-normal mb-[6px] mt-[8px] font-medium'>
-                    {item?.memoryUsage || '--'} / {item?.limitMemory || '--'}
+                    {displayCapacity()?.currentMemoryUsage} /{' '}
+                    {displayCapacity()?.currentMemoryLimit}
                   </div>
                   <Progress
-                    percent={calcDiv(
-                      Number(item?.memoryUsage || 0),
-                      Number(item?.limitMemory || 0)
+                    percent={calcDiv100(
+                      displayCapacity()?.currentMemoryUsage,
+                      displayCapacity()?.currentMemoryLimit
                     )}
                     showInfo={false}
                   />

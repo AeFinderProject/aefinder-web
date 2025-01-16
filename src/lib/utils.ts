@@ -363,15 +363,33 @@ export function calcTotalPrice(queryCount: number, price: number) {
   return queryCountBignumber.times(priceBignumber).toString();
 }
 
-export function calcDiv(number1: number | string, number2: number | string) {
-  console.log(number1, number2);
-  if (!number1 || !number2) {
+export function calcDiv100(
+  number1: number | string,
+  number2: number | string
+): number {
+  // Helper function to extract number from string
+  const extractNumericValue = (input: number | string): BigNumber => {
+    if (typeof input === 'string') {
+      // Extract numeric part from string
+      const numericValue = parseFloat(input.replace(/[^0-9.]/g, ''));
+      return new BigNumber(isNaN(numericValue) ? 0 : numericValue);
+    }
+
+    // If input is a number, directly convert it to BigNumber
+    return new BigNumber(input);
+  };
+
+  // Extract numeric parts from inputs
+  const number1Bignumber = extractNumericValue(number1);
+  const number2Bignumber = extractNumericValue(number2);
+
+  // Return 0 if number2 is 0 (to avoid division by 0)
+  if (number2Bignumber.isZero()) {
     return 0;
   }
 
-  const number1Bignumber = BigNumber(number1);
-  const number2Bignumber = BigNumber(number2);
-  return number1Bignumber.div(number2Bignumber).toNumber();
+  // Perform division and calculate percentage
+  return number1Bignumber.div(number2Bignumber).times(100).toNumber();
 }
 
 export function displayUnit(chargeType: number, type: number, unit: string) {
@@ -392,6 +410,24 @@ export function displayUnit(chargeType: number, type: number, unit: string) {
   return unit;
 }
 
+export function formatToTwoDecimals(input: string) {
+  // Handle null or undefined input
+  if (input == null) {
+    return '--';
+  }
+
+  // Convert the input to a floating-point number
+  const numericValue = parseFloat(input);
+
+  // Check if the input is a valid number
+  if (isNaN(numericValue)) {
+    return '--';
+  }
+
+  // Return the number formatted to at most two decimal places
+  return `${parseFloat(numericValue.toFixed(2))}`;
+}
+
 // eslint-disable-next-line
 export function processValue(input: any) {
   // Handle null or undefined input
@@ -399,9 +435,9 @@ export function processValue(input: any) {
     return '--';
   }
 
-  // If input is a number, return it as a string with two decimal places
+  // If input is a number, return it as a string with at most two decimal places
   if (typeof input === 'number') {
-    return input.toFixed(2); // Ensure number is converted to string with two decimal places
+    return `${parseFloat(input.toFixed(2))}`; // Ensure at most two decimal places
   }
 
   // If input is a string
@@ -411,16 +447,20 @@ export function processValue(input: any) {
 
     // If the string contains 'm'
     if (input.includes('m')) {
-      // Extract numeric part, divide by 1000, and convert to string with two decimal places
+      // Extract numeric part, divide by 1000, and convert to a string with at most two decimal places
       const numericValue = parseFloat(input.replace('m', ''));
 
       // If numericValue is valid, process it; if not, return '--'
-      return isNaN(numericValue) ? '--' : (numericValue / 1000).toFixed(2);
+      return isNaN(numericValue)
+        ? '--'
+        : `${parseFloat((numericValue / 1000).toFixed(2))}`;
     }
 
     // If the string does not contain 'm', try to convert to a number
     const numericValue = parseFloat(input);
-    return isNaN(numericValue) ? '--' : numericValue.toFixed(2);
+    return isNaN(numericValue)
+      ? '--'
+      : `${parseFloat(numericValue.toFixed(2))}`;
   }
 
   // For other types, return '--'
