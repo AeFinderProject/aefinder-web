@@ -45,7 +45,6 @@ export default function Deposit() {
   const [currentAmount, setCurrentAmount] = useState<number | null>(null);
 
   const userInfo = useAppSelector((state) => state.common.userInfo);
-  const orgUser = useAppSelector((state) => state.common.orgUser);
   const usdtBalance = useAppSelector((state) => state.common.usdtBalance);
   const elfBalance = useAppSelector((state) => state.common.elfBalance);
 
@@ -322,7 +321,6 @@ export default function Deposit() {
                   size='large'
                   onClick={handleApprove}
                   loading={loading}
-                  disabled={orgUser?.organizationStatus === 1}
                 >
                   Deposit
                 </Button>

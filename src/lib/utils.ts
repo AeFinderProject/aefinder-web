@@ -372,3 +372,21 @@ export function calcDiv(number1: number, number2: number) {
   const number2Bignumber = BigNumber(number2);
   return number1Bignumber.div(number2Bignumber).toNumber();
 }
+
+export function displayUnit(chargeType: number, type: number, unit: string) {
+  if (chargeType === 1) {
+    return unit;
+  }
+  if (chargeType === 0) {
+    if (type === 0) {
+      return unit;
+    }
+    if (type === 1) {
+      return 'hour';
+    }
+    if (type === 2) {
+      return 'GB-hour';
+    }
+  }
+  return unit;
+}

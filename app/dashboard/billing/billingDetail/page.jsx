@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { useDebounceCallback } from '@/lib/utils';
+import { displayUnit, useDebounceCallback } from '@/lib/utils';
 
 import { queryAuthToken } from '@/api/apiUtils';
 import { getBillingsDetail } from '@/api/requestMarket';
@@ -168,7 +168,11 @@ export default function BillingDetail() {
                           Price
                         </div>
                         {item?.merchandise?.price || '--'} USDT/
-                        {String(item?.merchandise?.unit)}
+                        {displayUnit(
+                          item?.merchandise?.chargeType,
+                          item?.merchandise?.type,
+                          item?.merchandise?.unit
+                        )}
                       </Col>
                       {item?.merchandise?.type === 0 && (
                         <Col xs={12} md={6} className='my-[12px]'>
@@ -192,7 +196,7 @@ export default function BillingDetail() {
                             Size
                           </div>
                           {item?.replicas || '--'}
-                          {String(item?.merchandise?.unit)}
+                          {item?.merchandise?.unit}
                         </Col>
                       )}
                       {item?.asset?.appId && (

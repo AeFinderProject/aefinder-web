@@ -33,7 +33,6 @@ export default function Withdraw() {
   const { callSendMethod, walletInfo, isConnected } = useConnectWallet();
   const [loading, setLoading] = useState(false);
   const userInfo = useAppSelector((state) => state.common.userInfo);
-  const orgUser = useAppSelector((state) => state.common.orgUser);
   const orgBalance = useAppSelector((state) => state.common.orgBalance);
   const [withdrawAddress, setWithdrawAddress] = useState(
     userInfo?.walletAddress
@@ -234,7 +233,6 @@ export default function Withdraw() {
               size='large'
               onClick={handleWithdraw}
               loading={loading}
-              disabled={orgUser?.organizationStatus === 1}
             >
               Withdraw
             </Button>

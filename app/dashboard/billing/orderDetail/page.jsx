@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { useDebounceCallback } from '@/lib/utils';
+import { displayUnit, useDebounceCallback } from '@/lib/utils';
 
 import Copy from '@/components/Copy';
 
@@ -69,11 +69,12 @@ export default function OrderDetail() {
     currentOrderDetail?.details?.map((item) => {
       if (item?.originalAsset) {
         tempOriginResources.push({
-          name: item?.merchandise?.name,
-          price: item?.merchandise?.price,
-          unit: item?.merchandise?.unit,
-          type: item?.merchandise?.type,
-          specification: item?.merchandise?.specification,
+          name: item?.originalAsset?.merchandise?.name,
+          price: item?.originalAsset?.merchandise?.price,
+          unit: item?.originalAsset?.merchandise?.unit,
+          type: item?.originalAsset?.merchandise?.type,
+          chargeType: item?.originalAsset?.merchandise?.chargeType,
+          specification: item?.originalAsset?.merchandise?.specification,
           quantity: item?.originalAsset?.quantity,
           replicas: item?.originalAsset?.replicas,
           appId:
@@ -86,6 +87,7 @@ export default function OrderDetail() {
         price: item?.merchandise?.price,
         unit: item?.merchandise?.unit,
         type: item?.merchandise?.type,
+        chargeType: item?.merchandise?.chargeType,
         specification: item?.merchandise?.specification,
         quantity: item?.quantity,
         replicas: item?.replicas,
@@ -211,7 +213,8 @@ export default function OrderDetail() {
                         <div className='text-gray-80 mb-[10px] text-xs'>
                           Price
                         </div>
-                        {item?.price || '--'} USDT/{item?.unit || '--'}
+                        {item?.price || '--'} USDT/
+                        {displayUnit(item?.chargeType, item?.type, item?.unit)}
                       </Col>
                       {item?.type === 0 && (
                         <Col xs={12} md={6} className='my-[12px]'>
@@ -235,7 +238,7 @@ export default function OrderDetail() {
                             Size
                           </div>
                           {item?.replicas || '--'}
-                          {item?.unit || ''}
+                          {item?.unit || '--'}
                         </Col>
                       )}
                       {item?.appId && (
@@ -274,7 +277,8 @@ export default function OrderDetail() {
                         <div className='text-gray-80 mb-[10px] text-xs'>
                           Price
                         </div>
-                        {item?.price || '--'} USDT/{item?.unit || '--'}
+                        {item?.price || '--'} USDT/
+                        {displayUnit(item?.chargeType, item?.type, item?.unit)}
                       </Col>
                       {item?.type === 0 && (
                         <Col xs={12} md={6} className='my-[12px]'>
@@ -298,7 +302,7 @@ export default function OrderDetail() {
                             Size
                           </div>
                           {item?.replicas || '--'}
-                          {item?.unit || ''}
+                          {item?.unit || '--'}
                         </Col>
                       )}
                       {item?.appId && (

@@ -104,8 +104,7 @@ export default function BillingTab() {
           {text === 0 && <Tag color='volcano'>Unpaid</Tag>}
           {text === 1 && <Tag color='processing'>Payment Pending</Tag>}
           {text === 2 && <Tag color='success'>Payment Confirmed</Tag>}
-          {text === 3 && <Tag color='orange'>Canceled</Tag>}
-          {text === 4 && <Tag color='red'>Payment Failed</Tag>}
+          {text === 3 && <Tag color='orange'>Payment Failed</Tag>}
         </div>
       ),
     },
