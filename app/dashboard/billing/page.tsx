@@ -54,12 +54,12 @@ export default function Billing() {
         </div>
         <div>
           <Button
-            className='relative top-[-2px] mr-[14px] h-[40px] w-[40px] text-center text-sm'
+            className='mr-[14px] h-[40px] w-[40px] text-center text-sm'
             onClick={() => {
               router.push('/dashboard/billing/notification');
             }}
           >
-            <BellOutlined className='hover:text-blue-link relative left-[-6px] cursor-pointer text-xl text-black' />
+            <BellOutlined className='hover:text-blue-link relative left-[-6px] top-[-2px] cursor-pointer text-xl text-black' />
           </Button>
           <Button
             type='primary'
