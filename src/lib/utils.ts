@@ -363,7 +363,8 @@ export function calcTotalPrice(queryCount: number, price: number) {
   return queryCountBignumber.times(priceBignumber).toString();
 }
 
-export function calcDiv(number1: number, number2: number) {
+export function calcDiv(number1: number | string, number2: number | string) {
+  console.log(number1, number2);
   if (!number1 || !number2) {
     return 0;
   }
@@ -382,11 +383,96 @@ export function displayUnit(chargeType: number, type: number, unit: string) {
       return unit;
     }
     if (type === 1) {
-      return 'hour';
+      return 'hr';
     }
     if (type === 2) {
       return 'GB-hour';
     }
   }
   return unit;
+}
+
+// eslint-disable-next-line
+export function processValue(input: any) {
+  // Handle null or undefined input
+  if (input == null) {
+    return '--';
+  }
+
+  // If input is a number, return it as a string with two decimal places
+  if (typeof input === 'number') {
+    return input.toFixed(2); // Ensure number is converted to string with two decimal places
+  }
+
+  // If input is a string
+  if (typeof input === 'string') {
+    // Trim whitespace
+    input = input.trim();
+
+    // If the string contains 'm'
+    if (input.includes('m')) {
+      // Extract numeric part, divide by 1000, and convert to string with two decimal places
+      const numericValue = parseFloat(input.replace('m', ''));
+
+      // If numericValue is valid, process it; if not, return '--'
+      return isNaN(numericValue) ? '--' : (numericValue / 1000).toFixed(2);
+    }
+
+    // If the string does not contain 'm', try to convert to a number
+    const numericValue = parseFloat(input);
+    return isNaN(numericValue) ? '--' : numericValue.toFixed(2);
+  }
+
+  // For other types, return '--'
+  return '--';
+}
+
+// eslint-disable-next-line
+export function bytesToGiB(memoryUsage: number | string) {
+  // If input is null or undefined, return '--'
+  if (memoryUsage == null) {
+    return '--';
+  }
+
+  // If input is a string, convert it to a number
+  const bytes =
+    typeof memoryUsage === 'string' ? parseInt(memoryUsage, 10) : memoryUsage;
+
+  // Check if the input is a valid number
+  if (isNaN(bytes) || typeof bytes !== 'number') {
+    return '--';
+  }
+
+  // Convert bytes to GiB
+  const gibibytes = bytes / 1024 ** 3;
+
+  // Format the result to two decimal places, remove unnecessary zeros, and add the unit
+  return `${parseFloat(gibibytes.toFixed(2))} GiB`;
+}
+
+export function convertToGiB(input: string) {
+  // If input is null or undefined, return '--'
+  if (input == null) {
+    return '--';
+  }
+
+  // If input is a string and contains 'Mi'
+  if (typeof input === 'string' && input.includes('Mi')) {
+    // Extract numeric part from string
+    const numericValue = parseFloat(input.replace('Mi', '').trim());
+
+    // Check if numericValue is a valid number
+    if (isNaN(numericValue)) {
+      return '--';
+    }
+
+    // Convert MiB to GiB by dividing by 1024
+    const gibValue = numericValue / 1024;
+
+    // Remove unnecessary trailing zeros from the result
+    return `${parseFloat(gibValue.toFixed(2))} GiB`;
+  }
+
+  // For other cases (e.g., string without 'Mi'), return '--'
+  return '--';
 }

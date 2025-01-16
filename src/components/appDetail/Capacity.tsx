@@ -1,7 +1,14 @@
 import { Progress } from 'antd';
-import { useEffect, useState } from 'react';
+import BigNumber from 'bignumber.js';
+import { useCallback, useEffect, useState } from 'react';
 
-import { calcDiv, useThrottleCallback } from '@/lib/utils';
+import {
+  bytesToGiB,
+  calcDiv,
+  convertToGiB,
+  processValue,
+  useThrottleCallback,
+} from '@/lib/utils';
 
 import { useAppSelector } from '@/store/hooks';
 
@@ -35,6 +42,27 @@ export default function Capacity() {
     getFullPodUsageTemp();
   }, [getFullPodUsageTemp]);
 
+  const displayCapacity = useCallback(() => {
+    const res = {
+      currentCpuUsage: '--',
+      currentCpuLimit: '--',
+      currentMemoryUsage: '--',
+      currentMemoryLimit: '--',
+    };
+    if (podUsage && podUsage?.length > 0) {
+      // 1 fixed 2
+      const currentPodUsage = podUsage[0];
+      res.currentCpuUsage = new BigNumber(currentPodUsage?.cpuUsage).toFixed(2);
+      // 2 fixed 2 m/1000 or number
+      res.currentCpuLimit = processValue(currentPodUsage?.limitCpu);
+      // 3 div 1024 1024 1024 GiB
+      res.currentMemoryUsage = bytesToGiB(currentPodUsage?.memoryUsage);
+      // 4 Mi Gi -> GiB
+      res.currentMemoryLimit = convertToGiB(currentPodUsage?.limitMemory);
+    }
+    return res;
+  }, [podUsage]);
+
   return (
     <div>
       {(!podUsage || podUsage?.length === 0) && (
@@ -53,12 +81,13 @@ export default function Capacity() {
                 <div className='border-gray-E0 flex-1 rounded-lg border p-[24px]'>
                   <div className='text-gray-80'>CPU</div>
                   <div className='text-dark-normal mb-[6px] mt-[8px] font-medium'>
-                    {item?.cpuUsage || '--'} / {item?.limitCpu || '--'}
+                    {displayCapacity()?.currentCpuUsage} /{' '}
+                    {displayCapacity()?.currentCpuLimit}
                   </div>
                   <Progress
                     percent={calcDiv(
-                      Number(item?.cpuUsage || 0),
-                      Number(item?.limitCpu || 0)
+                      Number(displayCapacity()?.currentCpuUsage),
+                      Number(displayCapacity()?.currentCpuLimit)
                     )}
                     showInfo={false}
                   />
