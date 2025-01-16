@@ -61,7 +61,7 @@ export default function Billing() {
           />
           <Button
             type='primary'
-            className='mx-[10px] h-[40px] w-[160px] text-sm'
+            className='mr-[10px] h-[40px] w-[160px] text-sm'
             onClick={() => {
               router.push('/dashboard/billing/upgrade');
             }}
@@ -77,7 +77,7 @@ export default function Billing() {
           </Button>
           <Button
             type='primary'
-            className='mx-[10px] h-[40px] w-[120px] text-sm'
+            className='mr-[10px] h-[40px] w-[120px] text-sm'
             onClick={() => {
               router.push('/dashboard/billing/deposit');
             }}
