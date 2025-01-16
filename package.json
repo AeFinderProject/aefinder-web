@@ -1,6 +1,6 @@
 {
   "name": "aefinder",
-  "version": "2.19.0",
+  "version": "2.20.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -29,6 +29,7 @@
     "@aelf-web-login/wallet-adapter-portkey-aa": "^0.1.7",
     "@aelf-web-login/wallet-adapter-portkey-discover": "^0.1.7",
     "@aelf-web-login/wallet-adapter-react": "^0.1.7",
+    "@ant-design/charts": "^2.2.3",
     "@ant-design/cssinjs": "^1.20.0",
     "@ant-design/nextjs-registry": "^1.0.0",
     "@apollo/client": "^3.11.8",
@@ -38,6 +39,7 @@
     "aelf-sdk": "^3.4.15",
     "antd": "^5.17.4",
     "axios": "^0.24.0",
+    "bignumber.js": "^9.1.2",
     "bn.js": "^5.2.1",
     "clsx": "^1.2.1",
     "dayjs": "^1.11.11",

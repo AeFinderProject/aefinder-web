@@ -1,8 +1,10 @@
 'use client';
 
 import { message } from 'antd';
+import BigNumber from 'bignumber.js';
 import BN, { isBN } from 'bn.js';
 import clsx, { ClassValue } from 'clsx';
+import dayjs from 'dayjs';
 import pako from 'pako';
 import { DependencyList, useCallback, useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
@@ -259,4 +261,258 @@ export function getOtherExploreLink(
 
 export function zeroFill(str: string | BN) {
   return isBN(str) ? str.toString(16, 64) : str.padStart(64, '0');
+}
+
+export function objectToQueryString(params: object) {
+  return Object.entries(params)
+    .filter(
+      ([, value]) => value !== undefined && value !== null && value !== ''
+    )
+    .map(
+      ([key, value]) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+    )
+    .join('&');
+}
+
+export const getRemainingDays = () => {
+  const now = dayjs();
+  const endOfMonth = now.endOf('month');
+  const remainingDays = endOfMonth.diff(now, 'day');
+  return remainingDays;
+};
+
+export const getQueryFee = (queryCount: number, monthlyUnitPrice: number) => {
+  if (!queryCount || !monthlyUnitPrice) {
+    return 0;
+  }
+  const queryCountBignumber = BigNumber(queryCount);
+  const monthlyUnitPriceBignumber = BigNumber(monthlyUnitPrice);
+  return queryCountBignumber
+    .times(monthlyUnitPriceBignumber)
+    .div(10000)
+    .toNumber();
+};
+
+export const ZERO = new BigNumber(0);
+export const ONE = new BigNumber(1);
+
+// eslint-disable-next-line
+export const isEffectiveNumber = (v: any) => {
+  const val = new BigNumber(v);
+  return !val.isNaN() && !val.lte(0);
+};
+
+export function timesDecimals(
+  a?: BigNumber.Value,
+  decimals: string | number = 18
+) {
+  if (!a) return ZERO;
+  const bigA = ZERO.plus(a);
+  if (bigA.isNaN()) return ZERO;
+  if (typeof decimals === 'string' && decimals.length > 10)
+    return bigA.times(decimals);
+  return bigA.times(`1e${decimals}`);
+}
+export function divDecimals(
+  a?: BigNumber.Value,
+  decimals: string | number = 18
+) {
+  if (!a) return ZERO;
+  const bigA = ZERO.plus(a);
+  if (bigA.isNaN()) return ZERO;
+  if (typeof decimals === 'string' && decimals.length > 10)
+    return bigA.div(decimals);
+  return bigA.div(`1e${decimals}`);
+}
+
+export function divDecimalsStr(
+  a?: BigNumber.Value,
+  decimals: string | number = 8,
+  defaultVal = '--'
+) {
+  const n = divDecimals(a, decimals);
+  return isEffectiveNumber(n) ? n.toFormat() : defaultVal;
+}
+
+export function calcProductNumber(
+  queryCount: number,
+  feeCount: number,
+  productQueryCount: number
+) {
+  if (!queryCount || !productQueryCount) {
+    return 0;
+  }
+
+  const queryCountBignumber = BigNumber(queryCount);
+  const feeCountBignumber = BigNumber(feeCount);
+  const productQueryCountBignumber = BigNumber(productQueryCount);
+  return queryCountBignumber
+    .times(1000)
+    .minus(feeCountBignumber)
+    .dividedBy(productQueryCountBignumber);
+}
+
+export function calcTotalPrice(queryCount: number, price: number) {
+  if (!queryCount || !price) {
+    return 0;
+  }
+
+  const queryCountBignumber = BigNumber(queryCount);
+  const priceBignumber = BigNumber(price);
+  return queryCountBignumber.times(priceBignumber).toString();
+}
+
+export function calcDiv100(
+  number1: number | string,
+  number2: number | string
+): number {
+  // Helper function to extract number from string
+  const extractNumericValue = (input: number | string): BigNumber => {
+    if (typeof input === 'string') {
+      // Extract numeric part from string
+      const numericValue = parseFloat(input.replace(/[^0-9.]/g, ''));
+      return new BigNumber(isNaN(numericValue) ? 0 : numericValue);
+    }
+
+    // If input is a number, directly convert it to BigNumber
+    return new BigNumber(input);
+  };
+
+  // Extract numeric parts from inputs
+  const number1Bignumber = extractNumericValue(number1);
+  const number2Bignumber = extractNumericValue(number2);
+
+  // Return 0 if number2 is 0 (to avoid division by 0)
+  if (number2Bignumber.isZero()) {
+    return 0;
+  }
+
+  // Perform division and calculate percentage
+  return number1Bignumber.div(number2Bignumber).times(100).toNumber();
+}
+
+export function displayUnit(chargeType: number, type: number, unit: string) {
+  if (chargeType === 1) {
+    return unit;
+  }
+  if (chargeType === 0) {
+    if (type === 0) {
+      return unit;
+    }
+    if (type === 1) {
+      return 'hr';
+    }
+    if (type === 2) {
+      return 'GB-hour';
+    }
+  }
+  return unit;
+}
+
+export function formatToTwoDecimals(input: string) {
+  // Handle null or undefined input
+  if (input == null) {
+    return '--';
+  }
+
+  // Convert the input to a floating-point number
+  const numericValue = parseFloat(input);
+
+  // Check if the input is a valid number
+  if (isNaN(numericValue)) {
+    return '--';
+  }
+
+  // Return the number formatted to at most two decimal places
+  return `${parseFloat(numericValue.toFixed(2))}`;
+}
+
+// eslint-disable-next-line
+export function processValue(input: any) {
+  // Handle null or undefined input
+  if (input == null) {
+    return '--';
+  }
+
+  // If input is a number, return it as a string with at most two decimal places
+  if (typeof input === 'number') {
+    return `${parseFloat(input.toFixed(2))}`; // Ensure at most two decimal places
+  }
+
+  // If input is a string
+  if (typeof input === 'string') {
+    // Trim whitespace
+    input = input.trim();
+
+    // If the string contains 'm'
+    if (input.includes('m')) {
+      // Extract numeric part, divide by 1000, and convert to a string with at most two decimal places
+      const numericValue = parseFloat(input.replace('m', ''));
+
+      // If numericValue is valid, process it; if not, return '--'
+      return isNaN(numericValue)
+        ? '--'
+        : `${parseFloat((numericValue / 1000).toFixed(2))}`;
+    }
+
+    // If the string does not contain 'm', try to convert to a number
+    const numericValue = parseFloat(input);
+    return isNaN(numericValue)
+      ? '--'
+      : `${parseFloat(numericValue.toFixed(2))}`;
+  }
+
+  // For other types, return '--'
+  return '--';
+}
+
+// eslint-disable-next-line
+export function bytesToGiB(memoryUsage: number | string) {
+  // If input is null or undefined, return '--'
+  if (memoryUsage == null) {
+    return '--';
+  }
+
+  // If input is a string, convert it to a number
+  const bytes =
+    typeof memoryUsage === 'string' ? parseInt(memoryUsage, 10) : memoryUsage;
+
+  // Check if the input is a valid number
+  if (isNaN(bytes) || typeof bytes !== 'number') {
+    return '--';
+  }
+
+  // Convert bytes to GiB
+  const gibibytes = bytes / 1024 ** 3;
+
+  // Format the result to two decimal places, remove unnecessary zeros, and add the unit
+  return `${parseFloat(gibibytes.toFixed(2))} GiB`;
+}
+
+export function convertToGiB(input: string) {
+  // If input is null or undefined, return '--'
+  if (input == null) {
+    return '--';
+  }
+
+  // If input is a string and contains 'Mi'
+  if (typeof input === 'string' && input.includes('Mi')) {
+    // Extract numeric part from string
+    const numericValue = parseFloat(input.replace('Mi', '').trim());
+
+    // Check if numericValue is a valid number
+    if (isNaN(numericValue)) {
+      return '--';
+    }
+
+    // Convert MiB to GiB by dividing by 1024
+    const gibValue = numericValue / 1024;
+
+    // Remove unnecessary trailing zeros from the result
+    return `${parseFloat(gibValue.toFixed(2))} GiB`;
+  }
+
+  // For other cases (e.g., string without 'Mi'), return '--'
+  return '--';
 }

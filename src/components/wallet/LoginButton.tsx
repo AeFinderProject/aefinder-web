@@ -101,7 +101,9 @@ export default function LogInButton({ className }: LogInButtonProps) {
         });
       }
     }
-    if (res?.address || walletInfoRef.current?.address) handleWalletLogin();
+    if (res?.address || walletInfoRef.current?.address) {
+      handleWalletLogin();
+    }
   }, [connectWallet, handleWalletLogin, messageApi]);
 
   return (

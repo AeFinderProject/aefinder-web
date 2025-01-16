@@ -1,10 +1,7 @@
-import { Button, Col, Divider, Form, Input, Row } from 'antd';
+import { Button, Col, Form, Input, Row } from 'antd';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { useCallback, useState } from 'react';
-
-import Copy from '@/components/Copy';
-import UnstyledLink from '@/components/links/UnstyledLink';
 
 import { getDevTemplate } from '@/api/requestSubscription';
 
@@ -34,7 +31,7 @@ export default function DownloadTempFile() {
   return (
     <div className='border-gray-E0 mt-[32px] w-full rounded-md'>
       <Row gutter={24} className='w-full'>
-        <Col sm={24} md={12}>
+        <Col sm={24} md={24}>
           <div className='sm:pr-[20px]'>
             <Image
               src='/assets/svg/arrow-down.svg'
@@ -43,7 +40,8 @@ export default function DownloadTempFile() {
               height={32}
             />
             <div className='text-block text-dark-primaryText my-[8px] text-2xl font-medium'>
-              Option 1: Set Up Using AeFinder UI
+              {/** todo 1*/}
+              Option : Set Up Using AeFinder UI
             </div>
             <div className='text-gray-80 mb-[24px] text-sm'>
               Use the project template files to get started with your
@@ -128,8 +126,8 @@ export default function DownloadTempFile() {
             </div>
           </div>
         </Col>
-        <Divider type='horizontal' className='sm:hidden' />
-        <Col sm={24} md={12} className='border-gray-F0 sm:border-l'>
+        {/* <Divider type='horizontal' className='sm:hidden' /> */}
+        {/* <Col sm={24} md={12} className='border-gray-F0 sm:border-l'>
           <div className=' sm:mt- sm:pl-[20px]'>
             <Image
               src='/assets/svg/terminal-window.svg'
@@ -215,7 +213,7 @@ export default function DownloadTempFile() {
               />
             </div>
           </div>
-        </Col>
+        </Col> */}
       </Row>
     </div>
   );

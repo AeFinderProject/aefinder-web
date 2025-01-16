@@ -1,9 +1,12 @@
 'use client';
-import { PlusOutlined } from '@ant-design/icons';
+
+import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import type { GetRef, TourProps } from 'antd';
-import { Button, message, Tour } from 'antd';
+import { Button, message, Tooltip, Tour } from 'antd';
 import Image from 'next/image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+
+import { getRemainingDays, useThrottleCallback } from '@/lib/utils';
 
 import AppItemCard from '@/components/dashboard/AppItemCard';
 import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
@@ -12,6 +15,7 @@ import Seo from '@/components/Seo';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
+  setApikeySummary,
   setAppList,
   setCurrentAppDetail,
   setCurrentVersion,
@@ -19,20 +23,23 @@ import {
 } from '@/store/slices/appSlice';
 
 import { queryAuthToken } from '@/api/apiUtils';
+import { getSummary } from '@/api/requestAPIKeys';
 import { getAppList } from '@/api/requestApp';
 
 import { CurrentTourStepEnum } from '@/types/appType';
 
 export default function Dashboard() {
   const dispatch = useAppDispatch();
+
   const createRef = useRef<GetRef<typeof Button>>(null);
   const [createAppDrawerVisible, setCreateAppDrawerVisible] = useState(false);
-  const appList = useAppSelector((state) => state.app.appList);
   const [messageApi, contextHolder] = message.useMessage();
   const [openTour, setOpenTour] = useState<boolean>(false);
   const [openCreateTour, setOpenCreateTour] = useState(false);
   const currentTourStep = localStorage.getItem('currentTourStep');
   const isMobile = window?.innerWidth < 640;
+  const appList = useAppSelector((state) => state.app.appList);
+  const apikeySummary = useAppSelector((state) => state.app.apikeySummary);
 
   const steps: TourProps['steps'] = [
     {
@@ -98,6 +105,16 @@ export default function Dashboard() {
     getAppListTemp();
   }, [dispatch, createAppDrawerVisible]);
 
+  const getSummaryTemp = useThrottleCallback(async () => {
+    const res = await getSummary();
+    console.log('getSummaryRes', res);
+    dispatch(setApikeySummary(res));
+  }, [dispatch]);
+
+  useEffect(() => {
+    getSummaryTemp();
+  }, [getSummaryTemp]);
+
   const handleCloseTour = useCallback(() => {
     localStorage.setItem(
       'currentTourStep',
@@ -121,26 +138,76 @@ export default function Dashboard() {
       {contextHolder}
       <Seo templateTitle='Dashboard' />
       <div className='px-[16px] sm:px-[40px]'>
-        <div className='border-gray-F0 flex h-[140px] items-center justify-between border-b'>
+        <div className='flex h-[120px] items-center justify-between'>
           <div>
             <div className='text-3xl text-black'>My Dashboard</div>
-            <div className='text-gray-80 relative top-6'>
-              ALL ({appList.length})
+          </div>
+          <div>
+            <Button
+              type='primary'
+              icon={<PlusOutlined className='relative top-[-3px]' />}
+              onClick={() => {
+                handleCreateCloseTour();
+                setCreateAppDrawerVisible(true);
+              }}
+              className='h-[40px] w-[160px] text-sm'
+              ref={createRef}
+            >
+              Create AeIndexer
+            </Button>
+          </div>
+        </div>
+        <div className='border-gray-E0 mb-[31px] flex h-[98px] items-center justify-between rounded-lg border p-[24px]'>
+          <div className='flex flex-col items-start'>
+            <div className='text-gray-80 text-base'>
+              Queries made
+              <Tooltip
+                title='The apikey has been used to query data from the aeindexer.'
+                className='relative top-[-3px] ml-[4px]'
+              >
+                <InfoCircleOutlined />
+              </Tooltip>
+            </div>
+            <div className='text-dark-normal mt-[2px] text-base font-medium'>
+              {apikeySummary.query}/{apikeySummary.queryLimit}
             </div>
           </div>
-          <Button
-            type='primary'
-            icon={<PlusOutlined />}
-            onClick={() => {
-              handleCreateCloseTour();
-              setCreateAppDrawerVisible(true);
-            }}
-            className='h-[40px] w-[160px] text-sm'
-            ref={createRef}
-          >
-            Create AeIndexer
-          </Button>
+          <div className='flex flex-col items-start'>
+            <div className='text-gray-80 text-base'>
+              API Keys
+              <Tooltip
+                title='There are currently active API keys.'
+                className='relative top-[-3px] ml-[4px]'
+              >
+                <InfoCircleOutlined />
+              </Tooltip>
+            </div>
+            <div className='text-dark-normal mt-[2px] text-base font-medium'>
+              {apikeySummary.apiKeyCount}/{apikeySummary.maxApiKeyCount || 10}
+            </div>
+          </div>
+          <div className='flex flex-col items-start'>
+            <div className='text-gray-80 text-base'>
+              Renews in
+              <Tooltip
+                title='Remaining days before the trial period ends.'
+                className='relative top-[-3px] ml-[4px]'
+              >
+                <InfoCircleOutlined />
+              </Tooltip>
+            </div>
+            <div className='text-dark-normal mt-[2px] text-base font-medium'>
+              {getRemainingDays()} Days
+            </div>
+          </div>
+          <div></div>
         </div>
+      </div>
+      <div className='px-[20px] sm:px-[40px]'>
+        <div className='border-gray-70 border-b'></div>
+      </div>
+      <div className='text-gray-80 ml-[40px] mt-[31px]'>
+        My AeIndexer ({appList.length})
       </div>
       {appList.length === 0 && (
         <div className='flex min-h-[450px] w-full flex-col items-center justify-center'>

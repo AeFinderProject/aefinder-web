@@ -67,7 +67,7 @@ export default function AppItemCard({ appList }: AppItemProps) {
   );
 
   return (
-    <div className='px-[16px] pb-[30px] sm:px-[40px] sm:py-[24px]'>
+    <div className='px-[16px] pb-[30px] sm:px-[40px] sm:pb-[24px] sm:pt-[14px]'>
       <Row gutter={24}>
         {appList.map((item, index) => (
           <Col
@@ -85,7 +85,9 @@ export default function AppItemCard({ appList }: AppItemProps) {
               <div
                 className={clsx(
                   'absolute left-[28px] top-[28px] h-[30px] rounded px-[6px] leading-8 text-white',
-                  item.status === 0 ? 'bg-gray-D6' : 'bg-blue-link'
+                  item.status === 0 && 'bg-gray-D6',
+                  item.status === 1 && 'bg-blue-link',
+                  item.status === 2 && 'bg-warning-normal'
                 )}
               >
                 {AppStatusType[item.status]}

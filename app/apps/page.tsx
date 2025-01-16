@@ -12,6 +12,7 @@ import HeaderHandle from '@/components/appDetail/HeaderHandle';
 import Logs from '@/components/appDetail/Logs';
 import Manifest from '@/components/appDetail/Manifest';
 import Playground from '@/components/appDetail/Playground';
+import Capacity from '@/components/appDetail/Capacity';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
@@ -25,25 +26,30 @@ import { getAppDetail } from '@/api/requestApp';
 import { getSubscriptions } from '@/api/requestSubscription';
 
 import { CurrentTourStepEnum, AppStatusType } from '@/types/appType';
+import { useDebounceCallback } from '@/lib/utils';
 
 export default function AppDetail() {
   const dispatch = useAppDispatch();
+  const [messageApi, contextHolder] = message.useMessage();
+
   const PlaygroundRef = useRef<HTMLDivElement>(null);
   const LogRef = useRef<HTMLDivElement>(null);
+
   const [openPlaygroundTour, setOpenPlaygroundTour] = useState(false);
   const [deployDrawerVisible, setDeployDrawerVisible] = useState(false);
+  const [isShowUpdateCapacityModal, setIsShowUpdateCapacityModal] =
+    useState(false);
   // currentTable default playground -> click change logs
   const [currentTable, setCurrentTable] = useState<string>(
     localStorage.getItem('currentTab') ?? 'playground'
   );
   const [isNeedRefresh, setIsNeedRefresh] = useState(false);
-  const { currentAppDetail, currentVersion } = useAppSelector(
-    (state) => state.app
+  const currentAppDetail = useAppSelector(
+    (state) => state.app.currentAppDetail
   );
-  const [messageApi, contextHolder] = message.useMessage();
+  const currentVersion = useAppSelector((state) => state.app.currentVersion);
 
-  const searchParams = new URLSearchParams(window.location.search);
-  const [appId, setAppId] = useState(searchParams.get('appId'));
+  const [appId, setAppId] = useState('');
 
   const currentTourStep = localStorage.getItem('currentTourStep');
 
@@ -87,7 +93,7 @@ export default function AppDetail() {
     const interval = setInterval(() => {
       if (!appId) {
         const searchParams = new URLSearchParams(window.location.search);
-        setAppId(searchParams.get('appId'));
+        setAppId(searchParams.get('appId') || '');
       } else {
         clearInterval(interval);
       }
@@ -95,35 +101,37 @@ export default function AppDetail() {
     return () => clearInterval(interval);
   }, [appId]);
 
-  useEffect(() => {
-    const getAppDetailTemp = async () => {
-      await queryAuthToken();
-      if (appId) {
-        const res = await getAppDetail({ appId: String(appId) });
-        dispatch(setCurrentAppDetail(res));
-        // set default version
-        if (res.versions?.currentVersion) {
-          dispatch(setCurrentVersion(res.versions?.currentVersion));
-        }
+  const getAppDetailTemp = useDebounceCallback(async () => {
+    await queryAuthToken();
+    if (appId) {
+      const res = await getAppDetail({ appId: String(appId) });
+      dispatch(setCurrentAppDetail(res));
+      // set default version
+      if (res.versions?.currentVersion) {
+        dispatch(setCurrentVersion(res.versions?.currentVersion));
       }
-    };
-    getAppDetailTemp();
-  }, [dispatch, deployDrawerVisible, appId]);
+    }
+  }, [dispatch, deployDrawerVisible, appId, isShowUpdateCapacityModal]);
 
   useEffect(() => {
+    getAppDetailTemp();
+  }, [getAppDetailTemp]);
+
+  const getSubscriptionsRes = useDebounceCallback(async () => {
     // when currentVersion is null, it means the app is not deployed
     if (!currentVersion) return;
-    const getSubscriptionsRes = async () => {
-      if (appId && currentAppDetail?.deployKey) {
-        const res = await getSubscriptions({
-          appId: String(appId),
-          deployKey: currentAppDetail?.deployKey,
-        });
-        dispatch(setSubscriptions(res));
-      }
-    };
-    getSubscriptionsRes();
+    if (appId && currentAppDetail?.deployKey) {
+      const res = await getSubscriptions({
+        appId: String(appId),
+        deployKey: currentAppDetail?.deployKey,
+      });
+      dispatch(setSubscriptions(res));
+    }
   }, [dispatch, currentVersion, appId, currentAppDetail?.deployKey]);
+
+  useEffect(() => {
+    getSubscriptionsRes();
+  }, [getSubscriptionsRes]);
 
   const handleTabChange = useCallback((key: string) => {
     localStorage.setItem('currentTab', key);
@@ -160,6 +168,8 @@ export default function AppDetail() {
         messageApi={messageApi}
         isNeedRefresh={isNeedRefresh}
         setIsNeedRefresh={setIsNeedRefresh}
+        isShowUpdateCapacityModal={isShowUpdateCapacityModal}
+        setIsShowUpdateCapacityModal={setIsShowUpdateCapacityModal}
       />
       <DetailBox currentAppDetail={currentAppDetail} />
       {currentAppDetail.status === AppStatusType.Deployed && (
@@ -187,6 +197,11 @@ export default function AppDetail() {
               key: 'manifest',
               label: 'Manifest',
               children: <Manifest />,
+            },
+            {
+              key: 'capacity',
+              label: 'Capacity',
+              children: <Capacity />,
             },
           ]}
         />

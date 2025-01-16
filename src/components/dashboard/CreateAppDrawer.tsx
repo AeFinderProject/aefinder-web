@@ -35,6 +35,7 @@ export default function CreateAppDrawer({
       status: 0,
       createTime: 0,
       updateTime: 0,
+      isLocked: false,
     }
   );
 
