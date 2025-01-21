@@ -39,8 +39,12 @@ export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
           setIsFreeCapacity(true);
           setEndTime(item?.endTime);
           setStatus(item?.status);
+        } else {
+          setIsFreeCapacity(false);
         }
       });
+    } else {
+      setIsFreeCapacity(false);
     }
   }, [currentAppDetail?.appId]);
 
