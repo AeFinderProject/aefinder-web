@@ -594,7 +594,7 @@ export default function UpdateCapacityDrawer({
               }
               className='w-[30%]'
               onClick={() => setCurrentCapacityType(item.specification)}
-              disabled={isProcessLocked}
+              disabled={isProcessLocked || currentFreeSelected}
             >
               {item.specification}
             </Button>
@@ -619,7 +619,7 @@ export default function UpdateCapacityDrawer({
           min={1}
           max={1000000}
           addonAfter='GB'
-          disabled={isStorageLocked}
+          disabled={isStorageLocked || currentFreeSelected}
         />
       </div>
       {currentTotalActualAmount > orgBalance?.balance && (
