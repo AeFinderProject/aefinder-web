@@ -207,7 +207,7 @@ export const marketList = {
     baseConfig: { method: 'POST' },
   },
   getAssetsList: `${AeFinderHost}/api/assets`,
-  getAssetsRelate: {
+  assetsRelate: {
     target: `${AeFinderHost}/api/assets/relate`,
     baseConfig: { method: 'POST' },
   },

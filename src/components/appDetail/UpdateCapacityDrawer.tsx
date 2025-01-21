@@ -2,9 +2,19 @@
 
 import { TWalletInfo } from '@aelf-web-login/wallet-adapter-base';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
-import type { CollapseProps } from 'antd';
-import { Button, Col, Collapse, Divider, Drawer, InputNumber, Row } from 'antd';
+import type { CheckboxProps, CollapseProps } from 'antd';
+import {
+  Button,
+  Checkbox,
+  Col,
+  Collapse,
+  Divider,
+  Drawer,
+  InputNumber,
+  Row,
+} from 'antd';
 import { MessageInstance } from 'antd/es/message/interface';
+import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -21,6 +31,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setOrgBalance } from '@/store/slices/commonSlice';
 
 import {
+  assetsRelate,
   cancelOrder,
   getOrgBalance,
   order,
@@ -31,7 +42,7 @@ import { getAssetsList, getMerchandisesList } from '@/api/requestMarket';
 import { AeFinderContractAddress, CHAIN_ID } from '@/constant';
 
 import { ApproveResponseType } from '@/types/appType';
-import { MerchandisesItem } from '@/types/marketType';
+import { AssetsItem, MerchandisesItem } from '@/types/marketType';
 
 type DeployDrawerProps = {
   readonly isShowUpdateCapacityModal: boolean;
@@ -48,6 +59,12 @@ export default function UpdateCapacityDrawer({
   const router = useRouter();
 
   const { callSendMethod, isConnected, walletInfo } = useConnectWallet();
+
+  const [isShowFreeSelect, setIsShowFreeSelect] = useState(false);
+  const [currentFreeSelected, setCurrentFreeSelected] =
+    useState<boolean>(false);
+  const [freeProcessor, setFreeProcessor] = useState<AssetsItem>();
+  const [freeStorage, setFreeStorage] = useState<AssetsItem>();
 
   const [isShowCapacityCollapse, setIsShowCapacityCollapse] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -162,6 +179,44 @@ export default function UpdateCapacityDrawer({
     getAssetsListTemp();
   }, [getAssetsListTemp]);
 
+  const getFreeAssetsTemp = useCallback(async () => {
+    // step:1 checkout asset list length is 0
+    const getResourceAssetListRes = await getAssetsList({
+      appId: currentAppDetail?.appId,
+      category: 1, // 1: Resource
+      skipCount: 0,
+      maxResultCount: 100,
+    });
+    console.log('getResourceAssetListRes', getResourceAssetListRes);
+    // step:2 checkout has free asset list length is 2
+    const getFreeResourceAssetListRes = await getAssetsList({
+      isFree: true,
+      category: 1,
+      skipCount: 0,
+      maxResultCount: 100,
+    });
+    console.log('getFreeResourceAssetListRes', getFreeResourceAssetListRes);
+    if (
+      getResourceAssetListRes?.totalCount === 0 &&
+      getFreeResourceAssetListRes?.totalCount === 2
+    ) {
+      setIsShowFreeSelect(true);
+      getFreeResourceAssetListRes?.items?.map((item) => {
+        if (item?.merchandise?.name === 'Processor') {
+          setFreeProcessor(item);
+        }
+        if (item?.merchandise?.name === 'Storage') {
+          setFreeStorage(item);
+        }
+      });
+    }
+    // eslint-disable-next-line
+  }, [currentAppDetail?.appId, isShowUpdateCapacityModal]);
+
+  useEffect(() => {
+    getFreeAssetsTemp();
+  }, [getFreeAssetsTemp]);
+
   const getOrgBalanceTemp = useDebounceCallback(async () => {
     const getOrgBalanceRes = await getOrgBalance();
     console.log('getOrgBalance', getOrgBalanceRes);
@@ -255,7 +310,7 @@ export default function UpdateCapacityDrawer({
     watchOrdersCostTemp();
   }, [watchOrdersCostTemp]);
 
-  const onChange: CollapseProps['onChange'] = (key) => {
+  const onCollapseChange: CollapseProps['onChange'] = (key) => {
     console.log(key);
     setIsShowCapacityCollapse((pre) => !pre);
   };
@@ -414,6 +469,51 @@ export default function UpdateCapacityDrawer({
     }
   }, [messageApi, handleClose, handlePreCreateOrder]);
 
+  const onFreeSelectChange: CheckboxProps['onChange'] = (e) => {
+    console.log(`checked = ${e?.target?.checked}`);
+    setCurrentFreeSelected(e?.target?.checked);
+    // 1 if select free, set capacity and storage as free
+    // 2 or set capacity and storage as original
+    if (e?.target?.checked) {
+      if (freeProcessor?.merchandise?.specification) {
+        setCurrentCapacityType(freeProcessor?.merchandise?.specification);
+      }
+      if (freeStorage?.replicas) {
+        setCurrentStorageNum(freeStorage?.replicas);
+      }
+    } else {
+      setCurrentCapacityType(currentCapacityType);
+      setCurrentStorageNum(currentStorageNum);
+    }
+  };
+
+  const handleRelateAssets = useCallback(async () => {
+    if (!freeProcessor?.id || !freeStorage?.id) {
+      messageApi.warning('Please select the capacity and storage capacity');
+      return;
+    }
+    try {
+      setLoading(true);
+      const assetsRelateRes = await assetsRelate({
+        appId: currentAppDetail?.appId,
+        assetIds: [freeProcessor?.id, freeStorage?.id],
+      });
+      console.log('assetsRelateRes', assetsRelateRes);
+      if (assetsRelateRes) {
+        messageApi.success('Relate assets successfully');
+        handleClose();
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    currentAppDetail?.appId,
+    freeProcessor?.id,
+    freeStorage?.id,
+    messageApi,
+    handleClose,
+  ]);
+
   const items: CollapseProps['items'] = [
     {
       key: '1',
@@ -469,7 +569,16 @@ export default function UpdateCapacityDrawer({
       onClose={handleClose}
       open={isShowUpdateCapacityModal}
     >
-      <Collapse items={items} onChange={onChange} />
+      {isShowFreeSelect && (
+        <Checkbox
+          className='mb-[20px]'
+          onChange={onFreeSelectChange}
+          value={currentFreeSelected}
+        >
+          Use free capacity
+        </Checkbox>
+      )}
+      <Collapse items={items} onChange={onCollapseChange} />
       <div className='text-dark-normal mb-[10px] mt-[24px]'>
         Processor Capacity:
       </div>
@@ -541,30 +650,31 @@ export default function UpdateCapacityDrawer({
             {orgBalance?.lockedBalance} USDT
           </span>
         </div>
-        {originalCapacityType !== currentCapacityType && (
-          <div>
-            <Divider className='my-[20px]' />
-            <div className='flex justify-between'>
-              <div className='text-gray-80 text-sm'>Processor</div>
-              <div className='text-dark-normal'>
-                {currentProcessAmount} USDT
+        {originalCapacityType !== currentCapacityType &&
+          !currentFreeSelected && (
+            <div>
+              <Divider className='my-[20px]' />
+              <div className='flex justify-between'>
+                <div className='text-gray-80 text-sm'>Processor</div>
+                <div className='text-dark-normal'>
+                  {currentProcessAmount} USDT
+                </div>
+              </div>
+              <div className='mt-[20px] flex justify-between'>
+                <div className='text-gray-80 text-sm'>Deduction Amount</div>
+                <div className='text-dark-normal'>
+                  {currentProcessDeductionAmount} USDT
+                </div>
+              </div>
+              <div className='mt-[20px] flex justify-between'>
+                <div className='text-dark-normal'>Actual Amount</div>
+                <div className='text-dark-normal'>
+                  {currentProcessActualAmount} USDT
+                </div>
               </div>
             </div>
-            <div className='mt-[20px] flex justify-between'>
-              <div className='text-gray-80 text-sm'>Deduction Amount</div>
-              <div className='text-dark-normal'>
-                {currentProcessDeductionAmount} USDT
-              </div>
-            </div>
-            <div className='mt-[20px] flex justify-between'>
-              <div className='text-dark-normal'>Actual Amount</div>
-              <div className='text-dark-normal'>
-                {currentProcessActualAmount} USDT
-              </div>
-            </div>
-          </div>
-        )}
-        {originalStorageNum !== currentStorageNum && (
+          )}
+        {originalStorageNum !== currentStorageNum && !currentFreeSelected && (
           <div>
             <Divider className='my-[20px]' />
             <div className='flex justify-between'>
@@ -588,52 +698,91 @@ export default function UpdateCapacityDrawer({
           </div>
         )}
         {(originalCapacityType !== currentCapacityType ||
-          originalStorageNum !== currentStorageNum) && (
+          originalStorageNum !== currentStorageNum) &&
+          !currentFreeSelected && (
+            <div>
+              <Divider className='my-[20px]' />
+              <div className='flex justify-between'>
+                <div className='text-gray-80 text-sm'>Total Amount</div>
+                <div className='text-dark-normal'>
+                  {currentTotalAmount} USDT
+                </div>
+              </div>
+              <div className='mt-[20px] flex justify-between'>
+                <div className='text-gray-80 text-sm'>
+                  Total Deduction Amount
+                </div>
+                <div className='text-dark-normal'>
+                  {currentTotalDeductionAmount} USDT
+                </div>
+              </div>
+              <div className='mt-[20px] flex justify-between'>
+                <div className='text-dark-normal'>Total Actual Amount</div>
+                <div className='text-dark-normal'>
+                  {currentTotalActualAmount} USDT
+                </div>
+              </div>
+            </div>
+          )}
+        {currentFreeSelected && (
           <div>
             <Divider className='my-[20px]' />
-            <div className='flex justify-between'>
-              <div className='text-gray-80 text-sm'>Total Amount</div>
-              <div className='text-dark-normal'>{currentTotalAmount} USDT</div>
-            </div>
             <div className='mt-[20px] flex justify-between'>
-              <div className='text-gray-80 text-sm'>Total Deduction Amount</div>
-              <div className='text-dark-normal'>
-                {currentTotalDeductionAmount} USDT
-              </div>
-            </div>
-            <div className='mt-[20px] flex justify-between'>
-              <div className='text-dark-normal'>Total Actual Amount</div>
-              <div className='text-dark-normal'>
-                {currentTotalActualAmount} USDT
-              </div>
+              <div className='text-dark-normal'>Total Amount</div>
+              <div className='text-dark-normal'>0 USDT</div>
             </div>
           </div>
         )}
       </div>
-      {isConnectedRef.current && walletInfoRef.current && (
+      {isConnectedRef.current &&
+        walletInfoRef.current &&
+        !currentFreeSelected && (
+          <Button
+            type='primary'
+            className='mt-[24px] w-full'
+            size='large'
+            onClick={handleSave}
+            loading={loading}
+            disabled={
+              (originalCapacityType === currentCapacityType &&
+                originalStorageNum === currentStorageNum) ||
+              orgUser?.organizationStatus === 1
+            }
+          >
+            Save
+          </Button>
+        )}
+      {(!isConnectedRef.current || !walletInfoRef.current) &&
+        !currentFreeSelected && (
+          <ConnectWalletFirst
+            classNames='w-full mt-[24px]'
+            messageApi={messageApi}
+          />
+        )}
+      {currentFreeSelected && (
         <Button
           type='primary'
           className='mt-[24px] w-full'
           size='large'
-          onClick={handleSave}
+          onClick={handleRelateAssets}
           loading={loading}
-          disabled={
-            (originalCapacityType === currentCapacityType &&
-              originalStorageNum === currentStorageNum) ||
-            orgUser?.organizationStatus === 1
-          }
         >
           Save
         </Button>
       )}
-      {(!isConnectedRef.current || !walletInfoRef.current) && (
-        <ConnectWalletFirst
-          classNames='w-full mt-[24px]'
-          messageApi={messageApi}
-        />
-      )}
       <Divider className='my-[24px]' />
-      <div className='text-gray-80 mt-[24px] text-sm'>
+      {currentFreeSelected && (
+        <div className='text-gray-80 mt-[24px] text-sm'>
+          Note: Your free trial of AeIndexer is active for 7 days. After that it
+          will be deactivated.
+        </div>
+      )}
+      <div
+        className={clsx(
+          'text-gray-80 text-sm',
+          currentFreeSelected ? 'mt-[10px]' : 'mt-[24px]'
+        )}
+      >
         The current prices are promotional and available for a limited time
         only.
       </div>
