@@ -183,6 +183,7 @@ export default function HeaderHandle({
   ];
 
   const getAssetsListTemp = useCallback(async () => {
+    if (!currentAppDetail?.appId) return;
     const getProcessorAssetListRes = await getAssetsList({
       appId: currentAppDetail?.appId,
       type: 1,

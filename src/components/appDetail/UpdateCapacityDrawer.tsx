@@ -135,6 +135,7 @@ export default function UpdateCapacityDrawer({
   }, [getMerchandisesListTemp]);
 
   const getAssetsListTemp = useCallback(async () => {
+    if (!currentAppDetail?.appId) return;
     const getProcessorAssetListRes = await getAssetsList({
       appId: currentAppDetail?.appId,
       type: 1,
@@ -180,6 +181,9 @@ export default function UpdateCapacityDrawer({
   }, [getAssetsListTemp]);
 
   const getFreeAssetsTemp = useCallback(async () => {
+    if (!currentAppDetail?.appId) {
+      return;
+    }
     // step:1 checkout asset list length is 0
     const getResourceAssetListRes = await getAssetsList({
       appId: currentAppDetail?.appId,
@@ -622,23 +626,23 @@ export default function UpdateCapacityDrawer({
           disabled={isStorageLocked || currentFreeSelected}
         />
       </div>
-      {currentTotalActualAmount > orgBalance?.balance && (
-        <div className='border-gray-E0 mb-[24px] flex items-center justify-between rounded-lg border px-[9px] py-[12px]'>
-          <div></div>
-          <div className='text-sm'>
-            You currently do not have enough balance to create the AeIndexer. To
-            proceed,
-            <span
-              className='text-blue-link cursor-pointer'
-              onClick={() => router.push('/dashboard/billing/deposit')}
-            >
-              {' '}
-              please deposit the required amount{' '}
-            </span>
-            .
+      {currentTotalActualAmount > orgBalance?.balance &&
+        !currentFreeSelected && (
+          <div className='border-gray-E0 mb-[24px] rounded-lg border px-[9px] py-[12px]'>
+            <div className='text-sm'>
+              You currently do not have enough balance to create the AeIndexer.
+              To proceed,
+              <span
+                className='text-blue-link cursor-pointer'
+                onClick={() => router.push('/dashboard/billing/deposit')}
+              >
+                {' '}
+                please deposit the required amount{' '}
+              </span>
+              .
+            </div>
           </div>
-        </div>
-      )}
+        )}
       <div className='bg-gray-F5 rounded-lg p-[20px]'>
         <div className='flex items-center justify-between'>
           <span className='text-gray-80 text-sm'>Balance</span>

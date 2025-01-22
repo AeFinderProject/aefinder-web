@@ -25,6 +25,9 @@ export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
   const [status, setStatus] = useState(0);
 
   const getFreeAssetsTemp = useCallback(async () => {
+    if (!currentAppDetail?.appId) {
+      return;
+    }
     // step:1 checkout asset list length is 0
     const getResourceAssetListRes = await getAssetsList({
       appId: currentAppDetail?.appId,
