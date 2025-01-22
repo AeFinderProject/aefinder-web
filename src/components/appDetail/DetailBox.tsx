@@ -75,7 +75,7 @@ export default function DetailBox({ currentAppDetail }: DetailBoxProps) {
                       height={16}
                       className='relative top-[-1px] mr-[8px] inline-block'
                     />
-                    {calculateTimeDifference(endTime)} left
+                    {calculateTimeDifference(endTime)}
                   </Tag>
                 )}
               </span>

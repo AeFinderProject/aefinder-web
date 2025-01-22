@@ -151,7 +151,10 @@ export default function UpdateCapacityDrawer({
       setIsProcessLocked(asset?.isLocked);
       setProcessOriginalAssetId(asset?.id);
       setCurrentCapacityType(asset?.merchandise?.specification);
-      setOriginalCapacityType(asset?.merchandise?.specification);
+      // only if free quantity is 0, set original capacity type
+      if (asset?.freeQuantity === 0) {
+        setOriginalCapacityType(asset?.merchandise?.specification);
+      }
     }
 
     const getStorageAssetListRes = await getAssetsList({
@@ -170,7 +173,10 @@ export default function UpdateCapacityDrawer({
       setStorageOriginalAssetId(asset?.id);
       if (asset?.replicas) {
         setCurrentStorageNum(asset?.replicas);
-        setOriginalStorageNum(asset?.replicas);
+        // only if free quantity is 0, set original storage num
+        if (asset?.freeQuantity === 0) {
+          setOriginalStorageNum(asset?.replicas);
+        }
       }
     }
     // eslint-disable-next-line
