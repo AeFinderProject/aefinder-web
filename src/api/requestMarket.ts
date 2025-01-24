@@ -260,14 +260,14 @@ export const getAssetsList = async (
   }
 };
 
-export const getAssetsRelate = async (
+export const assetsRelate = async (
   params: GetAssetsRelateRequest
 ): Promise<boolean> => {
   try {
-    const res = await request.market.getAssetsRelate({ data: params });
-    return res;
+    await request.market.assetsRelate({ data: params });
+    return true;
   } catch (error) {
-    throw new Error(handleErrorMessage(error, 'getAssetsRelate error'));
+    throw new Error(handleErrorMessage(error, 'assetsRelate error'));
   }
 };
 
