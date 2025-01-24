@@ -44,7 +44,7 @@ const networkHostMap = {
     AeFinderAuthHost: 'https://test-indexer-auth.aefinder.io',
     CollectorEndpoint: 'https://otel.aelf.com/v1/traces',
     GRAPHQL_SERVER:
-      'https://dapp-aa-portkey-test.portkey.finance/aefinder-v2/api/app/graphql/portkey',
+      'https://test-indexer-api.aefinder.io/api/app/graphql/portkey',
     CONNECT_SERVER: 'https://auth-aa-portkey-test.portkey.finance',
     SERVICE_SERVER: 'https://aa-portkey-test.portkey.finance',
     NETWORK_TYPE: NetworkEnum.TESTNET,
@@ -61,8 +61,7 @@ const networkHostMap = {
     AeFinderHost: 'https://indexer-api.aefinder.io',
     AeFinderAuthHost: 'https://indexer-auth.aefinder.io',
     CollectorEndpoint: 'https://otel-mainnet.aelf.com/v1/traces',
-    GRAPHQL_SERVER:
-      'https://dapp-aa-portkey.portkey.finance/aefinder-v2/api/app/graphql/portkey',
+    GRAPHQL_SERVER: 'https://indexer-api.aefinder.io/api/app/graphql/portkey',
     CONNECT_SERVER: 'https://auth-aa-portkey.portkey.finance',
     SERVICE_SERVER: 'https://aa-portkey.portkey.finance',
     NETWORK_TYPE: NetworkEnum.MAINNET,

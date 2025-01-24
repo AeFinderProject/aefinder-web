@@ -5,12 +5,17 @@ import BigNumber from 'bignumber.js';
 import BN, { isBN } from 'bn.js';
 import clsx, { ClassValue } from 'clsx';
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import utc from 'dayjs/plugin/utc';
 import pako from 'pako';
 import { DependencyList, useCallback, useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 import { ChainIdType } from '@/types/appType';
 import { ExploreUrlType } from '@/types/loginType';
+
+dayjs.extend(utc);
+dayjs.extend(duration);
 
 /** Merge classes with tailwind-merge with clsx full feature */
 export function cn(...inputs: ClassValue[]) {
@@ -515,4 +520,40 @@ export function convertToGiB(input: string) {
 
   // For other cases (e.g., string without 'Mi'), return '--'
   return '--';
+}
+
+/**
+ * Calculate time difference and return "X days left" or "< 1 day left".
+ * @param {string} endTime - The UTC end time in ISO format.
+ * @returns {string} - Formatted remaining time.
+ */
+export function calculateTimeDifference(endTime: string) {
+  // Parse the end time as UTC
+  const endDate = dayjs.utc(endTime);
+
+  // Get the current UTC time
+  const now = dayjs.utc();
+
+  // Calculate the total difference in milliseconds
+  const diffInMilliseconds = endDate.diff(now);
+
+  // If time has already passed, return "0 days left"
+  if (diffInMilliseconds <= 0) {
+    return '0 days left';
+  }
+
+  // Create a duration object for the difference
+  const duration = dayjs.duration(diffInMilliseconds);
+
+  // Extract total days
+  const days = Math.floor(duration.asDays()); // Total days without decimal
+
+  // If less than 1 day, return "< 1 day left"
+  if (days < 1) {
+    return '< 1 day left';
+  }
+
+  // Format with pluralization for "day" or "days"
+  const dayStr = days === 1 ? 'day' : 'days';
+  return `${days} ${dayStr} left`;
 }

@@ -2,7 +2,7 @@
 
 import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import type { GetRef, TourProps } from 'antd';
-import { Button, message, Tooltip, Tour } from 'antd';
+import { Button, message, Tag, Tooltip, Tour } from 'antd';
 import Image from 'next/image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -40,6 +40,7 @@ export default function Dashboard() {
   const isMobile = window?.innerWidth < 640;
   const appList = useAppSelector((state) => state.app.appList);
   const apikeySummary = useAppSelector((state) => state.app.apikeySummary);
+  const orgUser = useAppSelector((state) => state.common.orgUser);
 
   const steps: TourProps['steps'] = [
     {
@@ -139,8 +140,13 @@ export default function Dashboard() {
       <Seo templateTitle='Dashboard' />
       <div className='px-[16px] sm:px-[40px]'>
         <div className='flex h-[120px] items-center justify-between'>
-          <div>
+          <div className='flex items-center justify-start'>
             <div className='text-3xl text-black'>My Dashboard</div>
+            {orgUser?.organizationStatus === 1 && (
+              <Tag color='red' className='ml-[10px]'>
+                Account frozen
+              </Tag>
+            )}
           </div>
           <div>
             <Button

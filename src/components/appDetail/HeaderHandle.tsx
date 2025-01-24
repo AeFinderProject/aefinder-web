@@ -16,10 +16,12 @@ import CreateAppDrawer from '@/components/dashboard/CreateAppDrawer';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
+  setCurrentAppDetail,
   setCurrentVersion,
   setProcessorAssetListSlice,
 } from '@/store/slices/appSlice';
 
+import { getAppDetail } from '@/api/requestApp';
 import { getAssetsList, getIsCustomApp } from '@/api/requestMarket';
 
 import { AppStatusType, CurrentTourStepEnum } from '@/types/appType';
@@ -46,6 +48,7 @@ export default function HeaderHandle({
   const DeployRef = useRef<GetRef<typeof Button>>(null);
   const UpdateRef = useRef<GetRef<typeof Button>>(null);
   const [deployLoading, setDeployLoading] = useState(false);
+  const [setCapacityLoading, setSetCapacityLoading] = useState(false);
   const [openDeployTour, setOpenDeployTour] = useState(false);
   const [openUpdateTour, setOpenUpdateTour] = useState(false);
   const username = useAppSelector((state) => state.common.username);
@@ -149,13 +152,34 @@ export default function HeaderHandle({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTourStep]);
 
-  const handleClickUpdateCapacity = useCallback(() => {
-    if (currentAppDetail?.isLocked) {
-      messageApi.warning('You have unfinished order, Please wait.');
-      return;
+  const getAppDetailTemp = useCallback(
+    async (appId: string) => {
+      const res = await getAppDetail({ appId: appId });
+      dispatch(setCurrentAppDetail(res));
+    },
+    [dispatch]
+  );
+
+  const handleClickUpdateCapacity = useCallback(async () => {
+    if (!currentAppDetail?.appId) return;
+    try {
+      setSetCapacityLoading(true);
+      await getAppDetailTemp(currentAppDetail?.appId);
+      if (currentAppDetail?.isLocked) {
+        messageApi.warning('You have unfinished order, Please wait.');
+        return;
+      }
+      setIsShowUpdateCapacityModal(true);
+    } finally {
+      setSetCapacityLoading(false);
     }
-    setIsShowUpdateCapacityModal(true);
-  }, [currentAppDetail?.isLocked, messageApi, setIsShowUpdateCapacityModal]);
+  }, [
+    currentAppDetail?.appId,
+    currentAppDetail?.isLocked,
+    getAppDetailTemp,
+    messageApi,
+    setIsShowUpdateCapacityModal,
+  ]);
 
   const dropdownItems: MenuProps['items'] = [
     {
@@ -164,6 +188,7 @@ export default function HeaderHandle({
         <Button
           className='text-blue-link w-full'
           onClick={() => handleClickUpdateCapacity()}
+          loading={setCapacityLoading}
         >
           Set Capacity
         </Button>
@@ -183,6 +208,7 @@ export default function HeaderHandle({
   ];
 
   const getAssetsListTemp = useCallback(async () => {
+    if (!currentAppDetail?.appId) return;
     const getProcessorAssetListRes = await getAssetsList({
       appId: currentAppDetail?.appId,
       type: 1,
@@ -210,13 +236,13 @@ export default function HeaderHandle({
 
   const handleClickDeploy = useDebounceCallback(async () => {
     if (!currentAppDetail?.appId) return;
-
     // need to check the aeindexer has buy cpu and memory or not
     // if yes, then deploy the aeindexer and show the updateCapacity drawer
     try {
       setDeployLoading(true);
       handleDeployCloseTour();
-
+      // update current app detail
+      await getAppDetailTemp(currentAppDetail?.appId);
       // for custom app, show the deploy drawer always
       const getIsCustomAppRes = await getIsCustomApp({
         appId: currentAppDetail?.appId,
