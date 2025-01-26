@@ -81,8 +81,9 @@ export default function Bindwallet({
       }, 100);
       return;
     }
-
-    setIsLoading && setIsLoading(true);
+    if (setIsLoading) {
+      setIsLoading(true);
+    }
     try {
       const reqParams = await getReqParams({
         walletInfoRef: walletInfoRef.current,
