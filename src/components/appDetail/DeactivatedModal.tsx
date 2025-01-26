@@ -1,5 +1,4 @@
 import { Button, Modal } from 'antd';
-import { MessageInstance } from 'antd/es/message/interface';
 import Image from 'next/image';
 import { useCallback } from 'react';
 
@@ -11,7 +10,6 @@ type DeactivatedModalProps = {
   readonly isShowDeactivatedModal: boolean;
   readonly setIsShowDeactivatedModal: (visible: boolean) => void;
   readonly setIsShowUpdateCapacityModal: (visible: boolean) => void;
-  readonly messageApi: MessageInstance;
 };
 
 export default function DeactivatedModal({

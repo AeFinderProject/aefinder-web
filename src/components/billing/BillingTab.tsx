@@ -161,17 +161,14 @@ export default function BillingTab() {
       dataIndex: 'id',
       key: 'id',
       render: (text: string) => (
-        console.log(text),
-        (
-          <div
-            className='text-blue-link cursor-pointer'
-            onClick={() =>
-              router.push(`/dashboard/billing/billingDetail?billingId=${text}`)
-            }
-          >
-            Details
-          </div>
-        )
+        <div
+          className='text-blue-link cursor-pointer'
+          onClick={() =>
+            router.push(`/dashboard/billing/billingDetail?billingId=${text}`)
+          }
+        >
+          Details
+        </div>
       ),
     },
   ];

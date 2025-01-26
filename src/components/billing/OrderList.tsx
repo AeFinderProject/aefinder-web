@@ -170,25 +170,22 @@ export default function OrderList() {
       dataIndex: '',
       key: 'cancelOrder',
       render: (record) => (
-        console.log(record),
-        (
-          <div>
-            {(record?.status === 0 || record?.status === 4) && (
-              <Popconfirm
-                placement='top'
-                title='Are you sure to delete this order?'
-                okText='Yes'
-                cancelText='No'
-                onConfirm={() => handleCancelOrder(record?.id)}
-              >
-                <Button>Cancel</Button>
-              </Popconfirm>
-            )}
-            {record?.status !== 1 && record?.status !== 4 && (
-              <Button disabled>Cancel</Button>
-            )}
-          </div>
-        )
+        <div>
+          {(record?.status === 0 || record?.status === 4) && (
+            <Popconfirm
+              placement='top'
+              title='Are you sure to delete this order?'
+              okText='Yes'
+              cancelText='No'
+              onConfirm={() => handleCancelOrder(record?.id)}
+            >
+              <Button>Cancel</Button>
+            </Popconfirm>
+          )}
+          {record?.status !== 1 && record?.status !== 4 && (
+            <Button disabled>Cancel</Button>
+          )}
+        </div>
       ),
     },
     {
@@ -196,17 +193,14 @@ export default function OrderList() {
       dataIndex: 'id',
       key: 'id',
       render: (text: string) => (
-        console.log(text),
-        (
-          <div
-            className='text-blue-link cursor-pointer'
-            onClick={() =>
-              router.push(`/dashboard/billing/orderDetail?orderId=${text}`)
-            }
-          >
-            Details
-          </div>
-        )
+        <div
+          className='text-blue-link cursor-pointer'
+          onClick={() =>
+            router.push(`/dashboard/billing/orderDetail?orderId=${text}`)
+          }
+        >
+          Details
+        </div>
       ),
     },
   ];

@@ -33,12 +33,13 @@ import { setOrgBalance } from '@/store/slices/commonSlice';
 import {
   assetsRelate,
   cancelOrder,
+  getAssetsList,
+  getMerchandisesList,
   getOrgBalance,
   order,
   payOrder,
   watchOrdersCost,
 } from '@/api/requestMarket';
-import { getAssetsList, getMerchandisesList } from '@/api/requestMarket';
 import { AeFinderContractAddress, CHAIN_ID } from '@/constant';
 
 import { ApproveResponseType } from '@/types/appType';
@@ -642,8 +643,7 @@ export default function UpdateCapacityDrawer({
                 className='text-blue-link cursor-pointer'
                 onClick={() => router.push('/dashboard/billing/deposit')}
               >
-                {' '}
-                please deposit the required amount{' '}
+                please deposit the required amount
               </span>
               .
             </div>

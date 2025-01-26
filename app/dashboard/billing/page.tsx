@@ -15,7 +15,7 @@ export default function Billing() {
   const router = useRouter();
 
   const [activeTabKey, setActiveTabKey] = useState(
-    localStorage.getItem('billingTabKey') || 'overview'
+    localStorage.getItem('billingTabKey') ?? 'overview'
   );
 
   const onTabChange = (key: string) => {
