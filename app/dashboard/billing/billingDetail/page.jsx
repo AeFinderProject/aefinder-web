@@ -3,8 +3,7 @@
 import { LeftOutlined } from '@ant-design/icons';
 import { Col, Row, Tag } from 'antd';
 import dayjs from 'dayjs';
-import { useRouter } from 'next/navigation';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { displayUnit, useDebounceCallback } from '@/lib/utils';

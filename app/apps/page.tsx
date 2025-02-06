@@ -93,7 +93,7 @@ export default function AppDetail() {
     const interval = setInterval(() => {
       if (!appId) {
         const searchParams = new URLSearchParams(window.location.search);
-        setAppId(searchParams.get('appId') || '');
+        setAppId(searchParams.get('appId') ?? '');
       } else {
         clearInterval(interval);
       }

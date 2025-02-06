@@ -139,10 +139,9 @@ export default function LogIn() {
               <div className='mb-[16px]'>
                 Don’t have an account yet?
                 <span
-                  className='text-blue-link cursor-pointer font-medium'
+                  className='text-blue-link ml-[4px] cursor-pointer font-medium'
                   onClick={() => router.push('/login/signup')}
                 >
-                  {' '}
                   Sign up
                 </span>
               </div>

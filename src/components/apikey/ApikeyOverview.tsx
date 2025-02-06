@@ -20,10 +20,10 @@ import { calcTotalPrice, useDebounceCallback } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
+  setApiMerchandisesItem,
   setDefaultAeIndexersList,
   setDefaultAPIList,
 } from '@/store/slices/appSlice';
-import { setApiMerchandisesItem } from '@/store/slices/appSlice';
 
 import { queryAuthToken } from '@/api/apiUtils';
 import {
