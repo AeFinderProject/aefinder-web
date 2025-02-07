@@ -1,6 +1,6 @@
 {
   "name": "aefinder",
-  "version": "2.23.0",
+  "version": "2.22.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
