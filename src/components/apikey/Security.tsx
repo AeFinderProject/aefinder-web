@@ -45,15 +45,15 @@ export default function Security() {
   const [isShowAddDomainModal, setIsShowAddDomainModal] = useState(false);
   const [isShowEditAPIModal, setIsShowEditAPIModal] = useState(false);
 
+  const apikeyDetail = useAppSelector((state) => state.app.apikeyDetail);
+  console.log('apikeyDetail', apikeyDetail);
+
   const [currentAppId, setCurrentAppId] = useState(null);
   const [currentDomain, setCurrentDomain] = useState<string>('');
-  const [currentApi, setCurrentApi] = useState<(0 | 1 | 2)[]>([]);
+  const [currentApi, setCurrentApi] = useState<number[]>([]);
   const [currentMyAeindexersList, setCurrentMyAeindexersList] = useState<
     AuthorisedAeIndexers[]
   >([]);
-
-  const apikeyDetail = useAppSelector((state) => state.app.apikeyDetail);
-  console.log('apikeyDetail', apikeyDetail);
 
   const getApiKeyDetailTemp = useCallback(async () => {
     if (!id) {
@@ -248,9 +248,9 @@ export default function Security() {
   const handleAuthAPI = useDebounceCallback(async () => {
     // pre apis obj
     const apis: { [key: number]: boolean } = {
-      0: apikeyDetail?.authorisedApis.findIndex((item) => item === 0) > -1,
-      1: apikeyDetail?.authorisedApis.findIndex((item) => item === 1) > -1,
-      2: apikeyDetail?.authorisedApis.findIndex((item) => item === 2) > -1,
+      0: false,
+      1: false,
+      2: false,
     };
     const tempList = [0, 1, 2];
     tempList.forEach((item) => {
@@ -281,6 +281,7 @@ export default function Security() {
   const onCheckBoxChange: GetProp<typeof Checkbox.Group, 'onChange'> = (
     checkedValues
   ) => {
+    console.log('checkedValues', checkedValues);
     setCurrentApi(checkedValues as (0 | 1 | 2)[]);
   };
 
@@ -293,8 +294,8 @@ export default function Security() {
             Authorised AeIndexers
           </div>
           <div className='text-gray-80 mb-[30px] leading-5'>
-            To limit usage, restrict to specific Subgraphs. Only authorized
-            AeIndexers will be able to use the Test Key.
+            To limit usage, restrict to specific AeIndexer. Only authorized
+            AeIndexers will be able to use the API Key.
           </div>
           <div className='border-gray-E0 rounded-lg border px-[4px] pb-[12px] pt-[32px] sm:px-[24px]'>
             {apikeyDetail?.authorisedAeIndexers?.length === 0 && (
@@ -364,7 +365,7 @@ export default function Security() {
           </div>
           <div className='text-gray-80 mb-[30px] leading-5'>
             To limit usage, restrict to specific domains. Only authorized
-            domains will be able to use the Test Key.
+            domains will be able to use the API Key.
           </div>
           <div className='border-gray-E0 rounded-lg border px-[4px] pb-[12px] pt-[32px] sm:px-[24px]'>
             {apikeyDetail?.authorisedDomains?.length === 0 && (
@@ -424,7 +425,7 @@ export default function Security() {
           </div>
           <div className='text-gray-80 mb-[30px] leading-5'>
             To limit usage, restrict to specific AeFinder APIs. Only authorized
-            APIs will be able to use the Test Key.
+            APIs will be able to use the API Key.
           </div>
           <div className='border-gray-E0 rounded-lg border px-[4px] pb-[12px] pt-[32px] sm:px-[24px]'>
             {apikeyDetail?.authorisedApis?.length === 0 && (
