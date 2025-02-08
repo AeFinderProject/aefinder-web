@@ -81,17 +81,21 @@ export default function BillingDetail() {
             <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>Begin Time</div>
               <div>
-                {dayjs(currentBillingDetail?.beginTime).format(
-                  'YYYY/MM/DD HH:mm:ss'
-                )}
+                {currentBillingDetail?.beginTime !== '0001-01-01T00:00:00Z'
+                  ? dayjs(currentBillingDetail?.beginTime).format(
+                      'YYYY/MM/DD HH:mm:ss'
+                    )
+                  : '--'}
               </div>
             </Col>
             <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>End Time</div>
               <div>
-                {dayjs(currentBillingDetail?.endTime).format(
-                  'YYYY/MM/DD HH:mm:ss'
-                )}
+                {currentBillingDetail?.endTime !== '0001-01-01T00:00:00Z'
+                  ? dayjs(currentBillingDetail?.endTime).format(
+                      'YYYY/MM/DD HH:mm:ss'
+                    )
+                  : '--'}
               </div>
             </Col>
           </Row>
@@ -131,17 +135,21 @@ export default function BillingDetail() {
             <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>Create Time</div>
               <div>
-                {dayjs(currentBillingDetail?.createTime).format(
-                  'YYYY/MM/DD HH:mm:ss'
-                )}
+                {currentBillingDetail?.createTime !== '0001-01-01T00:00:00Z'
+                  ? dayjs(currentBillingDetail?.createTime).format(
+                      'YYYY/MM/DD HH:mm:ss'
+                    )
+                  : '--'}
               </div>
             </Col>
             <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>Payment Time</div>
               <div>
-                {dayjs(currentBillingDetail?.paymentTime).format(
-                  'YYYY/MM/DD HH:mm:ss'
-                )}
+                {currentBillingDetail?.paymentTime !== '0001-01-01T00:00:00Z'
+                  ? dayjs(currentBillingDetail?.paymentTime).format(
+                      'YYYY/MM/DD HH:mm:ss'
+                    )
+                  : '--'}
               </div>
             </Col>
           </Row>
@@ -211,9 +219,11 @@ export default function BillingDetail() {
                           <div className='text-gray-80 mb-[10px] text-xs'>
                             Start Time
                           </div>
-                          {dayjs(item?.asset?.startTime).format(
-                            'YYYY/MM/DD HH:mm:ss'
-                          )}
+                          {item?.asset?.startTime !== '0001-01-01T00:00:00Z'
+                            ? dayjs(item?.asset?.startTime).format(
+                                'YYYY/MM/DD HH:mm:ss'
+                              )
+                            : '--'}
                         </Col>
                       )}
                       {item?.asset?.endTime && (
@@ -221,9 +231,11 @@ export default function BillingDetail() {
                           <div className='text-gray-80 mb-[10px] text-xs'>
                             End Time
                           </div>
-                          {dayjs(item?.asset?.endTime).format(
-                            'YYYY/MM/DD HH:mm:ss'
-                          )}
+                          {item?.asset?.endTime !== '0001-01-01T00:00:00Z'
+                            ? dayjs(item?.asset?.endTime).format(
+                                'YYYY/MM/DD HH:mm:ss'
+                              )
+                            : '--'}
                         </Col>
                       )}
                     </Row>
