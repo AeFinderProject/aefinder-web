@@ -140,7 +140,11 @@ export default function OrderList() {
       dataIndex: 'orderTime',
       key: 'orderTime',
       render: (text: string) => (
-        <div>{dayjs(text).format('YYYY/MM/DD HH:mm:ss')}</div>
+        <div>
+          {text !== '0001-01-01T00:00:00Z'
+            ? dayjs(text).format('YYYY/MM/DD HH:mm:ss')
+            : '--'}
+        </div>
       ),
     },
     {
@@ -148,7 +152,11 @@ export default function OrderList() {
       dataIndex: 'paymentTime',
       key: 'paymentTime',
       render: (text: string) => (
-        <div>{dayjs(text).format('YYYY/MM/DD HH:mm:ss')}</div>
+        <div>
+          {text !== '0001-01-01T00:00:00Z'
+            ? dayjs(text).format('YYYY/MM/DD HH:mm:ss')
+            : '--'}
+        </div>
       ),
     },
     {
@@ -170,25 +178,22 @@ export default function OrderList() {
       dataIndex: '',
       key: 'cancelOrder',
       render: (record) => (
-        console.log(record),
-        (
-          <div>
-            {(record?.status === 0 || record?.status === 4) && (
-              <Popconfirm
-                placement='top'
-                title='Are you sure to delete this order?'
-                okText='Yes'
-                cancelText='No'
-                onConfirm={() => handleCancelOrder(record?.id)}
-              >
-                <Button>Cancel</Button>
-              </Popconfirm>
-            )}
-            {record?.status !== 1 && record?.status !== 4 && (
-              <Button disabled>Cancel</Button>
-            )}
-          </div>
-        )
+        <div>
+          {(record?.status === 0 || record?.status === 4) && (
+            <Popconfirm
+              placement='top'
+              title='Are you sure to delete this order?'
+              okText='Yes'
+              cancelText='No'
+              onConfirm={() => handleCancelOrder(record?.id)}
+            >
+              <Button>Cancel</Button>
+            </Popconfirm>
+          )}
+          {record?.status !== 1 && record?.status !== 4 && (
+            <Button disabled>Cancel</Button>
+          )}
+        </div>
       ),
     },
     {
@@ -196,17 +201,14 @@ export default function OrderList() {
       dataIndex: 'id',
       key: 'id',
       render: (text: string) => (
-        console.log(text),
-        (
-          <div
-            className='text-blue-link cursor-pointer'
-            onClick={() =>
-              router.push(`/dashboard/billing/orderDetail?orderId=${text}`)
-            }
-          >
-            Details
-          </div>
-        )
+        <div
+          className='text-blue-link cursor-pointer'
+          onClick={() =>
+            router.push(`/dashboard/billing/orderDetail?orderId=${text}`)
+          }
+        >
+          Details
+        </div>
       ),
     },
   ];

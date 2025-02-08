@@ -3,8 +3,7 @@
 import { LeftOutlined } from '@ant-design/icons';
 import { Col, Divider, Row, Tag } from 'antd';
 import dayjs from 'dayjs';
-import { useSearchParams } from 'next/navigation';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { displayUnit, useDebounceCallback } from '@/lib/utils';
@@ -177,17 +176,21 @@ export default function OrderDetail() {
             <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>Order Time</div>
               <div>
-                {dayjs(currentOrderDetail?.orderTime).format(
-                  'YYYY/MM/DD HH:mm:ss'
-                )}
+                {currentOrderDetail?.orderTime !== '0001-01-01T00:00:00Z'
+                  ? dayjs(currentOrderDetail?.orderTime).format(
+                      'YYYY/MM/DD HH:mm:ss'
+                    )
+                  : '--'}
               </div>
             </Col>
             <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>Payment Time</div>
               <div>
-                {dayjs(currentOrderDetail?.paymentTime).format(
-                  'YYYY/MM/DD HH:mm:ss'
-                )}
+                {currentOrderDetail?.paymentTime !== '0001-01-01T00:00:00Z'
+                  ? dayjs(currentOrderDetail?.paymentTime).format(
+                      'YYYY/MM/DD HH:mm:ss'
+                    )
+                  : '--'}
               </div>
             </Col>
           </Row>
