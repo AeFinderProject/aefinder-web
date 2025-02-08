@@ -176,17 +176,21 @@ export default function OrderDetail() {
             <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>Order Time</div>
               <div>
-                {dayjs(currentOrderDetail?.orderTime).format(
-                  'YYYY/MM/DD HH:mm:ss'
-                )}
+                {currentOrderDetail?.orderTime !== '0001-01-01T00:00:00Z'
+                  ? dayjs(currentOrderDetail?.orderTime).format(
+                      'YYYY/MM/DD HH:mm:ss'
+                    )
+                  : '--'}
               </div>
             </Col>
             <Col xs={12} md={6} className='my-[12px]'>
               <div className='text-gray-80 mb-[10px] text-xs'>Payment Time</div>
               <div>
-                {dayjs(currentOrderDetail?.paymentTime).format(
-                  'YYYY/MM/DD HH:mm:ss'
-                )}
+                {currentOrderDetail?.paymentTime !== '0001-01-01T00:00:00Z'
+                  ? dayjs(currentOrderDetail?.paymentTime).format(
+                      'YYYY/MM/DD HH:mm:ss'
+                    )
+                  : '--'}
               </div>
             </Col>
           </Row>

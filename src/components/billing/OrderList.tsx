@@ -140,7 +140,11 @@ export default function OrderList() {
       dataIndex: 'orderTime',
       key: 'orderTime',
       render: (text: string) => (
-        <div>{dayjs(text).format('YYYY/MM/DD HH:mm:ss')}</div>
+        <div>
+          {text !== '0001-01-01T00:00:00Z'
+            ? dayjs(text).format('YYYY/MM/DD HH:mm:ss')
+            : '--'}
+        </div>
       ),
     },
     {
@@ -148,7 +152,11 @@ export default function OrderList() {
       dataIndex: 'paymentTime',
       key: 'paymentTime',
       render: (text: string) => (
-        <div>{dayjs(text).format('YYYY/MM/DD HH:mm:ss')}</div>
+        <div>
+          {text !== '0001-01-01T00:00:00Z'
+            ? dayjs(text).format('YYYY/MM/DD HH:mm:ss')
+            : '--'}
+        </div>
       ),
     },
     {
