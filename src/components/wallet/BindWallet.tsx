@@ -83,8 +83,9 @@ export default function Bindwallet({
       }, 100);
       return;
     }
-
-    setIsLoading && setIsLoading(true);
+    if (setIsLoading) {
+      setIsLoading(true);
+    }
     try {
       const reqParams = await getReqParams({
         walletInfoRef: walletInfoRef.current,
@@ -108,7 +109,9 @@ export default function Bindwallet({
           address: reqParams.address,
         });
         if (res?.walletAddress) {
-          setAddress && setAddress(res?.walletAddress);
+          if (setAddress) {
+            setAddress(res?.walletAddress);
+          }
           messageApi.open({
             type: 'success',
             content: 'Bind sign wallet success',
@@ -124,7 +127,9 @@ export default function Bindwallet({
         await disConnectWallet();
       }
     } finally {
-      setIsLoading && setIsLoading(false);
+      if (setIsLoading) {
+        setIsLoading(false);
+      }
     }
   }, [
     getReqParams,
@@ -139,7 +144,9 @@ export default function Bindwallet({
     let res;
     if (!walletInfoRef.current || !walletTypeRef.current) {
       try {
-        setIsLoading && setIsLoading(true);
+        if (setIsLoading) {
+          setIsLoading(true);
+        }
         res = await connectWallet();
         // eslint-disable-next-line
       } catch (error: any) {
@@ -148,7 +155,9 @@ export default function Bindwallet({
           content: `${error?.message}` || 'connectWallet error',
         });
       } finally {
-        setIsLoading && setIsLoading(false);
+        if (setIsLoading) {
+          setIsLoading(false);
+        }
       }
     }
 

@@ -431,7 +431,6 @@ export default function HeaderHandle({
           isShowDeactivatedModal={isShowDeactivatedModal}
           setIsShowDeactivatedModal={setIsShowDeactivatedModal}
           setIsShowUpdateCapacityModal={setIsShowUpdateCapacityModal}
-          messageApi={messageApi}
         />
       )}
       <Tour

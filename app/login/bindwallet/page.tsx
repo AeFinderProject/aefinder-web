@@ -61,8 +61,7 @@ export default function BindWallet() {
         onClick={handleReturn}
       >
         Connect your wallet failed?
-        <span className='text-blue-link ml-[8px] cursor-pointer text-xs'>
-          {' '}
+        <span className='text-blue-link ml-[10px] cursor-pointer text-xs'>
           please use another account
         </span>
       </div>

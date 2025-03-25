@@ -251,6 +251,7 @@ export type AssetsItem = {
   freeQuantity: number;
   freeReplicas: number;
   beginTime: string;
+  startTime: string;
   endTime: string;
   status: number;
   appId: string;
@@ -374,6 +375,8 @@ export type BillingDetailsItem = {
   replicas: number;
   refundAmount: number;
   paidAmount: number;
+  merchandise: MerchandisesItem;
+  asset: AssetsItem;
 };
 
 export enum BillingType {

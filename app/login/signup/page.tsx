@@ -252,8 +252,7 @@ export default function Signup() {
         className='p-[50px]'
       >
         <div className='text-dark-normal mb-[4px] mt-[24px] font-medium'>
-          Email:
-          <span className='text-blue-link mx-[10px]'>{currentEmail}</span>
+          Email:<span className='text-blue-link mx-[10px]'>{currentEmail}</span>
           has been register, do you want to use it, please check your email!
         </div>
         <div className='mt-[24px] flex items-center justify-between'>

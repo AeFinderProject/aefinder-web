@@ -215,8 +215,7 @@ export default function Withdraw() {
                 Estimated Transaction Fee is approximately:
               </span>
               <span className='text-dark-normal text-sm'>
-                0.003625
-                <span className='ml-[10px]'>ELF</span>
+                0.003625<span className='ml-[10px]'>ELF</span>
               </span>
             </div>
           </div>

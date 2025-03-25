@@ -14,6 +14,7 @@ module.exports = {
   ],
   rules: {
     'no-unused-vars': 'off',
+    'jsx-a11y/click-events-have-key-events': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     'react/no-unescaped-entities': 'off',
 

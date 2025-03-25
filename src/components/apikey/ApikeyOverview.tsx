@@ -20,10 +20,10 @@ import { calcTotalPrice, useDebounceCallback } from '@/lib/utils';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
+  setApiMerchandisesItem,
   setDefaultAeIndexersList,
   setDefaultAPIList,
 } from '@/store/slices/appSlice';
-import { setApiMerchandisesItem } from '@/store/slices/appSlice';
 
 import { queryAuthToken } from '@/api/apiUtils';
 import {
@@ -240,7 +240,7 @@ export default function ApikeyOverview() {
           </div>
           <div className='text-gray-80 my-[22px] text-center'>
             Your API has not been used yet. Your API key can be used to query
-            Subgraphs.
+            AeIndexer.
             {/* <div className='text-blue-link mt-[4px] cursor-pointer'>
               Learn more
             </div> */}
