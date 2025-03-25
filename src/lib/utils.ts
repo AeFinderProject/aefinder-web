@@ -1,6 +1,6 @@
 'use client';
 
-import { message } from 'antd';
+import { message, notification } from 'antd';
 import BigNumber from 'bignumber.js';
 import BN, { isBN } from 'bn.js';
 import clsx, { ClassValue } from 'clsx';
@@ -97,6 +97,8 @@ export function handleErrorMessage(error: any, errorText?: string) {
   error = error?.data?.error_description || error;
   // api error
   error = error?.data?.error || error;
+  // contract error
+  error = error?.error || error;
   if (typeof error === 'string') errorText = error;
   if (typeof error.message === 'string') errorText = error.message;
   if (error?.validationErrors && typeof error?.validationErrors === 'object') {
@@ -107,7 +109,12 @@ export function handleErrorMessage(error: any, errorText?: string) {
   if (error?.details && typeof error?.details === 'string') {
     errorText = error?.details;
   }
-  message.error(errorText, 3);
+  notification.destroy();
+  errorText &&
+    notification?.error({
+      message: errorText,
+    });
+  // message.error(errorText, 3);
   return error;
 }
 

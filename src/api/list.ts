@@ -165,6 +165,7 @@ export const marketList = {
     baseConfig: { method: 'POST' },
   },
   getFullPodUsage: `${AeFinderHost}/api/apps/resources/full-pod/usage`,
+  getResourceUsage: `${AeFinderHost}/api/apps/resource-usages`,
   bindOrganization: {
     target: `${AeFinderHost}/api/users/bind/organization`,
     baseConfig: { method: 'POST' },

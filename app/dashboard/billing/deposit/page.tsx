@@ -57,6 +57,9 @@ export default function Deposit() {
     if (!isConnectedRef.current || !walletInfoRef.current) {
       return;
     }
+    if (walletInfoRef.current?.address !== userInfo?.walletAddress) {
+      return;
+    }
     try {
       const getELFBalance: GetBalanceResponseType = await callViewMethod({
         chainId: CHAIN_ID,
@@ -91,6 +94,7 @@ export default function Deposit() {
     messageApi,
     walletInfoRef.current,
     isConnectedRef.current,
+    userInfo?.walletAddress,
   ]);
 
   useEffect(() => {
@@ -154,17 +158,11 @@ export default function Deposit() {
             router.back();
           }, 2000);
         } else {
-          messageApi.open({
-            type: 'error',
-            content: 'Deposit failed',
-          });
+          handleErrorMessage(depositResult?.error || depositResult);
         }
         console.log('depositResult', depositResult);
       } else {
-        messageApi.open({
-          type: 'error',
-          content: 'Approve failed',
-        });
+        handleErrorMessage(approveResult?.error || approveResult);
       }
     } catch (error) {
       handleErrorMessage(error);

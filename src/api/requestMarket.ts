@@ -29,6 +29,8 @@ import {
   GetOrdersListRequest,
   GetOrdersListResponse,
   GetOrgBalanceResponse,
+  GetResourceUsageRequest,
+  GetResourceUsageResponse,
   GetTransactionHistoryRequest,
   GetTransactionHistoryResponse,
   GetUserAllResponse,
@@ -87,6 +89,19 @@ export const getFullPodUsage = async (
     const res = await request.market.getFullPodUsage({
       params,
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+    return res;
+  } catch (error) {
+    throw new Error(handleErrorMessage(error, 'getFullPodUsage error'));
+  }
+};
+
+export const getResourceUsage = async (
+  params: GetResourceUsageRequest
+): Promise<GetResourceUsageResponse> => {
+  try {
+    const res = await request.market.getResourceUsage({
+      url: `${marketList.getResourceUsage}/${params?.appId}`,
     });
     return res;
   } catch (error) {

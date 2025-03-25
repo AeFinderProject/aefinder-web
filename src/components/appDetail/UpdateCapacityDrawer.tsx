@@ -454,10 +454,7 @@ export default function UpdateCapacityDrawer({
         });
         handleClose();
       } else {
-        messageApi.open({
-          type: 'info',
-          content: 'Confirm monthly purchase failed',
-        });
+        handleErrorMessage(lockResult?.error || lockResult);
         await cancelOrder({
           id: billingId,
         });
@@ -465,12 +462,7 @@ export default function UpdateCapacityDrawer({
       console.log('lockResult', lockResult);
     } catch (error) {
       console.log('error', error);
-      messageApi.open({
-        type: 'error',
-        content: `Confirm monthly purchase failed: ${handleErrorMessage(
-          error
-        )}`,
-      });
+      handleErrorMessage(error);
       await cancelOrder({
         id: billingId,
       });
@@ -756,7 +748,8 @@ export default function UpdateCapacityDrawer({
             disabled={
               (originalCapacityType === currentCapacityType &&
                 originalStorageNum === currentStorageNum) ||
-              orgUser?.organizationStatus === 1
+              orgUser?.organizationStatus === 1 ||
+              currentTotalActualAmount > orgBalance?.balance
             }
           >
             Save

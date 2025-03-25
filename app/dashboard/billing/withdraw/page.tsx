@@ -93,17 +93,11 @@ export default function Withdraw() {
           router.back();
         }, 2000);
       } else {
-        messageApi.open({
-          type: 'error',
-          content: 'withdraw failed',
-        });
+        handleErrorMessage(withdrawResult?.error || withdrawResult);
       }
       console.log('withdrawResult', withdrawResult);
     } catch (error) {
-      messageApi.open({
-        type: 'error',
-        content: `withdraw failed: ${handleErrorMessage(error)}`,
-      });
+      handleErrorMessage(error);
     } finally {
       setLoading(false);
     }
