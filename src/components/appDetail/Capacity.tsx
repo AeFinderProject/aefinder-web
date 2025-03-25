@@ -12,13 +12,17 @@ import {
 
 import { useAppSelector } from '@/store/hooks';
 
-import { getFullPodUsage } from '@/api/requestMarket';
+import { getFullPodUsage, getResourceUsage } from '@/api/requestMarket';
 
-import { FullPodUsageItem } from '@/types/marketType';
+import {
+  FullPodUsageItem,
+  GetResourceUsageResponse,
+  usageItem,
+} from '@/types/marketType';
 
 export default function Capacity() {
   const [podUsage, setPodUsage] = useState<FullPodUsageItem[]>();
-  console.log('podUsage', podUsage);
+  const [storageUsage, setStorageUsage] = useState<usageItem>();
 
   const currentAppDetail = useAppSelector(
     (state) => state.app.currentAppDetail
@@ -38,9 +42,28 @@ export default function Capacity() {
     }
   }, [currentAppDetail?.appId, currentVersion]);
 
+  const getResourceUsageTemp = useThrottleCallback(async () => {
+    if (!currentAppDetail?.appId) return;
+    const res: GetResourceUsageResponse = await getResourceUsage({
+      appId: currentAppDetail?.appId,
+    });
+
+    if (res?.resourceUsages) {
+      const tempUsageArray = res?.resourceUsages[currentVersion];
+      if (tempUsageArray?.length > 0) {
+        tempUsageArray.find((item) => {
+          if (item.name === 'Storage') {
+            setStorageUsage(item);
+          }
+        });
+      }
+    }
+  }, [currentAppDetail?.appId, currentVersion]);
+
   useEffect(() => {
     getFullPodUsageTemp();
-  }, [getFullPodUsageTemp]);
+    getResourceUsageTemp();
+  }, [getFullPodUsageTemp, getResourceUsageTemp]);
 
   const displayCapacity = useCallback(() => {
     const res = {
@@ -106,13 +129,21 @@ export default function Capacity() {
                     showInfo={false}
                   />
                 </div>
-                {/* <div className='border-gray-E0 flex-1 rounded-lg border p-[24px]'>
-                  <div className='text-gray-80'>Disk</div>
-                  <div className='text-dark-normal mb-[6px] mt-[8px] font-medium'>
-                    -- / -- GB
+                {storageUsage && (
+                  <div className='border-gray-E0 flex-1 rounded-lg border p-[24px]'>
+                    <div className='text-gray-80'>Disk</div>
+                    <div className='text-dark-normal mb-[6px] mt-[8px] font-medium'>
+                      {storageUsage?.usage} / {storageUsage?.limit}
+                    </div>
+                    <Progress
+                      percent={calcDiv100(
+                        storageUsage?.usage,
+                        storageUsage?.limit
+                      )}
+                      showInfo={false}
+                    />
                   </div>
-                  <Progress percent={0} showInfo={false} />
-                </div> */}
+                )}
               </div>
             </div>
           );

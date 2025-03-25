@@ -128,4 +128,8 @@ export type ApproveResponseType = {
     TransactionSize: number;
   };
   transactionId: string;
+  error?: {
+    code: number;
+    message: string;
+  };
 };

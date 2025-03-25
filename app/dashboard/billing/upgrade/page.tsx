@@ -229,22 +229,14 @@ export default function Upgrade() {
           }, 2000);
         }
       } else {
-        messageApi.open({
-          type: 'info',
-          content: 'Confirm monthly purchase failed',
-        });
+        handleErrorMessage(lockResult?.error || lockResult);
         await cancelOrder({
           id: billingId,
         });
       }
       console.log('lockResult', lockResult);
     } catch (error) {
-      messageApi.open({
-        type: 'error',
-        content: `Confirm monthly purchase failed : ${handleErrorMessage(
-          error
-        )}`,
-      });
+      handleErrorMessage(error);
       await cancelOrder({
         id: billingId,
       });

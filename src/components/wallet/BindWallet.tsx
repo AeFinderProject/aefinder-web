@@ -15,6 +15,8 @@ import {
   useState,
 } from 'react';
 
+import { handleErrorMessage } from '@/lib/utils';
+
 import { useGetWalletSignParams } from '@/components/wallet/getWalletSignParams';
 
 import { bindWallet, getUsersInfo } from '@/api/requestApp';
@@ -115,6 +117,8 @@ export default function Bindwallet({
             content: 'Bind sign wallet success',
           });
           callback && callback();
+        } else {
+          handleErrorMessage(res);
         }
       }
     } catch (error) {
@@ -157,10 +161,23 @@ export default function Bindwallet({
       }
     }
 
-    if (res?.address || walletInfoRef.current?.address) {
+    const walletAddress = res?.address || walletInfoRef.current?.address;
+    if (walletAddress) {
       // if have bind wallet address, go to dashboard
       if (isHaveAddress) {
-        router.push('/dashboard');
+        // if not same wallet, show warning
+        if (walletAddress !== isHaveAddress) {
+          messageApi.open({
+            type: 'warning',
+            content: `Please use the same wallet address as the one you bind to sign in.`,
+            duration: 8,
+          });
+          if (isConnectedRef.current) {
+            await disConnectWallet();
+          }
+        } else {
+          router.push('/dashboard');
+        }
       } else {
         handleBindSignInWallet();
       }
@@ -172,6 +189,7 @@ export default function Bindwallet({
     isHaveAddress,
     router,
     setIsLoading,
+    disConnectWallet,
   ]);
 
   return (

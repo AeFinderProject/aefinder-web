@@ -85,6 +85,27 @@ export type FullPodUsageItem = {
   memoryUsage: string;
 };
 
+export type GetResourceUsageRequest = {
+  appId: string;
+};
+
+export type usageItem = {
+  name: string;
+  limit: string;
+  usage: string;
+};
+
+export type GetResourceUsageResponse = {
+  appInfo: {
+    appId: string;
+    appName: string;
+  };
+  organizationId: string;
+  resourceUsages: {
+    [key: string]: usageItem[];
+  };
+};
+
 export type GetFullPodUsageResponse = FullPodUsageItem[];
 
 export type BindOrganizationRequest = {
